@@ -1,11 +1,19 @@
 local composer = require( "composer" )
  
 local scene = composer.newScene()
+
+--some dimensions
+local height = display.actualContentHeight
+local width = display.actualContentWidth
+local centerX = display.contentCenterX
+local centerY = display.contentCenterY
  
 function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
+    local mainBackground = display.newImage("Images/sky_main.png",centerX,centerY)
+
  
 end
  
