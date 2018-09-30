@@ -16,7 +16,7 @@ function scene:create( event )
  
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local MainBackground = display.newImage("Images/sky_main.png", centerX, centerY)
+    local MainBackground = display.newImage("Images/Backgrounds/sky_main.png", centerX, centerY)
 
     local GameTitle = display.newText("Agile Grid", centerX, centerY-150, "BigBook-Heavy", 30)
     GameTitle: setFillColor(0.14, 0.19, 0.17)
