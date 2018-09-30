@@ -7,14 +7,23 @@ local height = display.actualContentHeight
 local width = display.actualContentWidth
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
+
+function TransitionToGameScene()
+    composer.gotoScene("game", { effect = "fade", time = 1000})
+end
  
 function scene:create( event )
  
-    local sceneGroup = self.view
+    local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local mainBackground = display.newImage("Images/sky_main.png",centerX,centerY)
+    local MainBackground = display.newImage("Images/sky_main.png", centerX, centerY)
 
- 
+    local GameTitle = display.newText("Agile Grid", centerX, centerY-150, "BigBook-Heavy", 30)
+    GameTitle: setFillColor(0.14, 0.19, 0.17)
+
+    --adding display elements to scene group
+    SceneGroup: insert(MainBackground)
+    SceneGroup: insert(GameTitle) 
 end
  
  
@@ -25,10 +34,12 @@ function scene:show( event )
     local phase = event.phase
  
     if ( phase == "will" ) then
-        -- Code here runs when the scene is still off screen (but is about to come on screen)
+        -- Code here runs when the scene is still off screen (but is about to come on screen
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+        Runtime:addEventListener("touch",TransitionToGameScene)
+
  
     end
 end

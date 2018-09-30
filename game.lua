@@ -2,7 +2,11 @@ local composer = require( "composer" )
  
 local scene = composer.newScene()
  
-
+--some dimensions
+local height = display.actualContentHeight
+local width = display.actualContentWidth
+local centerX = display.contentCenterX
+local centerY = display.contentCenterY
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -11,8 +15,12 @@ local scene = composer.newScene()
 
 function scene:create( event )
  
-    local sceneGroup = self.view
+    local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
+    local MainBackground = display.newImage("Images/sky_game.png", centerX, centerY)
+
+     --adding display elements to scene group
+    SceneGroup: insert(MainBackground)
  
 end
  
