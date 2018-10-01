@@ -11,41 +11,32 @@ local centerY = display.contentCenterY
 --scene garbage for objects that are not latched on to the scene
 local bin = {}
 
---global scene objects
-local Parallax_CloudPink_Small
-
+--global variables
+local ScrollParallaxObjects
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 function ParallaxScroll(object, options)
     --initialize options
     --the point where a parallax object starts and ends on the screen (ie. it ends when it wraps around)
-    local ObjectStart = { x = object.x, y = object.y } or options.start
-    local ObjectEnd = { x = centerX, y = 0} or options.exit
+    local ObjectStart = { x = centerX, y = centerY - 200 } or options.start
+    local ObjectEnd = { x = centerX, y = height} or options.exit
     -- the speed at which the parallax object's location updates in the scene (this is usually measured in pixels per frame in this case)
-    local Speed = 5 or options.speed
-    -- after the object hits its exit location we might not want to wrap right away, this is measured in milliseconds
-    local WrapDelay = 500 or options.wrapDelay
+    local Speed = 1 or options.speed
 
-    print( "Parallax object options: { ObjectStartX = " .. ObjectStart.x .. " ObjectStartY = " .. ObjectStart.y ..
-        " Speed = " .. Speed .. " WrapDelay = " .. WrapDelay)
+    --print( "Parallax object options: { ObjectStartX = " .. ObjectStart.x .. " ObjectStartY = " .. ObjectStart.y ..
+        --" Speed = " .. Speed .. " WrapDelay = " .. WrapDelay)
     
-    if (object.y >= ObjectEnd.y) then
+    if ( object.y <= ObjectEnd.y ) then
         object.y = object.y + Speed
     else
         if ( object ~= nil ) then
-            timer.performWithDelay( WrapDelay, function ()
-                print("parallax object wrap around delay listener was called")
-                object.x = ObjectStart.x
-                object.y = ObjectStart.y
-            end)
+            object.x = math.random(0, width)
+            object.y = ObjectStart.y
         end
     end  
 end
 
-function ParallaxScrollTrigger()
-    ParallaxScroll(Parallax_CloudPink_Small)
-end
 
 function scene:create( event )
  
@@ -62,13 +53,23 @@ function scene:show( event )
  
     local sceneGroup = self.view
     local phase = event.phase
+    --parallax scroll objects
+    local Parallax_PinkCloud_Small = display.newImage("Images/Parallax/cloud_pink_small.png", centerX, 0)
+    local Parallax_GreyCloud_Small = display.newImage("Images/Parallax/cloud_grey_small.png", centerX - 100, 0)
+
+    ScrollParallaxObjects =  function ()
+        ParallaxScroll(Parallax_PinkCloud_Small, { start = {y = -10}})
+        ParallaxScroll(Parallax_GreyCloud_Small, { start = {y = 0}})
+    end
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+        Runtime: addEventListener("enterFrame", ScrollParallaxObjects)
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
     end 
+    sceneGroup: insert(Parallax_PinkCloud_Small)
 end
 
  
@@ -84,7 +85,7 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
- 
+        Runtime: removeEventListener("enterFrame", ScrollParallaxObjects)
     end
 end
  
