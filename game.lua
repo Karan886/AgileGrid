@@ -13,10 +13,20 @@ local width = display.contentWidth
 local height = display.contentHeight
 
 --scene garbage for objects that are not latched on to the scene
-local bin = {}
+local bin = { 
+  grids = {}
+}
 
 --global variables
 local ScrollParallaxObjects
+
+--physics setup
+local physics = require "physics"
+--physics.start()
+
+-- glabal timer variables
+local gridSpawnTimer
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -43,8 +53,12 @@ end
 
 function createGridGroup(grid)
    local gridGroup = display.newGroup()
+   gridGroup.size = grid.size
+
    local gridXPos = (width - (grid.size * grid.blockSize + grid.size * grid.offsetX) / 2) - centerX
    local gridYPos = (height - (grid.size * grid.blockSize + grid.size * grid.offsetY) / 2) - centerY
+
+   local numOfBlocks = 0
 
   for i=1,grid.size do
     for j=1,grid.size do
@@ -52,6 +66,10 @@ function createGridGroup(grid)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
 
+        numOfBlocks = numOfBlocks + 1
+        block.id = numOfBlocks
+        
+        block:addEventListener("touch", blockSwipe)
         print("spawned block: "..block.x.." , "..block.y)
         gridGroup:insert(block)            
     end
@@ -60,13 +78,26 @@ function createGridGroup(grid)
   return gridGroup
 end
 
+function blockSwipe(event)
+   local parentGroup = event.target.parent
+   print(parentGroup[event.target.id].id)
+end
+
 function spawnGrid()
-   bin[#bin + 1] = createGridGroup({
+   local gridsTable = bin.grids
+   local grid_group = createGridGroup({
       size = 3,
       blockSize = 30,
       offsetX = 5,
       offsetY = 5
     })
+ 
+   grid_group.isABlockSelected = false
+   grid_group.id = #gridsTable
+
+   physics.addBody(grid_group)
+   gridsTable[#gridsTable + 1] = grid_group
+   
 end
 
 
@@ -75,7 +106,6 @@ function scene:create( event )
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
-
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
  
@@ -88,10 +118,11 @@ function scene:show( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
- 
+        gridSpawnTimer = timer.performWithDelay(500, spawnGrid, 1)
+
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        spawnGrid()
+       
     end 
 end
 
@@ -104,6 +135,7 @@ function scene:hide( event )
         -- Code here runs when the scene is on screen (but is about to go off screen)
  
     elseif ( phase == "did" ) then
+        timer.cancel(gridSpawnTimer)
 
     end
 end
