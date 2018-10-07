@@ -23,6 +23,7 @@ local ScrollParallaxObjects
 --physics setup
 local physics = require "physics"
 --physics.start()
+--physics.setGravity(0, 0.3)
 
 -- glabal timer variables
 local gridSpawnTimer
@@ -68,9 +69,9 @@ function createGridGroup(grid)
 
         numOfBlocks = numOfBlocks + 1
         block.id = numOfBlocks
+        block.isFocus = false
         
         block:addEventListener("touch", blockSwipe)
-        print("spawned block: "..block.x.." , "..block.y)
         gridGroup:insert(block)            
     end
   end
@@ -80,7 +81,22 @@ end
 
 function blockSwipe(event)
    local parentGroup = event.target.parent
-   print(parentGroup[event.target.id].id)
+   --print("groupID: "..parentGroup.id.." blockID: "..parentGroup[event.target.id].id)
+
+   if (event.phase == "began") then
+    
+     event.target.isFocus = true
+   elseif (event.target.isFocus) then
+     if (event.phase == "moved") then
+
+         print("blockID: "..event.target.id.." is being moved")
+     elseif (event.phase == "ended" or event.phase == "cancelled") then
+
+         event.target.isFocus = false
+
+     end
+   end
+   return true
 end
 
 function spawnGrid()
@@ -118,7 +134,7 @@ function scene:show( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        gridSpawnTimer = timer.performWithDelay(500, spawnGrid, 1)
+        gridSpawnTimer = timer.performWithDelay(2000, spawnGrid, 1)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
