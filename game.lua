@@ -53,14 +53,6 @@ function scene:show( event )
  
     local sceneGroup = self.view
     local phase = event.phase
-    --parallax scroll objects
-    local Parallax_PinkCloud_Small = display.newImage("Images/Parallax/cloud_pink_small.png", centerX, 0)
-    local Parallax_GreyCloud_Small = display.newImage("Images/Parallax/cloud_grey_small.png", centerX - 100, 0)
-
-    ScrollParallaxObjects =  function ()
-        ParallaxScroll(Parallax_PinkCloud_Small, { start = {y = -10}})
-        ParallaxScroll(Parallax_GreyCloud_Small, { start = {y = 0}})
-    end
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
@@ -69,7 +61,6 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
     end 
-    sceneGroup: insert(Parallax_PinkCloud_Small)
 end
 
 function scene:hide( event )
@@ -81,8 +72,7 @@ function scene:hide( event )
         -- Code here runs when the scene is on screen (but is about to go off screen)
  
     elseif ( phase == "did" ) then
-        -- Code here runs immediately after the scene goes entirely off screen
-        Runtime: removeEventListener("enterFrame", ScrollParallaxObjects)
+
     end
 end
  
