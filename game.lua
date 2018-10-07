@@ -72,9 +72,6 @@ function scene:show( event )
     sceneGroup: insert(Parallax_PinkCloud_Small)
 end
 
- 
- 
-
 function scene:hide( event )
  
     local sceneGroup = self.view
