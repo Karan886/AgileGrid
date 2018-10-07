@@ -41,8 +41,8 @@ function ParallaxScroll(object, options)
     end  
 end
 
-function createGrid(grid)
-
+function createGridGroup(grid)
+   local gridGroup = display.newGroup()
    local gridXPos = (width - (grid.size * grid.blockSize + grid.size * grid.offsetX) / 2) - centerX
    local gridYPos = (height - (grid.size * grid.blockSize + grid.size * grid.offsetY) / 2) - centerY
 
@@ -52,13 +52,16 @@ function createGrid(grid)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
 
-        print("spawned block: "..block.x.." , "..block.y)              
+        print("spawned block: "..block.x.." , "..block.y)
+        gridGroup:insert(block)            
     end
   end
+
+  return gridGroup
 end
 
 function spawnGrid()
-   createGrid({
+   bin[#bin + 1] = createGridGroup({
       size = 3,
       blockSize = 30,
       offsetX = 5,
