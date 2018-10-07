@@ -12,6 +12,7 @@ local centerY = display.contentCenterY
 local width = display.contentWidth
 local height = display.contentHeight
 
+
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
   grids = {}
@@ -19,6 +20,7 @@ local bin = {
 
 --global variables
 local ScrollParallaxObjects
+local debugText
 
 --physics setup
 local physics = require "physics"
@@ -79,21 +81,54 @@ function createGridGroup(grid)
   return gridGroup
 end
 
+function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
+  if (math.abs(horizontalMagnitude) > math.abs(verticalMagnitude)) then
+    return "HORIZONTAL"
+  end
+  return "VERTICAL"
+end
+
+
+
 function blockSwipe(event)
    local parentGroup = event.target.parent
    --print("groupID: "..parentGroup.id.." blockID: "..parentGroup[event.target.id].id)
 
    if (event.phase == "began") then
-    
+
      event.target.isFocus = true
    elseif (event.target.isFocus) then
      if (event.phase == "moved") then
 
          print("blockID: "..event.target.id.." is being moved")
+
+         local horizontalSwipeMagnitude = event.x - event.xStart
+         local verticalSwipeMagnitude = event.y - event.yStart
+
+         local swipeDirection = getDominant_Swipe_Direction(horizontalSwipeMagnitude, verticalSwipeMagnitude)
+         
+         if (swipeDirection == "HORIZONTAL") then
+             if (horizontalSwipeMagnitude < 0) then
+                 print "SWIPED LEFT"
+                 debugText.text = "SWIPED LEFT"
+             elseif (horizontalSwipeMagnitude > 0) then
+                 print "SWIPE RIGHT"
+                 debugText.text = "SWIPED RIGHT"
+             end
+         elseif (swipeDirection == "VERTICAL") then
+             if (verticalSwipeMagnitude < 0) then
+                 print "SWIPED UP"
+                 debugText.text = "SWIPED UP"
+             elseif (verticalSwipeMagnitude > 0) then
+                 print "SWIPE DOWN"
+                 debugText.text = "SWIPED DOWN"
+             end
+         end
+
+
      elseif (event.phase == "ended" or event.phase == "cancelled") then
 
-         event.target.isFocus = false
-
+         event.target.isFocus = false      
      end
    end
    return true
@@ -122,8 +157,11 @@ function scene:create( event )
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
+    debugText = display.newText("SWIPE DIRECTION", centerX, centerY - 100, system.nativeFont, 16)
+    debugText: setFillColor(0,0,0)
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
+    SceneGroup: insert(debugText)
  
 end
  
