@@ -122,6 +122,7 @@ end
 
 function swapBlocks(blockA, blockB)
   local parentGroup = blockA.parent
+  print("swapping block: "..blockA.id.." with "..blockB.id)
   --collect temp variables
   local tempIDA = blockA.id
   local tempIDB = blockB.id
@@ -129,13 +130,16 @@ function swapBlocks(blockA, blockB)
   blockA.id = blockB.id
   blockB.id = tempIDA
   -- swap its location in the group
-  parentGroup: insert(tempIDB, blockA)
-  parentGroup: insert(tempIDA, blockB)
+  parentGroup: insert(blockA.id, blockA)
+  parentGroup: insert(blockB.id, blockB)
+
+  for i=1,(parentGroup.size * parentGroup.size) do
+    print("id: "..parentGroup[i].id)
+  end
 end
 
 function blockSwipe(event)
    local parentGroup = event.target.parent
-   --print("groupID: "..parentGroup.id.." blockID: "..parentGroup[event.target.id].id)
 
    if (event.phase == "began") then
 
@@ -144,7 +148,7 @@ function blockSwipe(event)
    elseif (event.target.isFocus) then
      if (event.phase == "moved") then
 
-         print("blockID: "..event.target.id.." is being moved")
+         --print("blockID: "..event.target.id.." is being moved")
 
 
 
@@ -158,7 +162,7 @@ function blockSwipe(event)
          
          if (swipeDirection == "HORIZONTAL") then
              if (horizontalSwipeMagnitude < 0) then
-                 print "SWIPED LEFT"
+                 --print "SWIPED LEFT"
                  swipeStatusText.text = "SWIPED LEFT"
 
                  if (isBlockOnLeftEdge(event.target) == false) then
@@ -173,29 +177,35 @@ function blockSwipe(event)
                  end
 
              elseif (horizontalSwipeMagnitude > 0) then
-                 print "SWIPE RIGHT"
+                 --print "SWIPE RIGHT"
                  swipeStatusText.text = "SWIPED RIGHT"
 
-                 if (isBlockOnRightEdge(event.target)) then
-                     print "RIGHT EDGE DETECTED"
-                     debugEdgeBlocksText.text = "RIGHT EDGE DETECTED"
+                 if (isBlockOnRightEdge(event.target) == false) then
+                    local rightBlock = parentGroup[event.target.id + parentGroup.size]
+                    local rightBlockX = rightBlock.x
+                    local rightBlockY = rightBlock.y
+
+                    transition.to(rightBlock, { time = 300, x = event.target.x, y = event.target.y})
+                    transition.to(event.target, { time = 300, x = rightBlockX, y = rightBlockY})
+
+                    swapBlocks(event.target, rightBlock) 
                  end
              end
          elseif (swipeDirection == "VERTICAL") then
              if (verticalSwipeMagnitude < 0) then
-                 print "SWIPED UP"
+                 --print "SWIPED UP"
                  swipeStatusText.text = "SWIPED UP"
 
                  if (isBlockOnUpperEdge(event.target)) then
-                     print "UPPER EDGE DETECTED"
+                     --print "UPPER EDGE DETECTED"
                      debugEdgeBlocksText.text = "UPPER EDGE DETECTED"
                  end
              elseif (verticalSwipeMagnitude > 0) then
-                 print "SWIPE DOWN"
+                 --print "SWIPE DOWN"
                  swipeStatusText.text = "SWIPED DOWN"
 
                  if (isBlockOnBottomEdge(event.target)) then
-                     print "BOTTOM EDGE DETECTED"
+                     --print "BOTTOM EDGE DETECTED"
                      debugEdgeBlocksText.text = "BOTTOM EDGE DETECTED"
                  end
              end
