@@ -20,7 +20,8 @@ local bin = {
 
 --global variables
 local ScrollParallaxObjects
-local debugText
+local swipeStatusText
+local debugEdgeBlocksText
 
 --physics setup
 local physics = require "physics"
@@ -81,13 +82,20 @@ function createGridGroup(grid)
   return gridGroup
 end
 
+function isBlockOnRightEdge(block)
+    local parentGroup = block.parent
+    local gridSize = parentGroup.size
+    local totalGridSize = gridSize * gridSize
+
+    return (block.id >= (totalGridSize - gridSize))
+end
+
 function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
   if (math.abs(horizontalMagnitude) > math.abs(verticalMagnitude)) then
     return "HORIZONTAL"
   end
   return "VERTICAL"
 end
-
 
 
 function blockSwipe(event)
@@ -97,6 +105,7 @@ function blockSwipe(event)
    if (event.phase == "began") then
 
      event.target.isFocus = true
+     display.getCurrentStage():setFocus(event.target)
    elseif (event.target.isFocus) then
      if (event.phase == "moved") then
 
@@ -110,25 +119,33 @@ function blockSwipe(event)
          if (swipeDirection == "HORIZONTAL") then
              if (horizontalSwipeMagnitude < 0) then
                  print "SWIPED LEFT"
-                 debugText.text = "SWIPED LEFT"
+                 swipeStatusText.text = "SWIPED LEFT"
              elseif (horizontalSwipeMagnitude > 0) then
                  print "SWIPE RIGHT"
-                 debugText.text = "SWIPED RIGHT"
+                 swipeStatusText.text = "SWIPED RIGHT"
+                 
+                 if (isBlockOnRightEdge(event.target)) then
+                     print "Right Edge"
+                     debugEdgeBlocksText.text = "RIGHT EDGE"
+                 end
              end
          elseif (swipeDirection == "VERTICAL") then
              if (verticalSwipeMagnitude < 0) then
                  print "SWIPED UP"
-                 debugText.text = "SWIPED UP"
+                 swipeStatusText.text = "SWIPED UP"
              elseif (verticalSwipeMagnitude > 0) then
                  print "SWIPE DOWN"
-                 debugText.text = "SWIPED DOWN"
+                 swipeStatusText.text = "SWIPED DOWN"
              end
          end
 
 
      elseif (event.phase == "ended" or event.phase == "cancelled") then
 
-         event.target.isFocus = false      
+         event.target.isFocus = false 
+         display.getCurrentStage():setFocus(nil) 
+         swipeStatusText.text = "SWIPE STATUS"
+         debugEdgeBlocksText.text = "NO EDGE DETECTED"    
      end
    end
    return true
@@ -138,7 +155,7 @@ function spawnGrid()
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
       size = 3,
-      blockSize = 30,
+      blockSize = 40,
       offsetX = 5,
       offsetY = 5
     })
@@ -157,11 +174,15 @@ function scene:create( event )
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
-    debugText = display.newText("SWIPE DIRECTION", centerX, centerY - 100, system.nativeFont, 16)
-    debugText: setFillColor(0,0,0)
+    swipeStatusText = display.newText("SWIPE DIRECTION", centerX, centerY - 100, system.nativeFont, 16)
+    swipeStatusText: setFillColor(0,0,0)
+
+    debugEdgeBlocksText = display.newText("NO EDGE DETECTED", centerX, centerY + 100, system.nativeFont, 16)
+    debugEdgeBlocksText: setFillColor(0,0,0)
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
-    SceneGroup: insert(debugText)
+    SceneGroup: insert(swipeStatusText)
+    SceneGroup: insert(debugEdgeBlocksText)
  
 end
  
