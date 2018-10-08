@@ -20,6 +20,7 @@ local bin = {
 
 --global variables
 local ScrollParallaxObjects
+--debug variables
 local swipeStatusText
 local debugEdgeBlocksText
 
@@ -30,6 +31,7 @@ local physics = require "physics"
 
 -- glabal timer variables
 local gridSpawnTimer
+
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -87,7 +89,28 @@ function isBlockOnRightEdge(block)
     local gridSize = parentGroup.size
     local totalGridSize = gridSize * gridSize
 
-    return (block.id >= (totalGridSize - gridSize))
+    return (block.id > (totalGridSize - gridSize))
+end
+
+function isBlockOnLeftEdge(block)
+  local parentGroup = block.parent
+  local gridSize = parentGroup.size
+
+  return (block.id <= parentGroup.size)
+end
+
+function isBlockOnUpperEdge(block)
+  local parentGroup = block.parent
+  local gridSize = parentGroup.size
+
+  return (((block.id - 1) % gridSize) == 0)
+end
+
+function isBlockOnBottomEdge(block)
+  local parentGroup = block.parent
+  local gridSize = parentGroup.size
+
+  return ((block.id % gridSize) == 0)
 end
 
 function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
@@ -96,7 +119,6 @@ function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
   end
   return "VERTICAL"
 end
-
 
 function blockSwipe(event)
    local parentGroup = event.target.parent
@@ -120,22 +142,37 @@ function blockSwipe(event)
              if (horizontalSwipeMagnitude < 0) then
                  print "SWIPED LEFT"
                  swipeStatusText.text = "SWIPED LEFT"
+
+                 if (isBlockOnLeftEdge(event.target)) then
+                    print "LEFT EDGE DETECTED"
+                    debugEdgeBlocksText.text = "LEFT EDGE DETECTED"
+                 end
              elseif (horizontalSwipeMagnitude > 0) then
                  print "SWIPE RIGHT"
                  swipeStatusText.text = "SWIPED RIGHT"
-                 
+
                  if (isBlockOnRightEdge(event.target)) then
-                     print "Right Edge"
-                     debugEdgeBlocksText.text = "RIGHT EDGE"
+                     print "RIGHT EDGE DETECTED"
+                     debugEdgeBlocksText.text = "RIGHT EDGE DETECTED"
                  end
              end
          elseif (swipeDirection == "VERTICAL") then
              if (verticalSwipeMagnitude < 0) then
                  print "SWIPED UP"
                  swipeStatusText.text = "SWIPED UP"
+
+                 if (isBlockOnUpperEdge(event.target)) then
+                     print "UPPER EDGE DETECTED"
+                     debugEdgeBlocksText.text = "UPPER EDGE DETECTED"
+                 end
              elseif (verticalSwipeMagnitude > 0) then
                  print "SWIPE DOWN"
                  swipeStatusText.text = "SWIPED DOWN"
+
+                 if (isBlockOnBottomEdge(event.target)) then
+                     print "BOTTOM EDGE DETECTED"
+                     debugEdgeBlocksText.text = "BOTTOM EDGE DETECTED"
+                 end
              end
          end
 
@@ -144,7 +181,7 @@ function blockSwipe(event)
 
          event.target.isFocus = false 
          display.getCurrentStage():setFocus(nil) 
-         swipeStatusText.text = "SWIPE STATUS"
+
          debugEdgeBlocksText.text = "NO EDGE DETECTED"    
      end
    end
@@ -154,7 +191,7 @@ end
 function spawnGrid()
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
-      size = 3,
+      size = 4,
       blockSize = 40,
       offsetX = 5,
       offsetY = 5
@@ -174,10 +211,10 @@ function scene:create( event )
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
-    swipeStatusText = display.newText("SWIPE DIRECTION", centerX, centerY - 100, system.nativeFont, 16)
+    swipeStatusText = display.newText("SWIPE DIRECTION", centerX-100, centerY - (centerY+10), system.nativeFont, 16)
     swipeStatusText: setFillColor(0,0,0)
 
-    debugEdgeBlocksText = display.newText("NO EDGE DETECTED", centerX, centerY + 100, system.nativeFont, 16)
+    debugEdgeBlocksText = display.newText("NO EDGE DETECTED", centerX+100, centerY - (centerY+10), system.nativeFont, 16)
     debugEdgeBlocksText: setFillColor(0,0,0)
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
