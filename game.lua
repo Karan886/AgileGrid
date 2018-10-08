@@ -59,12 +59,13 @@ end
 
 function createGridGroup(grid)
    local gridGroup = display.newGroup()
+   local slotContainer = {}
+
    gridGroup.size = grid.size
 
    local gridXPos = (width - (grid.size * grid.blockSize + grid.size * grid.offsetX) / 2) - centerX
    local gridYPos = (height - (grid.size * grid.blockSize + grid.size * grid.offsetY) / 2) - centerY
 
-   local numOfBlocks = 0
 
   for i=1,grid.size do
     for j=1,grid.size do
@@ -72,15 +73,18 @@ function createGridGroup(grid)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
 
-        numOfBlocks = numOfBlocks + 1
-        block.id = numOfBlocks
+        block.id = #slotContainer + 1
         block.isFocus = false
         
         block:addEventListener("touch", blockSwipe)
+        slotContainer[#slotContainer + 1] = block
         gridGroup:insert(block)            
     end
   end
 
+  local slotContainers = bin.slotContainers
+  gridGroup.slotContainer = slotContainer
+  
   return gridGroup
 end
 
@@ -121,21 +125,7 @@ function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
 end
 
 function swapBlocks(blockA, blockB)
-  local parentGroup = blockA.parent
-  print("swapping block: "..blockA.id.." with "..blockB.id)
-  --collect temp variables
-  local tempIDA = blockA.id
-  local tempIDB = blockB.id
-  --swap block ids
-  blockA.id = blockB.id
-  blockB.id = tempIDA
-  -- swap its location in the group
-  parentGroup: insert(blockA.id, blockA)
-  parentGroup: insert(blockB.id, blockB)
-
-  for i=1,(parentGroup.size * parentGroup.size) do
-    print("id: "..parentGroup[i].id)
-  end
+  
 end
 
 function blockSwipe(event)
@@ -148,15 +138,13 @@ function blockSwipe(event)
    elseif (event.target.isFocus) then
      if (event.phase == "moved") then
 
-         --print("blockID: "..event.target.id.." is being moved")
-
-
-
-
      elseif (event.phase == "ended" or event.phase == "cancelled") then
 
         local horizontalSwipeMagnitude = event.x - event.xStart
         local verticalSwipeMagnitude = event.y - event.yStart
+
+        local parentGroup = event.target.parent
+        local slotContainer = parentGroup.slotContainer
 
          local swipeDirection = getDominant_Swipe_Direction(horizontalSwipeMagnitude, verticalSwipeMagnitude)
          
@@ -164,50 +152,48 @@ function blockSwipe(event)
              if (horizontalSwipeMagnitude < 0) then
                  --print "SWIPED LEFT"
                  swipeStatusText.text = "SWIPED LEFT"
-
-                 if (isBlockOnLeftEdge(event.target) == false) then
-                    local leftBlock = parentGroup[event.target.id - parentGroup.size]
-                    local leftBlockX = leftBlock.x
-                    local leftBlockY = leftBlock.y
-
-                    transition.to(leftBlock, { time = 300, x = event.target.x, y = event.target.y})
-                    transition.to(event.target, { time = 300, x = leftBlockX, y = leftBlockY})
-
-                    swapBlocks(leftBlock, event.target)
+                 if (isBlockOnLeftEdge(event.target)) then
+                     print "LEFT EDGE DETECTED"
+                     debugEdgeBlocksText.text = "LEFT EDGE DETECTED"
+                 elseif (slotContainer[event.target.id - parentGroup.size] == nil) then
+                     print "SWIPING TO NIL BLOCK"
+                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                  end
+                 
 
              elseif (horizontalSwipeMagnitude > 0) then
                  --print "SWIPE RIGHT"
                  swipeStatusText.text = "SWIPED RIGHT"
-
-                 if (isBlockOnRightEdge(event.target) == false) then
-                    local rightBlock = parentGroup[event.target.id + parentGroup.size]
-                    local rightBlockX = rightBlock.x
-                    local rightBlockY = rightBlock.y
-
-                    transition.to(rightBlock, { time = 300, x = event.target.x, y = event.target.y})
-                    transition.to(event.target, { time = 300, x = rightBlockX, y = rightBlockY})
-
-                    swapBlocks(event.target, rightBlock) 
+                 if (isBlockOnRightEdge(event.target)) then
+                     print "RIGHT EDGE DETECTED"
+                     debugEdgeBlocksText.text = "RIGHT EDGE DETECTED"
+                 elseif (slotContainer[event.target.id + parentGroup.size] == nil) then
+                     print "SWIPING TO NIL BLOCK"
+                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                  end
              end
          elseif (swipeDirection == "VERTICAL") then
              if (verticalSwipeMagnitude < 0) then
                  --print "SWIPED UP"
                  swipeStatusText.text = "SWIPED UP"
-
                  if (isBlockOnUpperEdge(event.target)) then
-                     --print "UPPER EDGE DETECTED"
+                     print "UPPER EDGE DETECTED"
                      debugEdgeBlocksText.text = "UPPER EDGE DETECTED"
+                 elseif (slotContainer[event.target.id - 1] == nil) then
+                     print "SWIPING TO NIL BLOCK"
+                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                  end
+
              elseif (verticalSwipeMagnitude > 0) then
                  --print "SWIPE DOWN"
                  swipeStatusText.text = "SWIPED DOWN"
-
                  if (isBlockOnBottomEdge(event.target)) then
-                     --print "BOTTOM EDGE DETECTED"
+                     print "BOTTOM EDGE DETECTED"
                      debugEdgeBlocksText.text = "BOTTOM EDGE DETECTED"
-                 end
+                 elseif (slotContainer[event.target.id + 1] == nil) then
+                     print "SWIPING TO NIL BLOCK"
+                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
+                 end                 
              end
          end
 
@@ -230,11 +216,11 @@ function spawnGrid()
     })
  
    grid_group.isABlockSelected = false
-   grid_group.id = #gridsTable
+   grid_group.id = #gridsTable + 1
 
    physics.addBody(grid_group)
    gridsTable[#gridsTable + 1] = grid_group
-   
+
 end
 
 
@@ -263,6 +249,8 @@ function scene:show( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         gridSpawnTimer = timer.performWithDelay(2000, spawnGrid, 1)
+        
+        
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
