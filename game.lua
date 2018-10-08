@@ -120,6 +120,19 @@ function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
   return "VERTICAL"
 end
 
+function swapBlocks(blockA, blockB)
+  local parentGroup = blockA.parent
+  --collect temp variables
+  local tempIDA = blockA.id
+  local tempIDB = blockB.id
+  --swap block ids
+  blockA.id = blockB.id
+  blockB.id = tempIDA
+  -- swap its location in the group
+  parentGroup: insert(tempIDB, blockA)
+  parentGroup: insert(tempIDA, blockB)
+end
+
 function blockSwipe(event)
    local parentGroup = event.target.parent
    --print("groupID: "..parentGroup.id.." blockID: "..parentGroup[event.target.id].id)
@@ -133,8 +146,13 @@ function blockSwipe(event)
 
          print("blockID: "..event.target.id.." is being moved")
 
-         local horizontalSwipeMagnitude = event.x - event.xStart
-         local verticalSwipeMagnitude = event.y - event.yStart
+
+
+
+     elseif (event.phase == "ended" or event.phase == "cancelled") then
+
+        local horizontalSwipeMagnitude = event.x - event.xStart
+        local verticalSwipeMagnitude = event.y - event.yStart
 
          local swipeDirection = getDominant_Swipe_Direction(horizontalSwipeMagnitude, verticalSwipeMagnitude)
          
@@ -143,10 +161,17 @@ function blockSwipe(event)
                  print "SWIPED LEFT"
                  swipeStatusText.text = "SWIPED LEFT"
 
-                 if (isBlockOnLeftEdge(event.target)) then
-                    print "LEFT EDGE DETECTED"
-                    debugEdgeBlocksText.text = "LEFT EDGE DETECTED"
+                 if (isBlockOnLeftEdge(event.target) == false) then
+                    local leftBlock = parentGroup[event.target.id - parentGroup.size]
+                    local leftBlockX = leftBlock.x
+                    local leftBlockY = leftBlock.y
+
+                    transition.to(leftBlock, { time = 300, x = event.target.x, y = event.target.y})
+                    transition.to(event.target, { time = 300, x = leftBlockX, y = leftBlockY})
+
+                    swapBlocks(leftBlock, event.target)
                  end
+
              elseif (horizontalSwipeMagnitude > 0) then
                  print "SWIPE RIGHT"
                  swipeStatusText.text = "SWIPED RIGHT"
@@ -175,9 +200,6 @@ function blockSwipe(event)
                  end
              end
          end
-
-
-     elseif (event.phase == "ended" or event.phase == "cancelled") then
 
          event.target.isFocus = false 
          display.getCurrentStage():setFocus(nil) 
