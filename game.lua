@@ -222,7 +222,7 @@ function blockSwipe(event)
                      moveBlockToEmptySpace(event.target, "LEFT")
                  else 
                      local leftBlock = slotContainer[event.target.id - parentGroup.size]
-                     print("LEFTBLOCK: "..leftBlock.id)
+                     print("Swiping with LEFTBLOCK: "..leftBlock.id)
                      swapBlocks(leftBlock, event.target)
                  end
                  
@@ -237,6 +237,10 @@ function blockSwipe(event)
                      print "SWIPING RIGHT TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "RIGHT")
+                 else 
+                    local rightBlock = slotContainer[event.target.id + parentGroup.size]
+                    print("Swiping with RIGHTBLOCK: "..rightBlock.id)
+                    swapBlocks(rightBlock, event.target)
                  end
              end
          elseif (swipeDirection == "VERTICAL") then
@@ -250,6 +254,10 @@ function blockSwipe(event)
                      print "SWIPING UP TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "UP")
+                 else
+                    local upperBlock = slotContainer[event.target.id - 1]
+                    print("Swiping with UPPERBLOCK: "..upperBlock.id)
+                    swapBlocks(upperBlock, event.target)          
                  end
 
              elseif (verticalSwipeMagnitude > 0) then
@@ -262,6 +270,10 @@ function blockSwipe(event)
                      print "SWIPING DOWN TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "DOWN")
+                  else
+                    local bottomBlock = slotContainer[event.target.id + 1]
+                    print("Swiping with BOTTOMBLOCK: "..bottomBlock.id)
+                    swapBlocks(bottomBlock, event.target)
                  end                 
              end
          end
@@ -278,7 +290,7 @@ end
 function spawnGrid()
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
-      size = 4,
+      size = 3,
       blockSize = 40,
       offsetX = 5,
       offsetY = 5
@@ -288,16 +300,6 @@ function spawnGrid()
 
    physics.addBody(grid_group)
    gridsTable[#gridsTable + 1] = grid_group
-
-   local grids = bin.grids
-   local grid = grids[1]
-   local slotContainer = grid.slotContainer
-   local child = slotContainer[2]
-
-   grid: remove(child)
-   display.remove(child)
-   slotContainer[child.id] = nil
-
 end
 
 
@@ -325,10 +327,8 @@ function scene:show( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        gridSpawnTimer = timer.performWithDelay(2000, spawnGrid, 1)
-        
-        
-
+        gridSpawnTimer = timer.performWithDelay(2000, spawnGrid, 2)
+            
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
        
