@@ -84,6 +84,9 @@ function createGridGroup(grid)
 
   local slotContainers = bin.slotContainers
   gridGroup.slotContainer = slotContainer
+  gridGroup.offsetX = grid.offsetX
+  gridGroup.offsetY = grid.offsetY
+  gridGroup.blockSize = grid.blockSize
   
   return gridGroup
 end
@@ -125,11 +128,69 @@ function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
 end
 
 function swapBlocks(blockA, blockB)
+  local grids = bin.grids
+  local parentGroupID = blockA.parent.id
+  local slotContainer = grids[parentGroupID].slotContainer
+
+  local blockAID = blockA.id
+  local blockBID = blockB.id
+
+  blockA.id = blockBID
+  blockB.id = blockAID
+
+  slotContainer[blockAID] = blockB
+  slotContainer[blockBID] = blockA
+
+  transition.to(blockA, { time = 300, x = blockB.x, y = blockB.y })
+  transition.to(blockB, { time = 300, x = blockA.x, y = blockA.y })
+
+end
+
+function moveBlockToEmptySpace(block, direction)
+  local newID
+  local newX
+  local newY
   
+  local parentGroup = block.parent
+  local slotContainer = parentGroup.slotContainer
+  if (direction == "LEFT") then
+      print "MOVING BLOCK LEFT TO EMPTY SPACE"
+      newID = block.id - parentGroup.size
+      newX = block.x - (parentGroup.blockSize + parentGroup.offsetX)
+      newY = block.y
+
+  elseif (direction == "RIGHT") then
+      print "MOVING BLOCK RIGHT TO EMPTY SPACE"
+      newID = block.id + parentGroup.size
+      newX = block.x + (parentGroup.blockSize + parentGroup.offsetX)
+      newY = block.y
+
+  elseif (direction == "UP") then
+      print "MOVING BLOCK UP TO EMPTY SPACE"
+      newID = block.id - 1
+      newX = block.x
+      newY = block.y - (parentGroup.blockSize + parentGroup.offsetY)
+
+  elseif (direction == "DOWN") then
+      print "MOVING BLOCK DOWN TO EMPTY SPACE"
+      newID = block.id + 1
+      newX = block.x
+      newY = block.y + (parentGroup.blockSize + parentGroup.offsetY)
+  end
+
+  if (newID ~= nil) then
+      print "NEWID is not null"
+      slotContainer[newID] = block
+      slotContainer[block.id] = nil
+      block.id = newID
+      
+      transition.to( block, { time = 300, x = newX, y = newY })
+  end
 end
 
 function blockSwipe(event)
    local parentGroup = event.target.parent
+    local slotContainer = parentGroup.slotContainer
 
    if (event.phase == "began") then
 
@@ -143,8 +204,7 @@ function blockSwipe(event)
         local horizontalSwipeMagnitude = event.x - event.xStart
         local verticalSwipeMagnitude = event.y - event.yStart
 
-        local parentGroup = event.target.parent
-        local slotContainer = parentGroup.slotContainer
+       
 
          local swipeDirection = getDominant_Swipe_Direction(horizontalSwipeMagnitude, verticalSwipeMagnitude)
          
@@ -153,11 +213,17 @@ function blockSwipe(event)
                  --print "SWIPED LEFT"
                  swipeStatusText.text = "SWIPED LEFT"
                  if (isBlockOnLeftEdge(event.target)) then
-                     print "LEFT EDGE DETECTED"
                      debugEdgeBlocksText.text = "LEFT EDGE DETECTED"
+                     print "SELECTED BLOCK IS ON THE LEFT EDGE"
+
                  elseif (slotContainer[event.target.id - parentGroup.size] == nil) then
-                     print "SWIPING TO NIL BLOCK"
+                     print "SWIPING LEFT TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
+                     moveBlockToEmptySpace(event.target, "LEFT")
+                 else 
+                     local leftBlock = slotContainer[event.target.id - parentGroup.size]
+                     print("LEFTBLOCK: "..leftBlock.id)
+                     swapBlocks(leftBlock, event.target)
                  end
                  
 
@@ -168,8 +234,9 @@ function blockSwipe(event)
                      print "RIGHT EDGE DETECTED"
                      debugEdgeBlocksText.text = "RIGHT EDGE DETECTED"
                  elseif (slotContainer[event.target.id + parentGroup.size] == nil) then
-                     print "SWIPING TO NIL BLOCK"
+                     print "SWIPING RIGHT TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
+                     moveBlockToEmptySpace(event.target, "RIGHT")
                  end
              end
          elseif (swipeDirection == "VERTICAL") then
@@ -180,19 +247,21 @@ function blockSwipe(event)
                      print "UPPER EDGE DETECTED"
                      debugEdgeBlocksText.text = "UPPER EDGE DETECTED"
                  elseif (slotContainer[event.target.id - 1] == nil) then
-                     print "SWIPING TO NIL BLOCK"
+                     print "SWIPING UP TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
+                     moveBlockToEmptySpace(event.target, "UP")
                  end
 
              elseif (verticalSwipeMagnitude > 0) then
-                 --print "SWIPE DOWN"
+                 print "SWIPE DOWN"
                  swipeStatusText.text = "SWIPED DOWN"
                  if (isBlockOnBottomEdge(event.target)) then
                      print "BOTTOM EDGE DETECTED"
                      debugEdgeBlocksText.text = "BOTTOM EDGE DETECTED"
                  elseif (slotContainer[event.target.id + 1] == nil) then
-                     print "SWIPING TO NIL BLOCK"
+                     print "SWIPING DOWN TO NIL BLOCK"
                      debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
+                     moveBlockToEmptySpace(event.target, "DOWN")
                  end                 
              end
          end
@@ -215,11 +284,19 @@ function spawnGrid()
       offsetY = 5
     })
  
-   grid_group.isABlockSelected = false
    grid_group.id = #gridsTable + 1
 
    physics.addBody(grid_group)
    gridsTable[#gridsTable + 1] = grid_group
+
+   local grids = bin.grids
+   local grid = grids[1]
+   local slotContainer = grid.slotContainer
+   local child = slotContainer[2]
+
+   grid: remove(child)
+   display.remove(child)
+   slotContainer[child.id] = nil
 
 end
 
