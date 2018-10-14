@@ -12,6 +12,8 @@ local centerY = display.contentCenterY
 local width = display.contentWidth
 local height = display.contentHeight
 
+local upperBoundary
+
 
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
@@ -26,8 +28,9 @@ local debugEdgeBlocksText
 
 --physics setup
 local physics = require "physics"
---physics.start()
---physics.setGravity(0, 0.3)
+physics.start()
+physics.setGravity(0, -0.1)
+physics.setDrawMode("hybrid")
 
 -- glabal timer variables
 local gridSpawnTimer
@@ -36,6 +39,19 @@ local gridSpawnTimer
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
+
+--clean up helper functions
+function removeGridFromGlobalTable(id)
+   local globalTable = bin.grids
+   local gridToRemove = bin.grids[id]
+
+   if (gridToRemove ~= nil) then
+       print "Grid exists, removing now..."
+       table.remove(globalTable, id)
+       print "Grid is successfully removed"
+   end
+end
+
 function ParallaxScroll(object, options)
     --initialize options
     --the point where a parallax object starts and ends on the screen (ie. it ends when it wraps around)
@@ -63,8 +79,11 @@ function createGridGroup(grid)
 
    gridGroup.size = grid.size
 
+   math.random(os.time())
+   local randomX = math.random(centerX - 100, centerX + 100)
+
    local gridXPos = (width - (grid.size * grid.blockSize + grid.size * grid.offsetX) / 2) - centerX
-   local gridYPos = (height - (grid.size * grid.blockSize + grid.size * grid.offsetY) / 2) - centerY
+   local gridYPos = (height - (grid.size * grid.blockSize + grid.size * grid.offsetY) / 2)  - centerY
 
 
   for i=1,grid.size do
@@ -82,6 +101,7 @@ function createGridGroup(grid)
     end
   end
 
+
   local slotContainers = bin.slotContainers
   gridGroup.slotContainer = slotContainer
   gridGroup.offsetX = grid.offsetX
@@ -91,7 +111,7 @@ function createGridGroup(grid)
   return gridGroup
 end
 
-function isBlockOnRightEdge(block)
+function isBlockOnRightEdge (block)
     local parentGroup = block.parent
     local gridSize = parentGroup.size
     local totalGridSize = gridSize * gridSize
@@ -99,7 +119,7 @@ function isBlockOnRightEdge(block)
     return (block.id > (totalGridSize - gridSize))
 end
 
-function isBlockOnLeftEdge(block)
+function isBlockOnLeftEdge (block)
   local parentGroup = block.parent
   local gridSize = parentGroup.size
 
@@ -141,8 +161,8 @@ function swapBlocks(blockA, blockB)
   slotContainer[blockAID] = blockB
   slotContainer[blockBID] = blockA
 
-  transition.to(blockA, { time = 300, x = blockB.x, y = blockB.y })
-  transition.to(blockB, { time = 300, x = blockA.x, y = blockA.y })
+  transition.to(blockA, { time = 500, x = blockB.x, y = blockB.y })
+  transition.to(blockB, { time = 500, x = blockA.x, y = blockA.y })
 
 end
 
@@ -288,26 +308,55 @@ function blockSwipe(event)
 end
 
 function spawnGrid()
+   math.randomseed(os.time())
+   local randomSize = (math.random(1,2)) * 3
+   local sizeofBlock = 30
+   local blockOffset = 5
+
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
-      size = 3,
-      blockSize = 40,
-      offsetX = 5,
-      offsetY = 5
+      size = randomSize,
+      blockSize = sizeofBlock,
+      offsetX = blockOffset,
+      offsetY = blockOffset
     })
+
+   
  
    grid_group.id = #gridsTable + 1
 
-   physics.addBody(grid_group)
+   --creating a custom physics shape since display groups behave differently when adding physics
+   local offsetCorrection = 1
+   local totalShapeSide = (sizeofBlock + blockOffset) * (randomSize - 1) + sizeofBlock + offsetCorrection
+
+   local leftCorner = { x = centerX - (totalShapeSide/2) - 2, y = centerY - (totalShapeSide/2) - 2}
+   local rightCorner = { x = leftCorner.x + totalShapeSide, y = leftCorner.y}
+   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeSide}
+   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeSide}
+
+   local gridPhysicsShape = {
+
+         leftCorner.x, leftCorner.y, 
+         rightCorner.x, rightCorner.y,
+         bottomRightCorner.x, bottomRightCorner.y,
+         bottomLeftCorner.x, bottomLeftCorner.y, 
+         leftCorner.x, leftCorner.y
+  }
+
+   physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape})
    gridsTable[#gridsTable + 1] = grid_group
 end
-
 
 function scene:create( event )
  
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
+     
+    upperBoundary = display.newRect(centerX, -35, width, 5)
+    upperBoundary: setFillColor(1,0,0,0.5)
+    physics.addBody(upperBoundary, "static")
+
     swipeStatusText = display.newText("SWIPE DIRECTION", centerX-100, centerY - (centerY+10), system.nativeFont, 16)
     swipeStatusText: setFillColor(0,0,0)
 
@@ -315,6 +364,7 @@ function scene:create( event )
     debugEdgeBlocksText: setFillColor(0,0,0)
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
+    SceneGroup: insert(upperBoundary)
     SceneGroup: insert(swipeStatusText)
     SceneGroup: insert(debugEdgeBlocksText)
  
@@ -327,7 +377,9 @@ function scene:show( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        gridSpawnTimer = timer.performWithDelay(2000, spawnGrid, 2)
+        --spawn the first grid then apply the delay
+        spawnGrid()
+        --gridSpawnTimer = timer.performWithDelay(10000, spawnGrid, 1)
             
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -356,7 +408,6 @@ function scene:destroy( event )
     -- Code here runs prior to the removal of scene's view
  
 end
- 
  
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
