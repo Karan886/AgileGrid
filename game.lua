@@ -13,6 +13,7 @@ local width = display.contentWidth
 local height = display.contentHeight
 
 local upperBoundary
+local lowerBoundary
 
 
 --scene garbage for objects that are not latched on to the scene
@@ -44,10 +45,12 @@ local gridSpawnTimer
 function removeGridFromGlobalTable(id)
    local globalTable = bin.grids
    local gridToRemove = bin.grids[id]
+   --print("Removing grid with id: "..gridToRemove.id)
 
    if (gridToRemove ~= nil) then
        print "Grid exists, removing now..."
        table.remove(globalTable, id)
+       display.remove(gridToRemove)
        print "Grid is successfully removed"
    end
 end
@@ -78,12 +81,10 @@ function createGridGroup(grid)
    local slotContainer = {}
 
    gridGroup.size = grid.size
+   
 
-   math.random(os.time())
-   local randomX = math.random(centerX - 100, centerX + 100)
-
-   local gridXPos = (width - (grid.size * grid.blockSize + grid.size * grid.offsetX) / 2) - centerX
-   local gridYPos = (height - (grid.size * grid.blockSize + grid.size * grid.offsetY) / 2)  - centerY
+   local gridXPos = grid.xPos
+   local gridYPos = grid.yPos
 
 
   for i=1,grid.size do
@@ -111,6 +112,15 @@ function createGridGroup(grid)
   return gridGroup
 end
 
+function onUpperSensorCollide(event)
+  print("Collision occured with upper sensor")
+  if (event.other.name == "GridContainer") then
+      print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
+      removeGridFromGlobalTable(event.other.id)
+      local grid = bin.grids
+      print("grids: "..#grid)
+  end
+end
 function isBlockOnRightEdge (block)
     local parentGroup = block.parent
     local gridSize = parentGroup.size
@@ -310,29 +320,38 @@ end
 function spawnGrid()
    math.randomseed(os.time())
    local randomSize = (math.random(1,2)) * 3
+
    local sizeofBlock = 30
    local blockOffset = 5
+
+   local totalShapeSide = (sizeofBlock + blockOffset) * (randomSize - 1) + sizeofBlock
+   local trueGridCenter = centerX - (totalShapeSide/2) 
+   local randomX = math.random(trueGridCenter - (totalShapeSide/2), trueGridCenter + (totalShapeSide/2))
 
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
       size = randomSize,
       blockSize = sizeofBlock,
       offsetX = blockOffset,
-      offsetY = blockOffset
+      offsetY = blockOffset,
+      xPos = randomX,
+      yPos = height
     })
 
    
- 
+   grid_group.name = "GridContainer"
    grid_group.id = #gridsTable + 1
 
-   --creating a custom physics shape since display groups behave differently when adding physics
-   local offsetCorrection = 1
-   local totalShapeSide = (sizeofBlock + blockOffset) * (randomSize - 1) + sizeofBlock + offsetCorrection
+   local slotContainer = grid_group.slotContainer
 
-   local leftCorner = { x = centerX - (totalShapeSide/2) - 2, y = centerY - (totalShapeSide/2) - 2}
-   local rightCorner = { x = leftCorner.x + totalShapeSide, y = leftCorner.y}
-   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeSide}
-   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeSide}
+   --use the position of the top left block to position physics boundary
+   local firstBlockPosition = { x = slotContainer[1].x, y = slotContainer[1].y }
+
+   --creating a custom physics shape since display groups behave differently when adding physics
+   local leftCorner = { x = firstBlockPosition.x - (sizeofBlock/2), y = firstBlockPosition.y - (sizeofBlock/2) }
+   local rightCorner = { x = leftCorner.x + totalShapeSide, y = leftCorner.y }
+   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeSide }
+   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeSide }
 
    local gridPhysicsShape = {
 
@@ -357,6 +376,9 @@ function scene:create( event )
     upperBoundary: setFillColor(1,0,0,0.5)
     physics.addBody(upperBoundary, "static")
 
+    lowerBoundary = display.newRect(centerX, height, width, 5)
+    lowerBoundary: setFillColor(1,0,0,0.5)
+
     swipeStatusText = display.newText("SWIPE DIRECTION", centerX-100, centerY - (centerY+10), system.nativeFont, 16)
     swipeStatusText: setFillColor(0,0,0)
 
@@ -379,7 +401,8 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
         spawnGrid()
-        --gridSpawnTimer = timer.performWithDelay(10000, spawnGrid, 1)
+        gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
+        upperBoundary: addEventListener("collision", onUpperSensorCollide)
             
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
