@@ -52,6 +52,9 @@ function removeGridFromGlobalTable(id)
        table.remove(globalTable, id)
        display.remove(gridToRemove)
        print "Grid is successfully removed"
+       for i=1,#globalTable do
+         globalTable[i].id = i
+       end
    end
 end
 
