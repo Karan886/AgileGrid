@@ -31,7 +31,7 @@ local debugEdgeBlocksText
 local physics = require "physics"
 physics.start()
 physics.setGravity(0, -0.1)
-physics.setDrawMode("hybrid")
+--physics.setDrawMode("hybrid")
 
 -- glabal timer variables
 local gridSpawnTimer
@@ -45,7 +45,6 @@ local gridSpawnTimer
 function removeGridFromGlobalTable(id)
    local globalTable = bin.grids
    local gridToRemove = bin.grids[id]
-   --print("Removing grid with id: "..gridToRemove.id)
 
    if (gridToRemove ~= nil) then
        print "Grid exists, removing now..."
