@@ -127,8 +127,8 @@ function createGridGroup(grid)
    local gridYPos = grid.yPos
 
 
-  for i=1,(grid.size - 3) do
-    for j=1,(grid.size - 3) do
+  for i=1,grid.size do
+    for j=1,grid.size do
         local block = display.newRect(100, 100, grid.blockSize, grid.blockSize)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
@@ -143,7 +143,7 @@ function createGridGroup(grid)
   end
 
   assignRandomColorsToBlocks(slotContainer)
-  checkForMatch(slotContainer, gridGroup.size)
+  --checkForMatch(slotContainer, gridGroup.size)
 
   local slotContainers = bin.slotContainers
   gridGroup.slotContainer = slotContainer
