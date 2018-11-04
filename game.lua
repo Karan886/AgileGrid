@@ -75,6 +75,21 @@ function ParallaxScroll(object, options)
     end  
 end
 
+function checkForMatch(slotContainer, size)
+  for i = 1, size do
+    for j = 1, size do
+      local blockId = slotContainer[i].colorId
+      local secondBlockId = slotContainer[i + 1].colorId
+      local thirdBlockId = slotContainer[i + 2].colorId
+    
+      if ((blockId == secondBlockId) and (blockId == thirdBlockId)) then
+        print("block ID: "..blockId)
+        print("vertical Match was found at block number "..i)
+      end
+    end
+  end
+end
+
 function assignRandomColorsToBlocks(slotContainer)   
    local numOfColors = #slotContainer
    local colors = getColorMatrix(numOfColors)
@@ -87,6 +102,7 @@ function assignRandomColorsToBlocks(slotContainer)
 
     table.remove(colors, randomColorIndex)
     block:setFillColor(colorToAssign.red, colorToAssign.green, colorToAssign.blue)
+    block.colorId = colorToAssign.id
   end
 end
 
@@ -95,10 +111,11 @@ function getColorMatrix(numOfBlocks)
   local colorMatrix = {}
   --math.random() gives me a random number between 0 and 1
   for i = 1, (numOfBlocks / 3) do
+    local uniqueId = #colorMatrix
     local color = {math.random(), math.random(), math.random()}
-    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3]}
-    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3]}
-    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3]}
+    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3], id = uniqueId}
+    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3], id = uniqueId}
+    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3], id = uniqueId}
   end
   return colorMatrix
 end
@@ -129,6 +146,7 @@ function createGridGroup(grid)
   end
 
   assignRandomColorsToBlocks(slotContainer)
+  checkForMatch(slotContainer, gridGroup.size)
 
   local slotContainers = bin.slotContainers
   gridGroup.slotContainer = slotContainer
