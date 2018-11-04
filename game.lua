@@ -23,9 +23,6 @@ local bin = {
 
 --global variables
 local ScrollParallaxObjects
---debug variables
-local swipeStatusText
-local debugEdgeBlocksText
 
 --physics setup
 local physics = require "physics"
@@ -270,15 +267,11 @@ function blockSwipe(event)
          
          if (swipeDirection == "HORIZONTAL") then
              if (horizontalSwipeMagnitude < 0) then
-                 --print "SWIPED LEFT"
-                 swipeStatusText.text = "SWIPED LEFT"
                  if (isBlockOnLeftEdge(event.target)) then
-                     debugEdgeBlocksText.text = "LEFT EDGE DETECTED"
                      print "SELECTED BLOCK IS ON THE LEFT EDGE"
 
                  elseif (slotContainer[event.target.id - parentGroup.size] == nil) then
                      print "SWIPING LEFT TO NIL BLOCK"
-                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "LEFT")
                  else 
                      local leftBlock = slotContainer[event.target.id - parentGroup.size]
@@ -289,13 +282,10 @@ function blockSwipe(event)
 
              elseif (horizontalSwipeMagnitude > 0) then
                  --print "SWIPE RIGHT"
-                 swipeStatusText.text = "SWIPED RIGHT"
                  if (isBlockOnRightEdge(event.target)) then
                      print "RIGHT EDGE DETECTED"
-                     debugEdgeBlocksText.text = "RIGHT EDGE DETECTED"
                  elseif (slotContainer[event.target.id + parentGroup.size] == nil) then
                      print "SWIPING RIGHT TO NIL BLOCK"
-                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "RIGHT")
                  else 
                     local rightBlock = slotContainer[event.target.id + parentGroup.size]
@@ -305,14 +295,10 @@ function blockSwipe(event)
              end
          elseif (swipeDirection == "VERTICAL") then
              if (verticalSwipeMagnitude < 0) then
-                 --print "SWIPED UP"
-                 swipeStatusText.text = "SWIPED UP"
                  if (isBlockOnUpperEdge(event.target)) then
                      print "UPPER EDGE DETECTED"
-                     debugEdgeBlocksText.text = "UPPER EDGE DETECTED"
                  elseif (slotContainer[event.target.id - 1] == nil) then
                      print "SWIPING UP TO NIL BLOCK"
-                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "UP")
                  else
                     local upperBlock = slotContainer[event.target.id - 1]
@@ -321,14 +307,11 @@ function blockSwipe(event)
                  end
 
              elseif (verticalSwipeMagnitude > 0) then
-                 print "SWIPE DOWN"
-                 swipeStatusText.text = "SWIPED DOWN"
                  if (isBlockOnBottomEdge(event.target)) then
                      print "BOTTOM EDGE DETECTED"
                      debugEdgeBlocksText.text = "BOTTOM EDGE DETECTED"
                  elseif (slotContainer[event.target.id + 1] == nil) then
                      print "SWIPING DOWN TO NIL BLOCK"
-                     debugEdgeBlocksText.text = "SWIPING TO NIL BLOCK"
                      moveBlockToEmptySpace(event.target, "DOWN")
                   else
                     local bottomBlock = slotContainer[event.target.id + 1]
@@ -339,9 +322,7 @@ function blockSwipe(event)
          end
 
          event.target.isFocus = false 
-         display.getCurrentStage():setFocus(nil) 
-
-         debugEdgeBlocksText.text = "NO EDGE DETECTED"    
+         display.getCurrentStage():setFocus(nil)   
      end
    end
    return true
@@ -409,17 +390,9 @@ function scene:create( event )
     lowerBoundary = display.newRect(centerX, height, width, 5)
     lowerBoundary: setFillColor(1,0,0,0.5)
 
-    swipeStatusText = display.newText("SWIPE DIRECTION", centerX-100, centerY - (centerY+10), system.nativeFont, 16)
-    swipeStatusText: setFillColor(0,0,0)
-
-    debugEdgeBlocksText = display.newText("NO EDGE DETECTED", centerX+100, centerY - (centerY+10), system.nativeFont, 16)
-    debugEdgeBlocksText: setFillColor(0,0,0)
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
-    SceneGroup: insert(upperBoundary)
-    SceneGroup: insert(swipeStatusText)
-    SceneGroup: insert(debugEdgeBlocksText)
- 
+    SceneGroup: insert(upperBoundary) 
 end
  
 function scene:show( event )
