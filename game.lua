@@ -15,6 +15,8 @@ local height = display.contentHeight
 local upperBoundary
 local lowerBoundary
 
+local matchSensor
+
 
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
@@ -32,11 +34,6 @@ physics.setGravity(0, -0.1)
 
 -- glabal timer variables
 local gridSpawnTimer
-
-
--- -----------------------------------------------------------------------------------
--- Scene event functions
--- -----------------------------------------------------------------------------------
 
 --clean up helper functions
 function removeGridFromGlobalTable(id)
@@ -130,8 +127,8 @@ function createGridGroup(grid)
    local gridYPos = grid.yPos
 
 
-  for i=1,grid.size do
-    for j=1,grid.size do
+  for i=1,(grid.size - 3) do
+    for j=1,(grid.size - 3) do
         local block = display.newRect(100, 100, grid.blockSize, grid.blockSize)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
@@ -395,6 +392,10 @@ function spawnGrid()
    gridsTable[#gridsTable + 1] = grid_group
 end
 
+-- -----------------------------------------------------------------------------------
+-- Scene event functions
+-- -----------------------------------------------------------------------------------
+
 function scene:create( event )
  
     local SceneGroup = self.view
@@ -407,6 +408,9 @@ function scene:create( event )
 
     lowerBoundary = display.newRect(centerX, height, width, 5)
     lowerBoundary: setFillColor(1,0,0,0.5)
+
+    matchSensor = display.newRect(centerX, 0, width, 5)
+    matchSensor:setFillColor(1,0,0)
 
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
