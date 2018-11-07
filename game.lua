@@ -72,19 +72,24 @@ function ParallaxScroll(object, options)
     end  
 end
 
-function checkForMatch(slotContainer, size)
-  for i = 1, size do
-    for j = 1, size do
-      local blockId = slotContainer[i].colorId
-      local secondBlockId = slotContainer[i + 1].colorId
-      local thirdBlockId = slotContainer[i + 2].colorId
-    
-      if ((blockId == secondBlockId) and (blockId == thirdBlockId)) then
-        print("block ID: "..blockId)
-        print("vertical Match was found at block number "..i)
+function checkForMatch(slotContainer)
+  -- check vertical match 3
+  for i = 1, (#slotContainer - 2) do
+      local block = slotContainer[i]
+      local secondBlock = slotContainer[i + 1]
+      local thirdBlock = slotContainer[i + 2]
+
+
+      if (isBlockOnBottomEdge(block) == false or isBlockOnBottomEdge(secondBlock) == false) then
+          if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
+              print("Match Detected")
+              block:setFillColor(1,1,1,0.5)
+              secondBlock:setFillColor(1,1,1,0.5)
+              thirdBlock:setFillColor(1,1,1,0.5)
+          end
       end
-    end
   end
+
 end
 
 function assignRandomColorsToBlocks(slotContainer)   
@@ -132,7 +137,8 @@ function createGridGroup(grid)
         local block = display.newRect(100, 100, grid.blockSize, grid.blockSize)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
-
+        
+        block.isEnabled = true
         block.id = #slotContainer + 1
         block.isFocus = false
         
@@ -260,6 +266,10 @@ function moveBlockToEmptySpace(block, direction)
   end
 end
 
+function canSwapBlocks(idA, idB, container)
+    return (container[idA].isEnabled and container[idB].isEnabled)
+end
+
 function blockSwipe(event)
    local parentGroup = event.target.parent
     local slotContainer = parentGroup.slotContainer
@@ -275,64 +285,43 @@ function blockSwipe(event)
 
         local horizontalSwipeMagnitude = event.x - event.xStart
         local verticalSwipeMagnitude = event.y - event.yStart
-
-       
-
-         local swipeDirection = getDominant_Swipe_Direction(horizontalSwipeMagnitude, verticalSwipeMagnitude)
+        local swipeDirection = getDominant_Swipe_Direction(horizontalSwipeMagnitude, verticalSwipeMagnitude)
          
          if (swipeDirection == "HORIZONTAL") then
              if (horizontalSwipeMagnitude < 0) then
-                 if (isBlockOnLeftEdge(event.target)) then
-                     print "SELECTED BLOCK IS ON THE LEFT EDGE"
-
-                 elseif (slotContainer[event.target.id - parentGroup.size] == nil) then
-                     print "SWIPING LEFT TO NIL BLOCK"
-                     moveBlockToEmptySpace(event.target, "LEFT")
-                 else 
-                     local leftBlock = slotContainer[event.target.id - parentGroup.size]
-                     print("Swiping with LEFTBLOCK: "..leftBlock.id)
-                     swapBlocks(leftBlock, event.target)
-                 end
-                 
-
+                 print("Swiped Left")
+                 local idA = event.target.id
+                 local idB = idA - parentGroup.size
+                 if (isBlockOnLeftEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                    local leftBlock = slotContainer[idB]
+                    swapBlocks(event.target, leftBlock)
+                 end               
              elseif (horizontalSwipeMagnitude > 0) then
-                 --print "SWIPE RIGHT"
-                 if (isBlockOnRightEdge(event.target)) then
-                     print "RIGHT EDGE DETECTED"
-                 elseif (slotContainer[event.target.id + parentGroup.size] == nil) then
-                     print "SWIPING RIGHT TO NIL BLOCK"
-                     moveBlockToEmptySpace(event.target, "RIGHT")
-                 else 
-                    local rightBlock = slotContainer[event.target.id + parentGroup.size]
-                    print("Swiping with RIGHTBLOCK: "..rightBlock.id)
-                    swapBlocks(rightBlock, event.target)
-                 end
+                 print("Swiped Right")
+                 local idA = event.target.id
+                 local idB = idA + parentGroup.size
+                 if (isBlockOnRightEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                    local rightBlock = slotContainer[idB]
+                    swapBlocks(event.target, rightBlock)
+                 end     
              end
          elseif (swipeDirection == "VERTICAL") then
              if (verticalSwipeMagnitude < 0) then
-                 if (isBlockOnUpperEdge(event.target)) then
-                     print "UPPER EDGE DETECTED"
-                 elseif (slotContainer[event.target.id - 1] == nil) then
-                     print "SWIPING UP TO NIL BLOCK"
-                     moveBlockToEmptySpace(event.target, "UP")
-                 else
-                    local upperBlock = slotContainer[event.target.id - 1]
-                    print("Swiping with UPPERBLOCK: "..upperBlock.id)
-                    swapBlocks(upperBlock, event.target)          
-                 end
-
+                 print("swiped up")
+                 local idA = event.target.id
+                 local idB = idA - 1
+                 if (isBlockOnUpperEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                    local upperBlock = slotContainer[idB]
+                    swapBlocks(event.target, upperBlock)
+                 end  
              elseif (verticalSwipeMagnitude > 0) then
-                 if (isBlockOnBottomEdge(event.target)) then
-                     print "BOTTOM EDGE DETECTED"
-                     debugEdgeBlocksText.text = "BOTTOM EDGE DETECTED"
-                 elseif (slotContainer[event.target.id + 1] == nil) then
-                     print "SWIPING DOWN TO NIL BLOCK"
-                     moveBlockToEmptySpace(event.target, "DOWN")
-                  else
-                    local bottomBlock = slotContainer[event.target.id + 1]
-                    print("Swiping with BOTTOMBLOCK: "..bottomBlock.id)
-                    swapBlocks(bottomBlock, event.target)
-                 end                 
+                 print("swiped down")
+                 local idA = event.target.id
+                 local idB = idA + 1
+                 if (isBlockOnBottomEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                    local lowerBlock = slotContainer[idB]
+                    swapBlocks(event.target, lowerBlock)
+                 end               
              end
          end
 
@@ -392,6 +381,14 @@ function spawnGrid()
    gridsTable[#gridsTable + 1] = grid_group
 end
 
+function onMatchSensorCollide (event)
+  if (event.phase == "began" and event.other.name == "GridContainer") then
+    print("sensor collision detected with slotContainer id: "..event.other.id)
+    checkForMatch(event.other.slotContainer)
+  end
+
+end
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -404,7 +401,6 @@ function scene:create( event )
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary: setFillColor(1,0,0,0.5)
-    physics.addBody(upperBoundary, "static")
 
     lowerBoundary = display.newRect(centerX, height, width, 5)
     lowerBoundary: setFillColor(1,0,0,0.5)
@@ -426,8 +422,14 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
         spawnGrid()
-        gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
+        gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 2)
+
+        physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
+        
+        physics.addBody(matchSensor, "static")
+        matchSensor.isSensor = true
+        matchSensor: addEventListener("collision", onMatchSensorCollide)
             
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
