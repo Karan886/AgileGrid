@@ -412,10 +412,6 @@ function scene:show( event )
 
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
-        
-        physics.addBody(matchSensor, "static")
-        matchSensor.isSensor = true
-        matchSensor: addEventListener("collision", onMatchSensorCollide)
             
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
