@@ -15,9 +15,6 @@ local height = display.contentHeight
 local upperBoundary
 local lowerBoundary
 
-local matchSensor
-
-
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
   grids = {}
@@ -381,14 +378,6 @@ function spawnGrid()
    gridsTable[#gridsTable + 1] = grid_group
 end
 
-function onMatchSensorCollide (event)
-  if (event.phase == "began" and event.other.name == "GridContainer") then
-    print("sensor collision detected with slotContainer id: "..event.other.id)
-    checkForMatch(event.other.slotContainer)
-  end
-
-end
-
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -404,9 +393,6 @@ function scene:create( event )
 
     lowerBoundary = display.newRect(centerX, height, width, 5)
     lowerBoundary: setFillColor(1,0,0,0.5)
-
-    matchSensor = display.newRect(centerX, 0, width, 5)
-    matchSensor:setFillColor(1,0,0)
 
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
