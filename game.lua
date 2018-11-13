@@ -69,17 +69,18 @@ function ParallaxScroll(object, options)
     end  
 end
 
-function checkForMatch(slotContainer)
-  -- check vertical match 3
+function checkForMatch(grid)
+  local slotContainer = grid.slotContainer
+
+  -- Vertical match check.
   for i = 1, (#slotContainer - 2) do
       local block = slotContainer[i]
       local secondBlock = slotContainer[i + 1]
       local thirdBlock = slotContainer[i + 2]
 
-
-      if (isBlockOnBottomEdge(block) == false or isBlockOnBottomEdge(secondBlock) == false) then
+      if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false) then
           if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
-              print("Match Detected")
+              print("Vertical Match Detected")
               block:setFillColor(1,1,1,0.5)
               secondBlock:setFillColor(1,1,1,0.5)
               thirdBlock:setFillColor(1,1,1,0.5)
@@ -87,6 +88,21 @@ function checkForMatch(slotContainer)
       end
   end
 
+-- Horizontal Match check.
+local index = 1
+  local block = slotContainer[index]
+  while (block.id + (grid.size * 2) <= #slotContainer) do
+    local secondBlock = slotContainer[index + grid.size]
+    local thirdBlock = slotContainer[index + (grid.size * 2)]
+    if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
+      print("Horizontal Match Detected")
+      block: setFillColor(1,1,1,0.5)
+      secondBlock: setFillColor(1,1,1,0.5)
+      thirdBlock: setFillColor(1,1,1,0.5)
+    end
+    index = index + 1
+    block = slotContainer[index]
+  end
 end
 
 function assignRandomColorsToBlocks(slotContainer)   
@@ -146,7 +162,6 @@ function createGridGroup(grid)
   end
 
   assignRandomColorsToBlocks(slotContainer)
-  --checkForMatch(slotContainer, gridGroup.size)
 
   local slotContainers = bin.slotContainers
   gridGroup.slotContainer = slotContainer
@@ -162,8 +177,6 @@ function onUpperSensorCollide(event)
   if (event.other.name == "GridContainer") then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
       removeGridFromGlobalTable(event.other.id)
-      local grid = bin.grids
-      print("grids: "..#grid)
   end
 end
 function isBlockOnRightEdge (block)
@@ -326,6 +339,7 @@ function blockSwipe(event)
          display.getCurrentStage():setFocus(nil)   
      end
    end
+   checkForMatch(parentGroup)
    return true
 end
 
