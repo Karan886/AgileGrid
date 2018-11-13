@@ -1,6 +1,9 @@
 local composer = require( "composer" )
  
 local scene = composer.newScene()
+
+-- Include files
+local data = require "data"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -91,9 +94,9 @@ function checkForMatch(grid)
 -- Horizontal Match check.
 local index = 1
   local block = slotContainer[index]
-  while (block.id + (grid.size * 2) <= #slotContainer) do
-    local secondBlock = slotContainer[index + grid.size]
-    local thirdBlock = slotContainer[index + (grid.size * 2)]
+  while (block.id + (grid.size.rows * 2) <= #slotContainer) do
+    local secondBlock = slotContainer[index + grid.size.rows]
+    local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
     if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
       print("Horizontal Match Detected")
       block: setFillColor(1,1,1,0.5)
@@ -144,9 +147,11 @@ function createGridGroup(grid)
    local gridXPos = grid.xPos
    local gridYPos = grid.yPos
 
+   local rows = grid.size.rows
+   local cols = grid.size.cols
 
-  for i=1,grid.size do
-    for j=1,grid.size do
+  for i=1, cols do
+    for j=1, rows do
         local block = display.newRect(100, 100, grid.blockSize, grid.blockSize)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
@@ -182,30 +187,28 @@ end
 function isBlockOnRightEdge (block)
     local parentGroup = block.parent
     local gridSize = parentGroup.size
-    local totalGridSize = gridSize * gridSize
+    local totalGridSize = gridSize.rows * gridSize.cols
 
-    return (block.id > (totalGridSize - gridSize))
+    return (block.id > (totalGridSize - gridSize.rows))
 end
 
 function isBlockOnLeftEdge (block)
   local parentGroup = block.parent
-  local gridSize = parentGroup.size
-
-  return (block.id <= parentGroup.size)
+  return (block.id <= parentGroup.size.rows)
 end
 
 function isBlockOnUpperEdge(block)
   local parentGroup = block.parent
   local gridSize = parentGroup.size
 
-  return (((block.id - 1) % gridSize) == 0)
+  return (((block.id - 1) % gridSize.cols) == 0)
 end
 
 function isBlockOnBottomEdge(block)
   local parentGroup = block.parent
   local gridSize = parentGroup.size
 
-  return ((block.id % gridSize) == 0)
+  return ((block.id % gridSize.cols) == 0)
 end
 
 function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
@@ -301,7 +304,7 @@ function blockSwipe(event)
              if (horizontalSwipeMagnitude < 0) then
                  print("Swiped Left")
                  local idA = event.target.id
-                 local idB = idA - parentGroup.size
+                 local idB = idA - parentGroup.size.rows
                  if (isBlockOnLeftEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
                     local leftBlock = slotContainer[idB]
                     swapBlocks(event.target, leftBlock)
@@ -309,7 +312,7 @@ function blockSwipe(event)
              elseif (horizontalSwipeMagnitude > 0) then
                  print("Swiped Right")
                  local idA = event.target.id
-                 local idB = idA + parentGroup.size
+                 local idB = idA + parentGroup.size.rows
                  if (isBlockOnRightEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
                     local rightBlock = slotContainer[idB]
                     swapBlocks(event.target, rightBlock)
@@ -345,12 +348,14 @@ end
 
 function spawnGrid()
    math.randomseed(os.time())
-   local randomSize = (math.random(1,2)) * 3
+   local sizeCombinations = data.sizeCombinations
+   local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
+   print("size = "..randomSize.rows..','..randomSize.cols)
 
    local sizeofBlock = 30
    local blockOffset = 5
 
-   local totalShapeSide = (sizeofBlock + blockOffset) * (randomSize - 1) + sizeofBlock
+   local totalShapeSide = (sizeofBlock + blockOffset) * (randomSize.cols - 1) + sizeofBlock
    local trueGridCenter = centerX - (totalShapeSide/2) 
    local randomX = math.random(trueGridCenter - (totalShapeSide/2), trueGridCenter + (totalShapeSide/2))
 
