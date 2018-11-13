@@ -166,6 +166,7 @@ function createGridGroup(grid)
     end
   end
 
+  gridGroup.topLeft = {x = slotContainer[1].x, y = slotContainer[1].y}
   assignRandomColorsToBlocks(slotContainer)
 
   local slotContainers = bin.slotContainers
@@ -377,10 +378,10 @@ function spawnGrid()
    local slotContainer = grid_group.slotContainer
 
    --use the position of the top left block to position physics boundary
-   local firstBlockPosition = { x = slotContainer[1].x, y = slotContainer[1].y }
+   local gridTopLeft = grid_group.topLeft
 
    -- Creating a custom physics shape since display groups behave differently when adding physics
-   local leftCorner = { x = firstBlockPosition.x - (sizeofBlock/2), y = firstBlockPosition.y - (sizeofBlock/2) }
+   local leftCorner = { x = gridTopLeft.x - (sizeofBlock/2), y = gridTopLeft.y - (sizeofBlock/2) }
    local rightCorner = { x = leftCorner.x + totalShapeWidth, y = leftCorner.y }
    local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeHeight }
    local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeHeight }
@@ -428,7 +429,7 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
         spawnGrid()
-        gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 2)
+        gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
 
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)

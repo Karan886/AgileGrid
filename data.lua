@@ -1,7 +1,6 @@
 local data = {}
 
 local rawSizeCombinations = {
-	{rows = 3, cols = 1},
 	{rows = 3, cols = 2},
 	{rows = 3, cols = 3},
     {rows = 3, cols = 4},
