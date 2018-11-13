@@ -30,7 +30,7 @@ local ScrollParallaxObjects
 local physics = require "physics"
 physics.start()
 physics.setGravity(0, -0.1)
---physics.setDrawMode("hybrid")
+physics.setDrawMode("hybrid")
 
 -- glabal timer variables
 local gridSpawnTimer
@@ -355,9 +355,10 @@ function spawnGrid()
    local sizeofBlock = 30
    local blockOffset = 5
 
-   local totalShapeSide = (sizeofBlock + blockOffset) * (randomSize.cols - 1) + sizeofBlock
-   local trueGridCenter = centerX - (totalShapeSide/2) 
-   local randomX = math.random(trueGridCenter - (totalShapeSide/2), trueGridCenter + (totalShapeSide/2))
+   local totalShapeWidth = (sizeofBlock + blockOffset) * (randomSize.cols - 1) + sizeofBlock
+   local totalShapeHeight = (sizeofBlock + blockOffset) * (randomSize.rows - 1) + sizeofBlock
+   local trueGridCenter = centerX - (totalShapeWidth/2) 
+   local randomX = math.random(trueGridCenter - (totalShapeWidth/2), trueGridCenter + (totalShapeWidth/2))
 
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
@@ -378,11 +379,11 @@ function spawnGrid()
    --use the position of the top left block to position physics boundary
    local firstBlockPosition = { x = slotContainer[1].x, y = slotContainer[1].y }
 
-   --creating a custom physics shape since display groups behave differently when adding physics
+   -- Creating a custom physics shape since display groups behave differently when adding physics
    local leftCorner = { x = firstBlockPosition.x - (sizeofBlock/2), y = firstBlockPosition.y - (sizeofBlock/2) }
-   local rightCorner = { x = leftCorner.x + totalShapeSide, y = leftCorner.y }
-   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeSide }
-   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeSide }
+   local rightCorner = { x = leftCorner.x + totalShapeWidth, y = leftCorner.y }
+   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeHeight }
+   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeHeight }
 
    local gridPhysicsShape = {
 
