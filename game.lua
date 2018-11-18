@@ -30,7 +30,7 @@ local ScrollParallaxObjects
 local physics = require "physics"
 physics.start()
 physics.setGravity(0, -0.1)
-physics.setDrawMode("hybrid")
+--physics.setDrawMode("hybrid")
 
 -- glabal timer variables
 local gridSpawnTimer
@@ -202,14 +202,14 @@ function isBlockOnUpperEdge(block)
   local parentGroup = block.parent
   local gridSize = parentGroup.size
 
-  return (((block.id - 1) % gridSize.cols) == 0)
+  return (((block.id - 1) % gridSize.rows) == 0)
 end
 
 function isBlockOnBottomEdge(block)
   local parentGroup = block.parent
   local gridSize = parentGroup.size
 
-  return ((block.id % gridSize.cols) == 0)
+  return ((block.id % gridSize.rows) == 0)
 end
 
 function getDominant_Swipe_Direction(horizontalMagnitude, verticalMagnitude)
@@ -327,6 +327,8 @@ function blockSwipe(event)
                  if (isBlockOnUpperEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
                     local upperBlock = slotContainer[idB]
                     swapBlocks(event.target, upperBlock)
+                 elseif (isBlockOnUpperEdge(event.target)) then
+                  print("upper edge detected")
                  end  
              elseif (verticalSwipeMagnitude > 0) then
                  print("swiped down")
@@ -376,8 +378,6 @@ function spawnGrid()
    grid_group.id = #gridsTable + 1
 
    local slotContainer = grid_group.slotContainer
-
-   --use the position of the top left block to position physics boundary
    local gridTopLeft = grid_group.topLeft
 
    -- Creating a custom physics shape since display groups behave differently when adding physics
