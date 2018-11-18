@@ -233,15 +233,13 @@ function swapBlocks(blockA, blockB)
   slotContainer[blockAID] = blockB
   slotContainer[blockBID] = blockA
 
-  transition.to(blockA, { time = 500, x = blockB.x, y = blockB.y })
-  transition.to(blockB, { time = 500, x = blockA.x, y = blockA.y })
+  transition.to(blockA, {time = 500, x = blockB.x, y = blockB.y })
+  transition.to(blockB, {time = 500, x = blockA.x, y = blockA.y })
 
 end
 
 function moveBlockToEmptySpace(block, direction)
-  local newID
-  local newX
-  local newY
+  local newID, newX, newY
   
   local parentGroup = block.parent
   local slotContainer = parentGroup.slotContainer
@@ -326,9 +324,7 @@ function blockSwipe(event)
                  local idB = idA - 1
                  if (isBlockOnUpperEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
                     local upperBlock = slotContainer[idB]
-                    swapBlocks(event.target, upperBlock)
-                 elseif (isBlockOnUpperEdge(event.target)) then
-                  print("upper edge detected")
+                    swapBlocks(event.target, upperBlock)               
                  end  
              elseif (verticalSwipeMagnitude > 0) then
                  print("swiped down")
