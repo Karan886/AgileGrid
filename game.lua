@@ -50,6 +50,15 @@ function removeGridFromGlobalTable(id)
    end
 end
 
+function removeMatchedBlocks(blocks)
+  -- Assuming that all blocks belong to the same parent grid
+  local parentGrid = blocks[1].parent
+  for i = 1, #blocks do
+    blocks[i].isEnabled = false
+    blocks[i].isVisible = false
+  end
+end
+
 function ParallaxScroll(object, options)
     --initialize options
     --the point where a parallax object starts and ends on the screen (ie. it ends when it wraps around)
@@ -83,9 +92,7 @@ function checkForMatch(grid)
       if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false) then
           if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
               print("Vertical Match Detected")
-              block:setFillColor(1,1,1,0.5)
-              secondBlock:setFillColor(1,1,1,0.5)
-              thirdBlock:setFillColor(1,1,1,0.5)
+              removeMatchedBlocks({block, secondBlock, thirdBlock})
           end
       end
   end
@@ -98,9 +105,7 @@ local index = 1
     local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
     if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
       print("Horizontal Match Detected")
-      block: setFillColor(1,1,1,0.5)
-      secondBlock: setFillColor(1,1,1,0.5)
-      thirdBlock: setFillColor(1,1,1,0.5)
+      removeMatchedBlocks({block, secondBlock, thirdBlock})
     end
     index = index + 1
     block = slotContainer[index]
@@ -277,9 +282,6 @@ function moveBlockToEmptySpace(block, direction)
   end
 end
 
-function canSwapBlocks(idA, idB, container)
-    return (container[idA].isEnabled and container[idB].isEnabled)
-end
 
 function blockSwipe(event)
    local parentGroup = event.target.parent
@@ -303,7 +305,7 @@ function blockSwipe(event)
                  print("Swiped Left")
                  local idA = event.target.id
                  local idB = idA - parentGroup.size.rows
-                 if (isBlockOnLeftEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                 if (isBlockOnLeftEdge(event.target) == false) then
                     local leftBlock = slotContainer[idB]
                     swapBlocks(event.target, leftBlock)
                  end               
@@ -311,7 +313,7 @@ function blockSwipe(event)
                  print("Swiped Right")
                  local idA = event.target.id
                  local idB = idA + parentGroup.size.rows
-                 if (isBlockOnRightEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                 if (isBlockOnRightEdge(event.target) == false) then
                     local rightBlock = slotContainer[idB]
                     swapBlocks(event.target, rightBlock)
                  end     
@@ -321,7 +323,7 @@ function blockSwipe(event)
                  print("swiped up")
                  local idA = event.target.id
                  local idB = idA - 1
-                 if (isBlockOnUpperEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                 if (isBlockOnUpperEdge(event.target) == false) then
                     local upperBlock = slotContainer[idB]
                     swapBlocks(event.target, upperBlock)               
                  end  
@@ -329,7 +331,7 @@ function blockSwipe(event)
                  print("swiped down")
                  local idA = event.target.id
                  local idB = idA + 1
-                 if (isBlockOnBottomEdge(event.target) == false and canSwapBlocks(idA, idB, parentGroup)) then
+                 if (isBlockOnBottomEdge(event.target) == false) then
                     local lowerBlock = slotContainer[idB]
                     swapBlocks(event.target, lowerBlock)
                  end               
@@ -392,6 +394,7 @@ function spawnGrid()
 
    physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape})
    gridsTable[#gridsTable + 1] = grid_group
+   checkForMatch(grid_group)
 end
 
 -- -----------------------------------------------------------------------------------
