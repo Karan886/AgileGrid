@@ -16,7 +16,6 @@ local width = display.contentWidth
 local height = display.contentHeight
 
 local upperBoundary
-local lowerBoundary
 
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
@@ -407,10 +406,7 @@ function scene:create( event )
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary: setFillColor(1,0,0,0.5)
-
-    lowerBoundary = display.newRect(centerX, height, width, 5)
-    lowerBoundary: setFillColor(1,0,0,0.5)
-
+    
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
     SceneGroup: insert(upperBoundary) 
