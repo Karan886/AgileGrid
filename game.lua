@@ -157,7 +157,9 @@ function createGridGroup(grid)
 
   for i=1, cols do
     for j=1, rows do
-        local block = display.newRect(100, 100, grid.blockSize, grid.blockSize)
+        local block = display.newRoundedRect(100, 100, grid.blockSize, grid.blockSize, grid.blockCornerRadius)
+        block.strokeWidth = 2
+        block: setStrokeColor(0,0,0,0.5)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
         
@@ -327,7 +329,8 @@ function spawnGrid()
       offsetX = blockOffset,
       offsetY = blockOffset,
       xPos = randomX,
-      yPos = height
+      yPos = height,
+      blockCornerRadius = 5
     })
 
    
