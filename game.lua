@@ -55,7 +55,8 @@ function removeMatchedBlocks(blocks)
   local parentGrid = blocks[1].parent
   for i = 1, #blocks do
     blocks[i].isEnabled = false
-    blocks[i].isVisible = false
+    blocks[i].alpha = 0.5
+    transition.to(blocks[i], {xScale = 0.5, yScale = 0.5, time = 350, onComplete = function() blocks[i].isVisible = false end})
   end
 end
 
@@ -92,7 +93,7 @@ function checkForMatch(grid)
       if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false) then
           if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
               print("Vertical Match Detected")
-              removeMatchedBlocks({block, secondBlock, thirdBlock})
+              timer.performWithDelay(500, function () removeMatchedBlocks({block, secondBlock, thirdBlock}) end)
           end
       end
   end
