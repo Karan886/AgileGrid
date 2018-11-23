@@ -242,47 +242,6 @@ function swapBlocks(blockA, blockB)
 
 end
 
-function moveBlockToEmptySpace(block, direction)
-  local newID, newX, newY
-  
-  local parentGroup = block.parent
-  local slotContainer = parentGroup.slotContainer
-  if (direction == "LEFT") then
-      print "MOVING BLOCK LEFT TO EMPTY SPACE"
-      newID = block.id - parentGroup.size
-      newX = block.x - (parentGroup.blockSize + parentGroup.offsetX)
-      newY = block.y
-
-  elseif (direction == "RIGHT") then
-      print "MOVING BLOCK RIGHT TO EMPTY SPACE"
-      newID = block.id + parentGroup.size
-      newX = block.x + (parentGroup.blockSize + parentGroup.offsetX)
-      newY = block.y
-
-  elseif (direction == "UP") then
-      print "MOVING BLOCK UP TO EMPTY SPACE"
-      newID = block.id - 1
-      newX = block.x
-      newY = block.y - (parentGroup.blockSize + parentGroup.offsetY)
-
-  elseif (direction == "DOWN") then
-      print "MOVING BLOCK DOWN TO EMPTY SPACE"
-      newID = block.id + 1
-      newX = block.x
-      newY = block.y + (parentGroup.blockSize + parentGroup.offsetY)
-  end
-
-  if (newID ~= nil) then
-      print "NEWID is not null"
-      slotContainer[newID] = block
-      slotContainer[block.id] = nil
-      block.id = newID
-      
-      transition.to( block, { time = 300, x = newX, y = newY })
-  end
-end
-
-
 function blockSwipe(event)
    local parentGroup = event.target.parent
     local slotContainer = parentGroup.slotContainer
