@@ -31,7 +31,7 @@ physics.start()
 physics.setGravity(0, -0.1)
 --physics.setDrawMode("hybrid")
 
--- glabal timer variables
+-- global timer variables
 local gridSpawnTimer
 
 --clean up helper functions
@@ -159,7 +159,7 @@ function createGridGroup(grid)
     for j=1, rows do
         local block = display.newRoundedRect(100, 100, grid.blockSize, grid.blockSize, grid.blockCornerRadius)
         block.strokeWidth = 2
-        block: setStrokeColor(0,0,0,0.5)
+        block: setStrokeColor(0, 0, 0, 0.5)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
         
@@ -240,8 +240,8 @@ function swapBlocks(blockA, blockB)
   slotContainer[blockAID] = blockB
   slotContainer[blockBID] = blockA
 
-  transition.to(blockA, {time = 500, x = blockB.x, y = blockB.y })
-  transition.to(blockB, {time = 500, x = blockA.x, y = blockA.y })
+  transition.to(blockA, {time = 500, x = blockB.x, y = blockB.y})
+  transition.to(blockB, {time = 500, x = blockA.x, y = blockA.y})
 
 end
 
@@ -254,9 +254,7 @@ function blockSwipe(event)
      event.target.isFocus = true
      display.getCurrentStage():setFocus(event.target)
    elseif (event.target.isFocus) then
-     if (event.phase == "moved") then
-
-     elseif (event.phase == "ended" or event.phase == "cancelled") then
+     if (event.phase == "ended" or event.phase == "cancelled") then
 
         local horizontalSwipeMagnitude = event.x - event.xStart
         local verticalSwipeMagnitude = event.y - event.yStart
@@ -312,15 +310,17 @@ function spawnGrid()
    math.randomseed(os.time())
    local sizeCombinations = data.sizeCombinations
    local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
-   print("size = "..randomSize.rows..','..randomSize.cols)
 
-   local sizeofBlock = 30
+   local sizeofBlock = centerX/5
    local blockOffset = 5
+
+   print(sizeofBlock)
 
    local totalShapeWidth = (sizeofBlock + blockOffset) * (randomSize.cols - 1) + sizeofBlock
    local totalShapeHeight = (sizeofBlock + blockOffset) * (randomSize.rows - 1) + sizeofBlock
    local trueGridCenter = centerX - (totalShapeWidth/2) 
-   local randomX = math.random(trueGridCenter - (totalShapeWidth/2), trueGridCenter + (totalShapeWidth/2))
+
+   local randomX = math.random(0, width - totalShapeWidth)
 
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
@@ -333,7 +333,6 @@ function spawnGrid()
       blockCornerRadius = 5
     })
 
-   
    grid_group.name = "GridContainer"
    grid_group.id = #gridsTable + 1
 
