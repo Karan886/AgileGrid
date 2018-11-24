@@ -4,6 +4,7 @@ local scene = composer.newScene()
 
 -- Include files
 local data = require "data"
+local colorstack = require "colorstack"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -116,6 +117,7 @@ end
 function assignRandomColorsToBlocks(slotContainer)   
    local numOfColors = #slotContainer
    local colors = getColorMatrix(numOfColors)
+
    print("number of colors: "..#colors)
 
   for i = 1, #slotContainer do
@@ -387,6 +389,12 @@ function scene:show( event )
         --spawn the first grid then apply the delay
         spawnGrid()
         gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
+        
+        local mStack = colorstack.newInstance()
+        mStack.push(1)
+        mStack.push(2)
+        mStack.push(3)
+        mStack.out()
 
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
