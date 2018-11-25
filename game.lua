@@ -114,6 +114,15 @@ local index = 1
   end
 end
 
+function shuffle(colors)
+    for i = 1, #colors, 2 do
+       local temp = colors[i]
+       local rand = math.random(1, #colors)
+       colors[i] = colors[rand]
+       colors[rand] = temp 
+    end
+end
+
 function assignRandomColorsToBlocks(slotContainer)   
    local numOfColors = #slotContainer
    local colors = getColorMatrix(numOfColors)
@@ -123,7 +132,12 @@ function assignRandomColorsToBlocks(slotContainer)
   for i = 1, #slotContainer do
     local block = slotContainer[i]
     local randomColorIndex = math.random(1, #colors)
+    local shuffleWithIndex = math.random(1, #colors)
+
+    shuffle(colors) 
+
     local colorToAssign = colors[randomColorIndex]
+   
 
     table.remove(colors, randomColorIndex)
     block:setFillColor(colorToAssign.red, colorToAssign.green, colorToAssign.blue)
@@ -389,12 +403,6 @@ function scene:show( event )
         --spawn the first grid then apply the delay
         spawnGrid()
         gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
-        
-        local mStack = colorstack.newInstance()
-        mStack.push(1)
-        mStack.push(2)
-        mStack.push(3)
-        mStack.out()
 
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
