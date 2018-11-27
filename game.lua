@@ -4,7 +4,6 @@ local scene = composer.newScene()
 
 -- Include files
 local data = require "data"
-local colorstack = require "colorstack"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -114,15 +113,6 @@ local index = 1
   end
 end
 
-function shuffle(colors)
-    for i = 1, #colors, 2 do
-       local temp = colors[i]
-       local rand = math.random(1, #colors)
-       colors[i] = colors[rand]
-       colors[rand] = temp 
-    end
-end
-
 function assignRandomColorsToBlocks(slotContainer)   
    local numOfColors = #slotContainer
    local colors = getColorMatrix(numOfColors)
@@ -132,13 +122,8 @@ function assignRandomColorsToBlocks(slotContainer)
   for i = 1, #slotContainer do
     local block = slotContainer[i]
     local randomColorIndex = math.random(1, #colors)
-    local shuffleWithIndex = math.random(1, #colors)
-
-    shuffle(colors) 
-
     local colorToAssign = colors[randomColorIndex]
-   
-
+  
     table.remove(colors, randomColorIndex)
     block:setFillColor(colorToAssign.red, colorToAssign.green, colorToAssign.blue)
     block.colorId = colorToAssign.id
@@ -387,6 +372,12 @@ function scene:create( event )
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary: setFillColor(1,0,0,0.5)
+
+    local randomPicker = require "RandomPicker"
+    local mRandomPicker = randomPicker.newInstance({1,2,2,3,4,5,6,6,6,2,1,20,11,12,13,13,13,13,1,1,1,1})
+    mRandomPicker.printUniqueSet()
+    mRandomPicker.getRandomItem()
+    
     
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
