@@ -52,12 +52,17 @@ end
 
 function removeMatchedBlocks(blocks)
   -- Assuming that all blocks belong to the same parent grid
+  if (blocks == nil or #blocks == 0) then
+    return false
+  end
+  print(blocks[1])
   local parentGrid = blocks[1].parent
   for i = 1, #blocks do
     blocks[i].isEnabled = false
     blocks[i].alpha = 0.5
     transition.to(blocks[i], {xScale = 0.5, yScale = 0.5, time = 350, onComplete = function() blocks[i].isVisible = false end})
   end
+  return true
 end
 
 function ParallaxScroll(object, options)
@@ -81,9 +86,9 @@ function ParallaxScroll(object, options)
     end  
 end
 
-function checkForMatch(grid)
+function getMatchedBlocks(grid)
   local slotContainer = grid.slotContainer
-
+  local matchedBlocks = {}
   -- Vertical match check.
   for i = 1, (#slotContainer - 2) do
       local block = slotContainer[i]
@@ -93,7 +98,11 @@ function checkForMatch(grid)
       if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false) then
           if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
               print("Vertical Match Detected")
-              timer.performWithDelay(500, function () removeMatchedBlocks({block, secondBlock, thirdBlock}) end)
+              --timer.performWithDelay(500, function () removeMatchedBlocks({block, secondBlock, thirdBlock}) end)
+              matchedBlocks[#matchedBlocks + 1] = block
+              matchedBlocks[#matchedBlocks + 1] = secondBlock
+              matchedBlocks[#matchedBlocks + 1] = thirdBlock
+
           end
       end
   end
@@ -106,11 +115,16 @@ local index = 1
     local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
     if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
       print("Horizontal Match Detected")
-      removeMatchedBlocks({block, secondBlock, thirdBlock})
+      --removeMatchedBlocks({block, secondBlock, thirdBlock})
+      matchedBlocks[#matchedBlocks + 1] = block
+      matchedBlocks[#matchedBlocks + 1] = secondBlock
+      matchedBlocks[#matchedBlocks + 1] = thirdBlock
     end
     index = index + 1
     block = slotContainer[index]
   end
+
+  return matchedBlocks
 end
 
 function assignRandomColorsToBlocks(slotContainer)   
@@ -127,6 +141,17 @@ function assignRandomColorsToBlocks(slotContainer)
     table.remove(colors, randomColorIndex)
     block:setFillColor(colorToAssign.red, colorToAssign.green, colorToAssign.blue)
     block.colorId = colorToAssign.id
+  end
+end
+
+function shuffleBlocks(blocks)
+  local blocksToSwap = {}
+  for i = 1, #blocks, 3 do
+      blocksToSwap[#blocksToSwap + 1] = blocks[i] 
+  end
+
+  for i = 1, #blocksToSwap - 1 do
+    swapBlocks(blocksToSwap[i], blocksToSwap[i + 1])
   end
 end
 
@@ -183,6 +208,12 @@ function createGridGroup(grid)
   gridGroup.offsetY = grid.offsetY
   gridGroup.blockSize = grid.blockSize
   
+  local blocks = getMatchedBlocks(gridGroup)
+  if (#blocks > 3) then
+      shuffleBlocks(blocks)
+  else
+      removeMatchedBlocks(blocks)
+  end
   return gridGroup
 end
 
@@ -303,7 +334,8 @@ function blockSwipe(event)
          display.getCurrentStage():setFocus(nil)   
      end
    end
-   checkForMatch(parentGroup)
+   local blocksToRemove = getMatchedBlocks(parentGroup)
+   removeMatchedBlocks(blocksToRemove)
    return true
 end
 
@@ -330,7 +362,7 @@ function spawnGrid()
       offsetX = blockOffset,
       offsetY = blockOffset,
       xPos = randomX,
-      yPos = height,
+      yPos = height + 35,
       blockCornerRadius = 5
     })
 
@@ -357,7 +389,7 @@ function spawnGrid()
 
    physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape})
    gridsTable[#gridsTable + 1] = grid_group
-   checkForMatch(grid_group)
+   
 end
 
 -- -----------------------------------------------------------------------------------
@@ -372,12 +404,6 @@ function scene:create( event )
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary: setFillColor(1,0,0,0.5)
-
-    local randomPicker = require "RandomPicker"
-    local mRandomPicker = randomPicker.newInstance({1,2,2,3,4,5,6,6,6,2,1,20,11,12,13,13,13,13,1,1,1,1})
-    mRandomPicker.printUniqueSet()
-    mRandomPicker.getRandomItem()
-    
     
      --adding display elements to scene group
     SceneGroup: insert(MainBackground)
