@@ -144,17 +144,6 @@ function assignRandomColorsToBlocks(slotContainer)
   end
 end
 
-function shuffleBlocks(blocks)
-  local blocksToSwap = {}
-  for i = 1, #blocks, 3 do
-      blocksToSwap[#blocksToSwap + 1] = blocks[i] 
-  end
-
-  for i = 1, #blocksToSwap - 1 do
-    swapBlocks(blocksToSwap[i], blocksToSwap[i + 1])
-  end
-end
-
 -- This function gets a random set of colors such that every color has triplets 
 function getColorMatrix(numOfBlocks)
   local colorMatrix = {}
@@ -173,13 +162,20 @@ function createGridGroup(grid)
    local gridGroup = display.newGroup()
    local slotContainer = {}
 
-   gridGroup.size = grid.size
+   local sizeCombinations = data.sizeCombinations
+   local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
 
-   local gridXPos = grid.xPos
-   local gridYPos = grid.yPos
+   local rows = randomSize.rows
+   local cols = randomSize.cols
 
-   local rows = grid.size.rows
-   local cols = grid.size.cols
+   gridGroup.totalShapeWidth = (grid.blockSize + grid.offsetX) * (cols - 1) + grid.blockSize
+   gridGroup.totalShapeHeight = (grid.blockSize + grid.offsetY) * (rows - 1) + grid.blockSize
+
+   gridGroup.size = randomSize
+   local randomX = math.random(0, width - gridGroup.totalShapeWidth)
+
+   local gridXPos = randomX
+   local gridYPos = height + 35
 
   for i=1, cols do
     for j=1, rows do
@@ -209,11 +205,7 @@ function createGridGroup(grid)
   gridGroup.blockSize = grid.blockSize
   
   local blocks = getMatchedBlocks(gridGroup)
-  if (#blocks > 3) then
-      shuffleBlocks(blocks)
-  else
-      removeMatchedBlocks(blocks)
-  end
+  removeMatchedBlocks(blocks)
   return gridGroup
 end
 
@@ -340,31 +332,18 @@ function blockSwipe(event)
 end
 
 function spawnGrid()
-   math.randomseed(os.time())
-   local sizeCombinations = data.sizeCombinations
-   local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
-
    local sizeofBlock = centerX/5
    local blockOffset = 5
 
-   print(sizeofBlock)
-
-   local totalShapeWidth = (sizeofBlock + blockOffset) * (randomSize.cols - 1) + sizeofBlock
-   local totalShapeHeight = (sizeofBlock + blockOffset) * (randomSize.rows - 1) + sizeofBlock
-   local trueGridCenter = centerX - (totalShapeWidth/2) 
-
-   local randomX = math.random(0, width - totalShapeWidth)
-
    local gridsTable = bin.grids
    local grid_group = createGridGroup({
-      size = randomSize,
       blockSize = sizeofBlock,
       offsetX = blockOffset,
       offsetY = blockOffset,
-      xPos = randomX,
-      yPos = height + 35,
       blockCornerRadius = 5
     })
+
+   local trueGridCenter = centerX - (grid_group.totalShapeWidth/2) 
 
    grid_group.name = "GridContainer"
    grid_group.id = #gridsTable + 1
@@ -374,9 +353,9 @@ function spawnGrid()
 
    -- Creating a custom physics shape since display groups behave differently when adding physics
    local leftCorner = { x = gridTopLeft.x - (sizeofBlock/2), y = gridTopLeft.y - (sizeofBlock/2) }
-   local rightCorner = { x = leftCorner.x + totalShapeWidth, y = leftCorner.y }
-   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + totalShapeHeight }
-   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + totalShapeHeight }
+   local rightCorner = { x = leftCorner.x + grid_group.totalShapeWidth, y = leftCorner.y }
+   local bottomLeftCorner = { x = leftCorner.x, y = leftCorner.y + grid_group.totalShapeHeight }
+   local bottomRightCorner = { x = rightCorner.x, y = rightCorner.y + grid_group.totalShapeHeight }
 
    local gridPhysicsShape = {
 
