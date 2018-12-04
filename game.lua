@@ -29,7 +29,7 @@ local ScrollParallaxObjects
 local physics = require "physics"
 physics.start()
 physics.setGravity(0, -0.1)
---physics.setDrawMode("hybrid")
+physics.setDrawMode("hybrid")
 
 -- global timer variables
 local gridSpawnTimer
@@ -55,13 +55,15 @@ function removeMatchedBlocks(blocks)
   if (blocks == nil or #blocks == 0) then
     return false
   end
-  print(blocks[1])
   local parentGrid = blocks[1].parent
   for i = 1, #blocks do
     blocks[i].isEnabled = false
     blocks[i].alpha = 0.5
     transition.to(blocks[i], {xScale = 0.5, yScale = 0.5, time = 350, onComplete = function() blocks[i].isVisible = false end})
+    parentGrid.numOfBlocks = parentGrid.numOfBlocks - 1
+    print("blocks left: "..parentGrid.numOfBlocks)
   end
+
   return true
 end
 
@@ -86,6 +88,12 @@ function ParallaxScroll(object, options)
     end  
 end
 
+function disableBlocks(blocks)
+  for i = 1, #blocks do
+    blocks[i].isEnabled = false
+  end
+end
+
 function getMatchedBlocks(grid)
   local slotContainer = grid.slotContainer
   local matchedBlocks = {}
@@ -95,14 +103,12 @@ function getMatchedBlocks(grid)
       local secondBlock = slotContainer[i + 1]
       local thirdBlock = slotContainer[i + 2]
 
-      if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false) then
+      if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false and block.isEnabled == true) then
           if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
-              print("Vertical Match Detected")
-              --timer.performWithDelay(500, function () removeMatchedBlocks({block, secondBlock, thirdBlock}) end)
+              disableBlocks({block, secondBlock, thirdBlock})
               matchedBlocks[#matchedBlocks + 1] = block
               matchedBlocks[#matchedBlocks + 1] = secondBlock
               matchedBlocks[#matchedBlocks + 1] = thirdBlock
-
           end
       end
   end
@@ -113,9 +119,8 @@ local index = 1
   while (block.id + (grid.size.rows * 2) <= #slotContainer) do
     local secondBlock = slotContainer[index + grid.size.rows]
     local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
-    if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
-      print("Horizontal Match Detected")
-      --removeMatchedBlocks({block, secondBlock, thirdBlock})
+    if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId and block.isEnabled == true) then
+      disableBlocks({block, secondBlock, thirdBlock})
       matchedBlocks[#matchedBlocks + 1] = block
       matchedBlocks[#matchedBlocks + 1] = secondBlock
       matchedBlocks[#matchedBlocks + 1] = thirdBlock
@@ -123,7 +128,6 @@ local index = 1
     index = index + 1
     block = slotContainer[index]
   end
-
   return matchedBlocks
 end
 
@@ -196,6 +200,7 @@ function createGridGroup(grid)
   end
 
   gridGroup.topLeft = {x = slotContainer[1].x, y = slotContainer[1].y}
+  gridGroup.numOfBlocks = cols * rows
   assignRandomColorsToBlocks(slotContainer)
 
   local slotContainers = bin.slotContainers
@@ -271,7 +276,7 @@ end
 
 function blockSwipe(event)
    local parentGroup = event.target.parent
-    local slotContainer = parentGroup.slotContainer
+   local slotContainer = parentGroup.slotContainer
 
    if (event.phase == "began") then
 
@@ -323,11 +328,20 @@ function blockSwipe(event)
          end
 
          event.target.isFocus = false 
-         display.getCurrentStage():setFocus(nil)   
+         display.getCurrentStage():setFocus(nil)
+
+         local blocksToRemove = getMatchedBlocks(parentGroup)
+         removeMatchedBlocks(blocksToRemove)
+
+         if (parentGroup.numOfBlocks == 0) then
+             print("no blocks left")
+             removeGridFromGlobalTable(parentGroup.id)
+             spawnGrid()
+         end
+          
      end
    end
-   local blocksToRemove = getMatchedBlocks(parentGroup)
-   removeMatchedBlocks(blocksToRemove)
+
    return true
 end
 
@@ -367,8 +381,7 @@ function spawnGrid()
   }
 
    physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape})
-   gridsTable[#gridsTable + 1] = grid_group
-   
+   gridsTable[#gridsTable + 1] = grid_group  
 end
 
 -- -----------------------------------------------------------------------------------
@@ -398,7 +411,7 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
         spawnGrid()
-        gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
+        --gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
 
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
