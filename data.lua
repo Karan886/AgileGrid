@@ -19,4 +19,9 @@ function getSizeCombinations()
 end
 
 getSizeCombinations()
+
+data.smallSizeCombinations = {
+	{rows = 3, cols = 2},
+	{rows = 3, cols = 3}
+}
 return data

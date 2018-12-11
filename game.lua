@@ -1,5 +1,4 @@
 local composer = require( "composer" )
- 
 local scene = composer.newScene()
 
 -- Include files
@@ -29,7 +28,7 @@ local ScrollParallaxObjects
 local physics = require "physics"
 physics.start()
 physics.setGravity(0, -0.1)
-physics.setDrawMode("hybrid")
+--physics.setDrawMode("hybrid")
 
 -- global timer variables
 local gridSpawnTimer
@@ -47,6 +46,8 @@ function removeGridFromGlobalTable(id)
        for i=1,#globalTable do
          globalTable[i].id = i
        end
+   else
+       print("no grid to remove")
    end
 end
 
@@ -113,21 +114,21 @@ function getMatchedBlocks(grid)
       end
   end
 
--- Horizontal Match check.
-local index = 1
-  local block = slotContainer[index]
-  while (block.id + (grid.size.rows * 2) <= #slotContainer) do
-    local secondBlock = slotContainer[index + grid.size.rows]
-    local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
-    if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId and block.isEnabled == true) then
+ -- Horizontal Match check.
+ local index = 1
+ local block = slotContainer[index]
+ while (block.id + (grid.size.rows * 2) <= #slotContainer) do
+   local secondBlock = slotContainer[index + grid.size.rows]
+   local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
+   if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId and block.isEnabled == true) then
       disableBlocks({block, secondBlock, thirdBlock})
       matchedBlocks[#matchedBlocks + 1] = block
       matchedBlocks[#matchedBlocks + 1] = secondBlock
       matchedBlocks[#matchedBlocks + 1] = thirdBlock
-    end
-    index = index + 1
-    block = slotContainer[index]
-  end
+   end
+   index = index + 1
+   block = slotContainer[index]
+end
   return matchedBlocks
 end
 
@@ -169,20 +170,22 @@ function createGridGroup(grid)
    local sizeCombinations = data.sizeCombinations
    local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
 
-   local rows = randomSize.rows
-   local cols = randomSize.cols
+   local rows = grid.rows or randomSize.rows
+   local cols = grid.cols or randomSize.cols
+
+   local size = {rows = rows, cols = cols}
 
    gridGroup.totalShapeWidth = (grid.blockSize + grid.offsetX) * (cols - 1) + grid.blockSize
    gridGroup.totalShapeHeight = (grid.blockSize + grid.offsetY) * (rows - 1) + grid.blockSize
 
-   gridGroup.size = randomSize
+   gridGroup.size = size
    local randomX = math.random(0, width - gridGroup.totalShapeWidth)
 
-   local gridXPos = randomX
-   local gridYPos = height + 35
+   local gridXPos = grid.xpos or randomX
+   local gridYPos = grid.ypos or (height + 35)
 
-  for i=1, cols do
-    for j=1, rows do
+   for i=1, cols do
+     for j=1, rows do
         local block = display.newRoundedRect(100, 100, grid.blockSize, grid.blockSize, grid.blockCornerRadius)
         block.strokeWidth = 2
         block: setStrokeColor(0, 0, 0, 0.5)
@@ -194,29 +197,26 @@ function createGridGroup(grid)
         block.isFocus = false
         
         block:addEventListener("touch", blockSwipe)
-        slotContainer[#slotContainer + 1] = block
-        gridGroup:insert(block)            
-    end
-  end
+        slotContainer[#slotContainer + 1] = block           
+     end
+   end
+   
+   gridGroup.topLeft = {x = slotContainer[1].x, y = slotContainer[1].y}
+   gridGroup.numOfBlocks = cols * rows
+   assignRandomColorsToBlocks(slotContainer)
 
-  gridGroup.topLeft = {x = slotContainer[1].x, y = slotContainer[1].y}
-  gridGroup.numOfBlocks = cols * rows
-  assignRandomColorsToBlocks(slotContainer)
+   local slotContainers = bin.slotContainers
+   gridGroup.slotContainer = slotContainer
+   gridGroup.offsetX = grid.offsetX
+   gridGroup.offsetY = grid.offsetY
+   gridGroup.blockSize = grid.blockSize
 
-  local slotContainers = bin.slotContainers
-  gridGroup.slotContainer = slotContainer
-  gridGroup.offsetX = grid.offsetX
-  gridGroup.offsetY = grid.offsetY
-  gridGroup.blockSize = grid.blockSize
-  
-  local blocks = getMatchedBlocks(gridGroup)
-  removeMatchedBlocks(blocks)
-  return gridGroup
+   return gridGroup
 end
 
 function onUpperSensorCollide(event)
   print("Collision occured with upper sensor")
-  if (event.other.name == "GridContainer") then
+  if (event.other.name == "GridContainer" and event.phase == 'ended') then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
       removeGridFromGlobalTable(event.other.id)
   end
@@ -274,12 +274,27 @@ function swapBlocks(blockA, blockB)
 
 end
 
+function getAbsolutePosition(object)
+ if (object == nil) then
+     print("Object is nil")
+     return nil
+ end
+
+ local xpos, ypos = object:localToContent(0,0)
+ return {x = xpos, y = ypos}
+end
+
+function getGridlocation(gridGroup)
+    local blockSize = gridGroup.blockSize
+    local shapeWidth = gridGroup.shapeWidth
+    local shapeHeight = gridGroup.shapeHeight
+end
+
 function blockSwipe(event)
    local parentGroup = event.target.parent
    local slotContainer = parentGroup.slotContainer
 
    if (event.phase == "began") then
-
      event.target.isFocus = true
      display.getCurrentStage():setFocus(event.target)
    elseif (event.target.isFocus) then
@@ -326,7 +341,7 @@ function blockSwipe(event)
                  end               
              end
          end
-
+      
          event.target.isFocus = false 
          display.getCurrentStage():setFocus(nil)
 
@@ -334,9 +349,7 @@ function blockSwipe(event)
          removeMatchedBlocks(blocksToRemove)
 
          if (parentGroup.numOfBlocks == 0) then
-             print("no blocks left")
              removeGridFromGlobalTable(parentGroup.id)
-             spawnGrid()
          end
           
      end
@@ -345,17 +358,37 @@ function blockSwipe(event)
    return true
 end
 
-function spawnGrid()
+function spawnGrid(x, y, rows, cols)
    local sizeofBlock = centerX/5
    local blockOffset = 5
 
-   local gridsTable = bin.grids
-   local grid_group = createGridGroup({
+   local defaultOptions = {
       blockSize = sizeofBlock,
       offsetX = blockOffset,
       offsetY = blockOffset,
       blockCornerRadius = 5
-    })
+   }
+
+   print("rows: "..type(rows).."cols: "..type(cols))
+   
+   if (type(x) == 'number') then
+       defaultOptions['xpos'] = x
+   end
+
+   if (type(y) == 'number') then
+       defaultOptions['ypos'] = y
+   end
+
+   if (type(rows) == 'number') then
+       defaultOptions['rows'] = rows
+   end
+
+   if (type(cols) == 'number') then
+       defaultOptions['cols'] = cols
+   end
+
+   local gridsTable = bin.grids
+   local grid_group = createGridGroup(defaultOptions)
 
    local trueGridCenter = centerX - (grid_group.totalShapeWidth/2) 
 
@@ -378,9 +411,33 @@ function spawnGrid()
          bottomRightCorner.x, bottomRightCorner.y,
          bottomLeftCorner.x, bottomLeftCorner.y, 
          leftCorner.x, leftCorner.y
-  }
+   }
 
-   physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape})
+   local backdrop = display.newRect(
+   grid_group.topLeft.x + grid_group.totalShapeWidth/2 - sizeofBlock/2, 
+   grid_group.topLeft.y + grid_group.totalShapeHeight/2 - sizeofBlock/2, 
+   grid_group.totalShapeWidth, 
+   grid_group.totalShapeHeight
+   )
+   backdrop: setFillColor(1, 0, 0, 0.5)
+   grid_group: insert(backdrop)
+   grid_group.backdrop = backdrop
+
+   for i = 1, #slotContainer do
+       grid_group: insert(slotContainer[i])
+   end
+
+   local blocks = getMatchedBlocks(grid_group)
+   removeMatchedBlocks(blocks)
+
+   print("id: "..grid_group.id)
+   
+   if (grid_group.numOfBlocks == 0) then
+       removeGridFromGlobalTable(grid_group.id)
+       spawnGrid()
+   end
+
+   physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape, isSensor = true})
    gridsTable[#gridsTable + 1] = grid_group  
 end
 
@@ -390,16 +447,16 @@ end
 
 function scene:create( event )
  
-    local SceneGroup = self.view
+    local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
-    upperBoundary: setFillColor(1,0,0,0.5)
+    upperBoundary.isVisible = false
     
      --adding display elements to scene group
-    SceneGroup: insert(MainBackground)
-    SceneGroup: insert(upperBoundary) 
+    sceneGroup: insert(MainBackground)
+    sceneGroup: insert(upperBoundary) 
 end
  
 function scene:show( event )
@@ -410,9 +467,9 @@ function scene:show( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
-        spawnGrid()
-        --gridSpawnTimer = timer.performWithDelay(15000, spawnGrid, 0)
-
+        spawnGrid(centerX - 100, centerY)
+        gridSpawnTimer = timer.performWithDelay(10000, spawnGrid, 0)
+        
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
             
@@ -432,7 +489,9 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         timer.cancel(gridSpawnTimer)
-
+        
+        upperBoundary: removeEventListener("collision", onUpperSensorCollide)
+        physics.removeBody(upperBoundary, "static")
     end
 end
  
