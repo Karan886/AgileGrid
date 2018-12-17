@@ -366,7 +366,7 @@ function spawnGrid(x, y, rows, cols)
       blockSize = sizeofBlock,
       offsetX = blockOffset,
       offsetY = blockOffset,
-      blockCornerRadius = 5
+      blockCornerRadius = 5,
    }
 
    print("rows: "..type(rows).."cols: "..type(cols))
@@ -389,8 +389,6 @@ function spawnGrid(x, y, rows, cols)
 
    local gridsTable = bin.grids
    local grid_group = createGridGroup(defaultOptions)
-
-   local trueGridCenter = centerX - (grid_group.totalShapeWidth/2) 
 
    grid_group.name = "GridContainer"
    grid_group.id = #gridsTable + 1
@@ -431,14 +429,14 @@ function spawnGrid(x, y, rows, cols)
    removeMatchedBlocks(blocks)
 
    print("id: "..grid_group.id)
-   
+
+   physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape, isSensor = true})
+   gridsTable[#gridsTable + 1] = grid_group 
+
    if (grid_group.numOfBlocks == 0) then
        removeGridFromGlobalTable(grid_group.id)
        spawnGrid()
-   end
-
-   physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape, isSensor = true})
-   gridsTable[#gridsTable + 1] = grid_group  
+   end 
 end
 
 -- -----------------------------------------------------------------------------------
@@ -467,7 +465,7 @@ function scene:show( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
-        spawnGrid(centerX - 100, centerY)
+        spawnGrid(centerX - 100, centerY, 4, 3)
         gridSpawnTimer = timer.performWithDelay(10000, spawnGrid, 0)
         
         physics.addBody(upperBoundary, "static")
