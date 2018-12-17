@@ -68,27 +68,6 @@ function removeMatchedBlocks(blocks)
   return true
 end
 
-function ParallaxScroll(object, options)
-    --initialize options
-    --the point where a parallax object starts and ends on the screen (ie. it ends when it wraps around)
-    local ObjectStart = { x = centerX, y = centerY - 200 } or options.start
-    local ObjectEnd = { x = centerX, y = actualHeight} or options.exit
-    -- the speed at which the parallax object's location updates in the scene (this is usually measured in pixels per frame in this case)
-    local Speed = 1 or options.speed
-
-    --print( "Parallax object options: { ObjectStartX = " .. ObjectStart.x .. " ObjectStartY = " .. ObjectStart.y ..
-        --" Speed = " .. Speed .. " WrapDelay = " .. WrapDelay)
-    
-    if ( object.y <= ObjectEnd.y ) then
-        object.y = object.y + Speed
-    else
-        if ( object ~= nil ) then
-            object.x = math.random(0, actualWidth)
-            object.y = ObjectStart.y
-        end
-    end  
-end
-
 function disableBlocks(blocks)
   for i = 1, #blocks do
     blocks[i].isEnabled = false
