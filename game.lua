@@ -411,13 +411,16 @@ function spawnGrid(x, y, rows, cols)
          leftCorner.x, leftCorner.y
    }
 
-   local backdrop = display.newRect(
+   local backdrop = display.newRoundedRect(
    grid_group.topLeft.x + grid_group.totalShapeWidth/2 - sizeofBlock/2, 
    grid_group.topLeft.y + grid_group.totalShapeHeight/2 - sizeofBlock/2, 
-   grid_group.totalShapeWidth, 
-   grid_group.totalShapeHeight
+   grid_group.totalShapeWidth + 10, 
+   grid_group.totalShapeHeight + 10,
+   5
    )
-   backdrop: setFillColor(1, 0, 0, 0.5)
+   backdrop: setFillColor(1, 1, 1, 0.5)
+   backdrop.strokeWidth = 2
+   backdrop: setStrokeColor(0, 0, 0, 0.5)
    grid_group: insert(backdrop)
    grid_group.backdrop = backdrop
 
