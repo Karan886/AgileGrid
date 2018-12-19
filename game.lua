@@ -421,6 +421,25 @@ function spawnGrid(x, y, rows, cols)
    end 
 end
 
+function moveBackgroundAssets(event)
+  print("hello world")
+end
+
+function scroll(options, group)
+  for i = 1, #options do
+    local asset = display.newImage(options[i].path, options[i].xstart, options[i].ystart)
+    asset.duration = options[i].duration
+    transition.to(asset, {
+       delay = options[i].delay, 
+       time = options[i].duration, 
+       x = options[i].xend, 
+       y = options[i].yend, 
+       iterations = 0
+    })
+    group: insert(asset)
+  end
+end
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -452,9 +471,29 @@ function scene:show( event )
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
-            
+        local options = {
+            {
+                path = "Images/Parallax/cloud_grey_small.png", 
+                xstart = math.random(0, width), 
+                ystart = -100, 
+                duration = 10000,
+                xend = math.random(0, width),
+                yend = height + 50,
+            },
+            {
+                path = "Images/Parallax/cloud_grey_large.png", 
+                xstart = math.random(0, width), 
+                ystart = -100, 
+                duration = 15000,
+                xend = math.random(0, width),
+                yend = height + 50, 
+                delay = 5000
+            }
+        }
+        scroll(options, sceneGroup)
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+       
        
     end 
 end
