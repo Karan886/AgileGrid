@@ -434,7 +434,9 @@ function scroll(options, group)
        time = options[i].duration, 
        x = options[i].xend, 
        y = options[i].yend, 
-       iterations = 0
+       iterations = 0,
+       rotation = options[i].rotation,
+       onRepeat = function() asset.x = math.random(0, width) end
     })
     group: insert(asset)
   end
@@ -471,24 +473,48 @@ function scene:show( event )
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
+
+        -- setup background scroll assets ie. clouds
         local options = {
             {
-                path = "Images/Parallax/cloud_grey_small.png", 
+                path = "Images/Parallax/gridbits.png", 
                 xstart = math.random(0, width), 
-                ystart = -100, 
-                duration = 10000,
+                ystart = height + 250, 
+                duration = 120000,
                 xend = math.random(0, width),
-                yend = height + 50,
+                yend = -250,
+                delay = 3000
             },
             {
-                path = "Images/Parallax/cloud_grey_large.png", 
+                path = "Images/Parallax/cloud_spiral_medium.png", 
                 xstart = math.random(0, width), 
                 ystart = -100, 
-                duration = 15000,
+                duration = 35000,
                 xend = math.random(0, width),
-                yend = height + 50, 
-                delay = 5000
+                yend = height + 50,
+                rotation = 180
+            },
+            {
+                path = "Images/Parallax/cloud_spiral_medium.png", 
+                xstart = math.random(0, width), 
+                ystart = -100, 
+                duration = 40000,
+                xend = math.random(0, width),
+                yend = height + 50,
+                rotation = 180,
+                delay = 6000
+            },
+            {
+                path = "Images/Parallax/cloud_spiral_medium.png", 
+                xstart = math.random(0, width), 
+                ystart = -100, 
+                duration = 50000,
+                xend = math.random(0, width),
+                yend = height + 50,
+                rotation = 180,
+                delay = 12000
             }
+
         }
         scroll(options, sceneGroup)
     elseif ( phase == "did" ) then
