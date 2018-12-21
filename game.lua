@@ -21,6 +21,8 @@ local bin = {
   grids = {}
 }
 
+local gameElements = display.newGroup()
+
 --global variables
 local ScrollParallaxObjects
 
@@ -41,6 +43,7 @@ function removeGridFromGlobalTable(id)
    if (gridToRemove ~= nil) then
        print "Grid exists, removing now..."
        table.remove(globalTable, id)
+       gameElements: remove(gridToRemove)
        display.remove(gridToRemove)
        print "Grid is successfully removed"
        for i=1,#globalTable do
@@ -413,14 +416,12 @@ function spawnGrid(x, y, rows, cols)
    physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape, isSensor = true})
    gridsTable[#gridsTable + 1] = grid_group 
 
+   gameElements: insert(grid_group)
+
    if (grid_group.numOfBlocks == 0) then
        removeGridFromGlobalTable(grid_group.id)
        spawnGrid()
    end 
-end
-
-function moveBackgroundAssets(event)
-  print("hello world")
 end
 
 function scroll(options, group)
@@ -452,10 +453,10 @@ function scene:create( event )
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary.isVisible = false
-    
+
      --adding display elements to scene group
     sceneGroup: insert(MainBackground)
-    sceneGroup: insert(upperBoundary) 
+    sceneGroup: insert(upperBoundary)
 end
  
 function scene:show( event )
@@ -471,6 +472,8 @@ function scene:show( event )
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
+
+        local frame = require "UIFrame"
 
         -- setup background scroll assets ie. clouds
         local options = {
@@ -514,9 +517,12 @@ function scene:show( event )
             }
 
         }
+
+        -- Insert elements on the screen in proper order
         scroll(options, sceneGroup)
-        -- Overlay the screen frames
-        composer.showOverlay("Frame")
+        sceneGroup: insert(gameElements)
+        frame.init(nil, sceneGroup)
+
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
        
