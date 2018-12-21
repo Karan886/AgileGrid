@@ -115,8 +115,6 @@ function assignRandomColorsToBlocks(slotContainer)
    local numOfColors = #slotContainer
    local colors = getColorMatrix(numOfColors)
 
-   print("number of colors: "..#colors)
-
   for i = 1, #slotContainer do
     local block = slotContainer[i]
     local randomColorIndex = math.random(1, #colors)
@@ -391,11 +389,11 @@ function spawnGrid(x, y, rows, cols)
    }
 
    local backdrop = display.newRoundedRect(
-   grid_group.topLeft.x + grid_group.totalShapeWidth/2 - sizeofBlock/2, 
-   grid_group.topLeft.y + grid_group.totalShapeHeight/2 - sizeofBlock/2, 
-   grid_group.totalShapeWidth + 10, 
-   grid_group.totalShapeHeight + 10,
-   5
+       grid_group.topLeft.x + grid_group.totalShapeWidth/2 - sizeofBlock/2, 
+       grid_group.topLeft.y + grid_group.totalShapeHeight/2 - sizeofBlock/2, 
+       grid_group.totalShapeWidth + 10, 
+       grid_group.totalShapeHeight + 10,
+       5
    )
    backdrop: setFillColor(1, 1, 1, 0.5)
    backdrop.strokeWidth = 2
@@ -517,6 +515,8 @@ function scene:show( event )
 
         }
         scroll(options, sceneGroup)
+        -- Overlay the screen frames
+        composer.showOverlay("Frame")
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
        
@@ -541,20 +541,12 @@ function scene:hide( event )
 end
  
  
-function scene:destroy( event )
- 
-    local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
- 
-end
- 
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
 -- -----------------------------------------------------------------------------------
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
-scene:addEventListener( "destroy", scene )
 -- -----------------------------------------------------------------------------------
  
 return scene
