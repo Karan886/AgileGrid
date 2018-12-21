@@ -21,10 +21,7 @@ local bin = {
   grids = {}
 }
 
-local gameElements = display.newGroup()
-
---global variables
-local ScrollParallaxObjects
+local spawnLayer = display.newGroup()
 
 --physics setup
 local physics = require "physics"
@@ -43,7 +40,7 @@ function removeGridFromGlobalTable(id)
    if (gridToRemove ~= nil) then
        print "Grid exists, removing now..."
        table.remove(globalTable, id)
-       gameElements: remove(gridToRemove)
+       spawnLayer: remove(gridToRemove)
        display.remove(gridToRemove)
        print "Grid is successfully removed"
        for i=1,#globalTable do
@@ -416,7 +413,7 @@ function spawnGrid(x, y, rows, cols)
    physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape, isSensor = true})
    gridsTable[#gridsTable + 1] = grid_group 
 
-   gameElements: insert(grid_group)
+   spawnLayer: insert(grid_group)
 
    if (grid_group.numOfBlocks == 0) then
        removeGridFromGlobalTable(grid_group.id)
@@ -520,7 +517,7 @@ function scene:show( event )
 
         -- Insert elements on the screen in proper order
         scroll(options, sceneGroup)
-        sceneGroup: insert(gameElements)
+        sceneGroup: insert(spawnLayer)
         frame.init(nil, sceneGroup)
 
     elseif ( phase == "did" ) then
