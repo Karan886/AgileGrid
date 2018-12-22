@@ -8,3 +8,9 @@ before it goes offscreen.
 - Player must match as many blocks as possible before grids go offscreen.
 - Future enhancements include adding perks that the player can unlock - ie. slow down time.
 - Player can move blocks on each grid by swapping in the playable area
+
+Structure:
+
+- game.lua - main/game scene
+- menu.lua - start menu
+- UIFrame.lua - self written module that controls menu options (play/pause) and score during game play
