@@ -14,3 +14,4 @@ Structure:
 - ./game.lua - main/game scene
 - ./menu.lua - start menu
 - ./UIFrame.lua - self written module that controls menu options (play/pause) and score during game play
+- ./data.lua - self written module that provides size configurations for the grid  
