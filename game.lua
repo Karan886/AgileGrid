@@ -524,7 +524,6 @@ function scene:show( event )
 
         -- customize header bar
         scoreText = frame.addText("score", "Score: 0 pts")
-        frame.addButton("Text2", {id = "button", label = "Play/Pause"})
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
