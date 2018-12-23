@@ -3,6 +3,7 @@ local scene = composer.newScene()
 
 -- Include files
 local data = require "data"
+local frame = require "UIFrame"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -14,7 +15,10 @@ local centerY = display.contentCenterY
 local width = display.contentWidth
 local height = display.contentHeight
 
+-- global variables
 local upperBoundary
+local scoreText
+
 
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
@@ -470,8 +474,6 @@ function scene:show( event )
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
 
-        local frame = require "UIFrame"
-
         -- setup background scroll assets ie. clouds
         local options = {
             {
@@ -518,7 +520,11 @@ function scene:show( event )
         -- Insert elements on the screen in proper order
         scroll(options, sceneGroup)
         sceneGroup: insert(spawnLayer)
-        frame.init(nil, sceneGroup)
+        frame.init({alpha = 0.6}, sceneGroup)
+
+        -- customize header bar
+        scoreText = frame.addText("score", "Score: 0 pts")
+        frame.addButton("Text2", {id = "button", label = "Play/Pause"})
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
