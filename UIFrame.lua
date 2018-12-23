@@ -71,6 +71,7 @@ function frame.addText(name, text, options)
 
    local text = display.newText(text, 0, header.position.y, font, size)
    text.anchorX, text.anchorY = 0, 0.5
+   text.name = name
    
    positionObject(text)
 
@@ -98,25 +99,20 @@ function frame.addButton(name, options)
         displayGroup: insert(button)
     end
     previousObj = button
+    button.name = name
     return button
 end
 
-function frame.poke(name, options)
+function frame.add(name, obj)
   local frameObjects = frame.frameObjects
-  
-  if (frameObjects[name] ~= nil) then
-    local obj = frameObjects[name]
-    local initWidth, initHeight = obj.width, obj.height
-    transition.to(obj, {
-       time = options.time, 
-       xScale = options.xScale, 
-       yScale = options.yScale, 
-       onComplete = function() 
-           obj.xScale = 1.0
-           obj.yScale = 1.0
-       end
-    })
+  if (init == false) then
+       print("Cannot add text to UIFrame because it was not initialized")
+       return false
   end
+
+  obj.anchorX, obj.anchorY = 0, 0.5
+  positionObject(obj)
+  return true
 end
 
 function simpleHeader()

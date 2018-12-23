@@ -4,6 +4,7 @@ local scene = composer.newScene()
 -- Include files
 local data = require "data"
 local frame = require "UIFrame"
+local score = require "score"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -55,7 +56,14 @@ function removeGridFromGlobalTable(id)
    end
 end
 
-function removeMatchedBlocks(blocks)
+function updateScore(value)
+    if (scoreText ~= nil) then
+       scoreText.add("Score: ", value)
+       scoreText.poke()
+    end
+end
+
+function removeMatchedBlocks(blocks, score)
   -- Assuming that all blocks belong to the same parent grid
   if (blocks == nil or #blocks == 0) then
     return false
@@ -68,7 +76,9 @@ function removeMatchedBlocks(blocks)
     parentGrid.numOfBlocks = parentGrid.numOfBlocks - 1
     print("blocks left: "..parentGrid.numOfBlocks)
   end
-
+  if (score == true) then
+      updateScore(3)
+  end
   return true
 end
 
@@ -327,7 +337,7 @@ function blockSwipe(event)
          display.getCurrentStage():setFocus(nil)
 
          local blocksToRemove = getMatchedBlocks(parentGroup)
-         removeMatchedBlocks(blocksToRemove)
+         removeMatchedBlocks(blocksToRemove, true)
 
          if (parentGroup.numOfBlocks == 0) then
              removeGridFromGlobalTable(parentGroup.id)
@@ -410,7 +420,7 @@ function spawnGrid(x, y, rows, cols)
    end
 
    local blocks = getMatchedBlocks(grid_group)
-   removeMatchedBlocks(blocks)
+   removeMatchedBlocks(blocks, false)
 
    print("id: "..grid_group.id)
 
@@ -523,7 +533,10 @@ function scene:show( event )
         frame.init({alpha = 0.6}, sceneGroup)
 
         -- customize header bar
-        scoreText = frame.addText("score", "Score: 0 pts")
+        scoreText = display.newText("Score: 0 pts", 0, 0, "Fonts/BigBook-Heavy", 10)
+        scoreText: setFillColor(0.5, 0.5, 0.5)
+        score.new("score", scoreText, 0)
+        frame.add(scoreText.name, scoreText)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
