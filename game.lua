@@ -78,7 +78,7 @@ function removeMatchedBlocks(blocks, score)
     print("blocks left: "..parentGrid.numOfBlocks)
   end
   if (score == true) then
-      updateScore(1)
+      updateScore(#blocks / 3)
   end
   return true
 end
