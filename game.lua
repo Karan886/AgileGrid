@@ -78,7 +78,7 @@ function removeMatchedBlocks(blocks, score)
     print("blocks left: "..parentGrid.numOfBlocks)
   end
   if (score == true) then
-      updateScore(3)
+      updateScore(1)
   end
   return true
 end
@@ -210,6 +210,9 @@ function onUpperSensorCollide(event)
   print("Collision occured with upper sensor")
   if (event.other.name == "GridContainer" and event.phase == 'ended') then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
+      local matchesLeft = event.other.numOfBlocks / 3
+      updateScore(matchesLeft * -3)
+
       removeGridFromGlobalTable(event.other.id)
   end
 end
