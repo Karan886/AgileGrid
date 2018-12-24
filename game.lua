@@ -57,10 +57,10 @@ function removeGridFromGlobalTable(id)
    end
 end
 
-function updateScore(value)
+function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
        scoreText.add("Score: ", value)
-       scoreText.poke()
+       scoreText.poke(pokeOptions)
     end
 end
 
@@ -78,7 +78,9 @@ function removeMatchedBlocks(blocks, score)
     print("blocks left: "..parentGrid.numOfBlocks)
   end
   if (score == true) then
-      updateScore(#blocks / 3)
+      updateScore(#blocks / 3, {
+          startColor = {0.28, 0.52, 0.34}
+      })
   end
   return true
 end
@@ -211,7 +213,9 @@ function onUpperSensorCollide(event)
   if (event.other.name == "GridContainer" and event.phase == 'ended') then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
       local matchesLeft = event.other.numOfBlocks / 3
-      updateScore(matchesLeft * -3)
+      updateScore(matchesLeft * -2, {
+          startColor = {1, 0, 0}
+      })
 
       removeGridFromGlobalTable(event.other.id)
   end

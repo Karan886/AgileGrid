@@ -1,8 +1,9 @@
 local score = {}
 local scoreObjects = {}
-local file = require "file"
 
+local file = require "file"
 local json = require "json"
+
 
 function isObjectValid(name)
     if (scoreObjects[name] == nil) then
@@ -24,17 +25,25 @@ function score.new(name, obj, value)
     obj.poke = function(options)
         local duration = 300
         local scaleX, scaleY = 2.0, 2.0
+        local startColor = {0, 1, 0}
+        local endColor = {0.5, 0.5, 0.5}
+
         if (options ~= nil) then
         	scaleX = options.xScale or 2.0
         	scaleY = options.yScale or 2.0
         	duration = options.time or 300
+            startColor, endColor = options.startColor or startColor, options.endColor or endColor
         end
-
+        
         transition.to(obj, {
             time = duration,
             xScale =  scaleX,
             yScale = scaleY,
-            onComplete = function() obj.xScale, obj.yScale = 1.0, 1.0 end
+            onStart = function() obj:setFillColor(unpack(startColor)) end,
+            onComplete = function() 
+                 obj.xScale, obj.yScale = 1.0, 1.0 
+                 obj:setFillColor(unpack(endColor))
+            end
         })
 
     end
