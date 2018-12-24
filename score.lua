@@ -1,7 +1,16 @@
 local score = {}
 local scoreObjects = {}
+local file = require "file"
 
 local json = require "json"
+
+function isObjectValid(name)
+    if (scoreObjects[name] == nil) then
+        print("Error: could not find score object with name: "..name)
+        return false
+    end
+    return true
+end
 
 function score.new(name, obj, value)
     obj.name = name or #scoreObjects
@@ -31,6 +40,21 @@ function score.new(name, obj, value)
     end
     scoreObjects[name] = obj
     return obj
+end
+
+function score.save(name)
+    if (isObjectValid(name)) then
+        local userJson = file.loadJson("user.json")
+        userJson[name] = scoreObjects[name].value
+        file.save("user.json", json.encode(userJson))
+    end
+end
+
+function score.load(name, property)
+     if (isObjectValid(name)) then
+         return file.load("user.json", property)
+     end
+     return nil
 end
 
 return score

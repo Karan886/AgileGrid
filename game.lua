@@ -540,6 +540,7 @@ function scene:show( event )
         scoreText: setFillColor(0.5, 0.5, 0.5)
         score.new("score", scoreText, 0)
         frame.add(scoreText.name, scoreText)
+        score.save("score")
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
