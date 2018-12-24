@@ -3,29 +3,6 @@ local scoreObjects = {}
 
 local json = require "json"
 
-function readFile(filePath)
-    local path = system.pathForFile(filePath)
-    local decoded, position, message = json.decodeFile(path)
-
-    if not decoded then
-        print("Error: failed to decode json file at "..filePath.." at "..position.." msg: "..message)
-        return nil
-    end
-    
-    return decoded
-end
-
-function writeFile(filePath, content)
-    local path = system.pathForFile(filePath)
-    local file, errorMessage = io.open(path, "w")
-    if not file then
-        print("Error: "..errorMessage)
-        return false
-    end
-    file:write(json.encode(content))
-    io.close()
-end
-
 function score.new(name, obj, value)
     obj.name = name or #scoreObjects
     obj.value = value
@@ -55,15 +32,5 @@ function score.new(name, obj, value)
     scoreObjects[name] = obj
     return obj
 end
-
-function score.load(name)
-    if (scoreObjects[name] == nil) then
-        print("Score.save unable to save score because specified score object does not exist")
-        return false
-    end
-    local userContent = readFile("./user.json")
-    return userContent[name]
-end
-
 
 return score

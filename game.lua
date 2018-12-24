@@ -5,6 +5,7 @@ local scene = composer.newScene()
 local data = require "data"
 local frame = require "UIFrame"
 local score = require "score"
+local file = require "file"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -459,6 +460,8 @@ end
 function scene:create( event )
  
     local sceneGroup = self.view
+    --initialize user data
+    file.create("user.json", '{"name" : "clark"}')
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
      
