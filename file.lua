@@ -60,6 +60,7 @@ function file.loadJson(filename, property)
 		print("Error: could not read json file "..filename.." at position "..position.. " with error message: "..msg)
 		return returnVal
 	end
+    
 	if (property ~= nil) then
 		returnVal = decodedJson[property]
 	else

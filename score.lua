@@ -52,7 +52,7 @@ end
 
 function score.load(name, property)
      if (isObjectValid(name)) then
-         return file.load("user.json", property)
+         return file.loadJson("user.json", property)
      end
      return nil
 end
