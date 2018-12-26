@@ -347,14 +347,11 @@ function blockSwipe(event)
          local blocksToRemove = getMatchedBlocks(parentGroup)
          removeMatchedBlocks(blocksToRemove, true)
 
-         local smokeAffect = particles.new("./ParticleAffects/Example.json")
-
          if (parentGroup.numOfBlocks == 0) then
-             removeGridFromGlobalTable(parentGroup.id)
              local position = getAbsolutePosition(parentGroup.backdrop)
-             smokeAffect.start(position.x, position.y, spawnLayer)
-         end
-          
+             parentGroup.smokeAffect.start(position.x, position.y, spawnLayer)
+             removeGridFromGlobalTable(parentGroup.id)
+         end  
      end
    end
 
@@ -426,6 +423,7 @@ function spawnGrid(x, y, rows, cols)
    backdrop: setStrokeColor(0, 0, 0, 0.5)
    grid_group: insert(backdrop)
    grid_group.backdrop = backdrop
+   grid_group.smokeAffect = particles.new("./ParticleAffects/Example.json")
 
    for i = 1, #slotContainer do
        grid_group: insert(slotContainer[i])
@@ -464,6 +462,13 @@ function scroll(options, group)
   end
 end
 
+function parallaxScroll(options, group)
+    local initPosition = {x = centerX, y = centerY}
+    local firstAsset = display.newImage(options[1].path, initPosition.x, initPosition.y)
+
+    group: insert(firstAsset)
+end
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -497,50 +502,31 @@ function scene:show( event )
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
 
         -- setup background scroll assets ie. clouds
-        local options = {
+        local scrollOptions = {
             {
-                path = "Images/Parallax/gridbits.png", 
+                path = "./Images/Parallax/gridbits.png", 
                 xstart = math.random(0, width), 
                 ystart = height + 250, 
                 duration = 120000,
                 xend = math.random(0, width),
                 yend = -250,
                 delay = 3000
-            },
-            {
-                path = "Images/Parallax/cloud_spiral_medium.png", 
-                xstart = math.random(0, width), 
-                ystart = -100, 
-                duration = 35000,
-                xend = math.random(0, width),
-                yend = height + 50,
-                rotation = 180
-            },
-            {
-                path = "Images/Parallax/cloud_spiral_medium.png", 
-                xstart = math.random(0, width), 
-                ystart = -100, 
-                duration = 40000,
-                xend = math.random(0, width),
-                yend = height + 50,
-                rotation = 180,
-                delay = 6000
-            },
-            {
-                path = "Images/Parallax/cloud_spiral_medium.png", 
-                xstart = math.random(0, width), 
-                ystart = -100, 
-                duration = 50000,
-                xend = math.random(0, width),
-                yend = height + 50,
-                rotation = 180,
-                delay = 12000
             }
+        }
 
+        local parallaxOptions = {
+           {
+               path = "./Images/Parallax/parallax_clouds_one.png"
+
+           }, 
+           {
+               path = "./Images/Parallax/parallax_clouds_two.png"
+           }
         }
 
         -- Insert elements on the screen in proper order
-        scroll(options, sceneGroup)
+        scroll(scrollOptions, sceneGroup)
+        parallaxScroll(parallaxOptions, sceneGroup)
         sceneGroup: insert(spawnLayer)
         frame.init({alpha = 0.6}, sceneGroup)
 
