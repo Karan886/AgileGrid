@@ -1,10 +1,8 @@
 local file = {}
-file.location = system.DocumentsDirectory
-
 local json = require "json"
 
-function file.create(name, contents)
-    local path = system.pathForFile(name, file.location)
+function file.create(name, contents, location)
+    local path = system.pathForFile(name, location)
     local open, errorMsg = io.open(path, "r")
     if not open then
     	--file does not exist, create one
@@ -25,8 +23,8 @@ function file.create(name, contents)
     return false
 end
 
-function file.save(name, contents)
-    local path = system.pathForFile(name, file.location)
+function file.save(name, contents, location)
+    local path = system.pathForFile(name, location)
     local open, errorMsg = io.open(path, "w")
     if not open then
     	print("Error: saving data to file "..name.." failed. Error message: "..errorMsg)
@@ -39,8 +37,8 @@ function file.save(name, contents)
     return true
 end
 
-function file.load(name)
-	local path = system.pathForFile(name, file.location)
+function file.load(name, location)
+	local path = system.pathForFile(name, location)
 	local open, errorMsg = io.open(path, "r")
 	if not open then
 		print("Error: loading data from file "..name.." failed. Error message: "..errorMsg)
@@ -52,8 +50,8 @@ function file.load(name)
 	return contents
 end
 
-function file.loadJson(filename, property)
-	local path = system.pathForFile(filename, file.location)
+function file.loadJson(filename, property, location)
+	local path = system.pathForFile(filename, location)
 	local decodedJson, position, msg = json.decodeFile(path)
 	local returnVal = nil
 	if not decodedJson then
