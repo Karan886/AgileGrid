@@ -5,6 +5,7 @@ local scene = composer.newScene()
 local data = require "data"
 local frame = require "UIFrame"
 local score = require "score"
+local particles = require "Particles"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -346,8 +347,12 @@ function blockSwipe(event)
          local blocksToRemove = getMatchedBlocks(parentGroup)
          removeMatchedBlocks(blocksToRemove, true)
 
+         local smokeAffect = particles.new("./ParticleAffects/Example.json")
+
          if (parentGroup.numOfBlocks == 0) then
              removeGridFromGlobalTable(parentGroup.id)
+             local position = getAbsolutePosition(parentGroup.backdrop)
+             smokeAffect.start(position.x, position.y, spawnLayer)
          end
           
      end
