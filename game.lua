@@ -21,6 +21,13 @@ local height = display.contentHeight
 local upperBoundary
 local scoreText
 
+local parallax_clouds_one
+local parallax_clouds_two
+local parallax_clouds_three
+
+local parallaxWrapPosition
+local smokeAffect = particles.new("./ParticleAffects/SmokeExplosion.json")
+
 
 --scene garbage for objects that are not latched on to the scene
 local bin = { 
@@ -349,7 +356,7 @@ function blockSwipe(event)
 
          if (parentGroup.numOfBlocks == 0) then
              local position = getAbsolutePosition(parentGroup.backdrop)
-             parentGroup.smokeAffect.start(position.x, position.y, spawnLayer)
+             smokeAffect.start(position.x, position.y, spawnLayer)
              removeGridFromGlobalTable(parentGroup.id)
          end  
      end
@@ -423,7 +430,6 @@ function spawnGrid(x, y, rows, cols)
    backdrop: setStrokeColor(0, 0, 0, 0.5)
    grid_group: insert(backdrop)
    grid_group.backdrop = backdrop
-   grid_group.smokeAffect = particles.new("./ParticleAffects/Example.json")
 
    for i = 1, #slotContainer do
        grid_group: insert(slotContainer[i])
@@ -462,11 +468,24 @@ function scroll(options, group)
   end
 end
 
-function parallaxScroll(options, group)
-    local initPosition = {x = centerX, y = centerY}
-    local firstAsset = display.newImage(options[1].path, initPosition.x, initPosition.y)
+function parallaxScroll()
+    if (parallax_clouds_one.y > parallax_clouds_one.height) then
+        parallax_clouds_one.y = parallaxWrapPosition.y + 40
+    else
+        parallax_clouds_one.y = parallax_clouds_one.y + 0.5
+    end
 
-    group: insert(firstAsset)
+    if (parallax_clouds_two.y > parallax_clouds_two.height) then
+        parallax_clouds_two.y = parallaxWrapPosition.y + 40
+    else
+        parallax_clouds_two.y = parallax_clouds_two.y + 0.5
+    end
+
+    if (parallax_clouds_three.y > parallax_clouds_three.height) then
+        parallax_clouds_three.y = parallaxWrapPosition.y + 40
+    else
+        parallax_clouds_three.y = parallax_clouds_three.y + 0.5
+    end
 end
 
 -- -----------------------------------------------------------------------------------
@@ -477,13 +496,22 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local MainBackground = display.newImage("Images/Backgrounds/sky_game.png", centerX, centerY)
+    local mainBackground = display.newImage("./Images/Backgrounds/sky_game.png", centerX, centerY)
+
+    parallax_clouds_one = display.newImage("./Images/Parallax/parallax_clouds_one.png", centerX, centerY)
+    parallax_clouds_two = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
+    parallax_clouds_three = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_two.height)
+
+    parallaxWrapPosition = {x = parallax_clouds_two.x, y = parallax_clouds_two.y}
      
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary.isVisible = false
 
      --adding display elements to scene group
-    sceneGroup: insert(MainBackground)
+    sceneGroup: insert(mainBackground)
+    sceneGroup: insert(parallax_clouds_one)
+    sceneGroup: insert(parallax_clouds_two)
+    sceneGroup: insert(parallax_clouds_three)
     sceneGroup: insert(upperBoundary)
 end
  
@@ -500,33 +528,9 @@ function scene:show( event )
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
-
-        -- setup background scroll assets ie. clouds
-        local scrollOptions = {
-            {
-                path = "./Images/Parallax/gridbits.png", 
-                xstart = math.random(0, width), 
-                ystart = height + 250, 
-                duration = 120000,
-                xend = math.random(0, width),
-                yend = -250,
-                delay = 3000
-            }
-        }
-
-        local parallaxOptions = {
-           {
-               path = "./Images/Parallax/parallax_clouds_one.png"
-
-           }, 
-           {
-               path = "./Images/Parallax/parallax_clouds_two.png"
-           }
-        }
+        Runtime: addEventListener("enterFrame", parallaxScroll)
 
         -- Insert elements on the screen in proper order
-        scroll(scrollOptions, sceneGroup)
-        parallaxScroll(parallaxOptions, sceneGroup)
         sceneGroup: insert(spawnLayer)
         frame.init({alpha = 0.6}, sceneGroup)
 
