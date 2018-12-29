@@ -3,9 +3,9 @@ local scene = composer.newScene()
 
 -- Include files
 local data = require "data"
-local frame = require "UIFrame"
-local score = require "score"
-local particles = require "Particles"
+local frame = require "Modules.UIFrame"
+local score = require "Modules.Score"
+local particles = require "Modules.Particles"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
