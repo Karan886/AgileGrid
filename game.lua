@@ -533,13 +533,13 @@ function scene:show( event )
 
         -- Insert elements on the screen in proper order
         sceneGroup: insert(spawnLayer)
-        frame.init({alpha = 0.6}, sceneGroup)
+        local headerFrame = frame.init({alpha = 0.6}, sceneGroup)
 
         -- customize header bar
         scoreText = display.newText("Score: 0 pts", 0, 0, "Fonts/BigBook-Heavy", 10)
         scoreText: setFillColor(0.5, 0.5, 0.5)
         score.new("score", scoreText, 0)
-        frame.add(scoreText.name, scoreText, { xpos = centerX - (scoreText.width/2)})
+        headerFrame.add(scoreText.name, scoreText, { xpos = centerX - (scoreText.width/2)})
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen

@@ -3,7 +3,6 @@ local frame = {
 }
 
 local widget = require "widget"
-local init = false
 
 -- Dimensions
 local actualHeight = display.actualContentHeight
@@ -23,6 +22,12 @@ local header = {
 
 local displayGroup = nil
 
+function addToGroup(obj)
+  if (displayGroup ~= nil) then
+    displayGroup: insert(obj)
+  end
+end
+
 function positionObject(obj, options)
     local xpos = obj.offsetLeft or 5
 
@@ -39,50 +44,50 @@ function positionObject(obj, options)
 end
 
 function frame.init(options, group)
+  local frameObjects = frame.frameObjects
 	if (options ~= nil) then
 		for key, value in pairs(options) do
     	    header[key] = value
         end
 	end
-    local headerFrame = nil
-    if (header.image == nil) then
+
+  local headerFrame = nil
+  if (header.image == nil) then
     	headerFrame = simpleHeader()
-    else
-        headerFrame = texturedHeader()
-    end
-    if (group ~= nil) then
-    	displayGroup = group
-    	group: insert(headerFrame)
-    end
-    init = true
+  else
+      headerFrame = texturedHeader()
+  end
+
+  headerFrame.add = function(name, obj, options)
+      obj.anchorX, obj.anchorY = 0, 0.5
+      positionObject(obj, options)
+      frameObjects[name] = obj
+      addToGroup(obj)  
+  end
+    
+  addToGroup(headerFrame)
+  return headerFrame
 end
 
 function frame.addText(name, text, options)
-   if (init == false) then
-       print("Cannot add text to UIFrame because it was not initialized")
-       return nil
-   end
-   local frameObjects = frame.frameObjects
+    local frameObjects = frame.frameObjects
 
-   local size = 10 
-   local font = "Fonts/BigBook-Heavy" 
+    local size = 10 
+    local font = "Fonts/BigBook-Heavy" 
 
-   if (options ~= nil) then
-    size = 10
-    font = "Fonts/BigBook-Heavy"
-   end
+    if (options ~= nil) then
+        size = 10
+        font = "Fonts/BigBook-Heavy"
+    end
 
-   local text = display.newText(text, 0, header.position.y, font, size)
-   text.anchorX, text.anchorY = 0, 0.5
-   text.name = name
+    local text = display.newText(text, 0, header.position.y, font, size)
+    text.anchorX, text.anchorY = 0, 0.5
+    text.name = name
    
-   positionObject(text)
+    positionObject(text)
 
-   frameObjects[name] = text
-   if (displayGroup ~= nil) then
-       displayGroup: insert(text)
-   end
-   return text
+    frameObjects[name] = text
+    addToGroup(text)
 end
 
 function frame.addButton(name, options)
