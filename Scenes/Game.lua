@@ -498,8 +498,7 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local mainBackground = display.newRect(centerX, centerY, actualWidth, actualHeight)
-    mainBackground: setFillColor(0.02, 0.91, 1.0)
+    local mainBackground = display.newImage("./Images/Backgrounds/sky_game.png", centerX, centerY)
 
     parallax_clouds_one = display.newImage("./Images/Parallax/parallax_clouds_one.png", centerX, centerY)
     parallax_clouds_two = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
