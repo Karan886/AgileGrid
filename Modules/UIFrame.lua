@@ -22,13 +22,6 @@ local header = {
 
 local displayGroup = nil
 
-function isObjectValid(name)
-    if (frameObjects[name] == nil) then
-      return false
-    end
-    return true
-end
-
 function addToGroup(obj)
   if (displayGroup ~= nil) then
     displayGroup: insert(obj)
@@ -54,7 +47,6 @@ function positionObject(obj, options, isPrevious)
 end
 
 function frame.init(options, group)
-  local frameObjects = frame.frameObjects
 	if (options ~= nil) then
 		for key, value in pairs(options) do
     	    header[key] = value
@@ -69,6 +61,7 @@ function frame.init(options, group)
   end
 
   headerFrame.add = function(name, obj, options)
+      local frameObjects = frame.frameObjects
       obj.anchorX, obj.anchorY = 0, 0.5
       positionObject(obj, options, true)
       frameObjects[name] = obj
@@ -76,10 +69,11 @@ function frame.init(options, group)
   end
 
   headerFrame.fixPosition = function(name)
-      if (isObjectValid(name)) then
-          positionObject(frameObjects[name], nil, false)
+      local frameObjects = frame.frameObjects
+      if (frameObjects[name]) then
+          positionObject(frameObjects[name],{xpos = centerX - frameObjects[name].width}, false)
       else
-        print("Warning: the object name specified is invalid in function UIFrame.init.fixPosition")
+         print("Warning: the object name specified is invalid in function UIFrame.init.fixPosition")
       end
   end
     
@@ -110,10 +104,6 @@ end
 
 function frame.addButton(name, options)
     local frameObjects = frame.frameObjects
-    if (init == false) then
-       print("Cannot add text to UIFrame because it was not initialized")
-       return nil
-    end
     local button = widget.newButton(options)
     button.anchorX, button.anchorY = 0, 0.5
     positionObject(button, nil, true)
@@ -124,19 +114,17 @@ function frame.addButton(name, options)
         displayGroup: insert(button)
     end
     button.name = name
-    
 end
 
-function frame.add(name, obj, options)
-  local frameObjects = frame.frameObjects
-  if (init == false) then
-       print("Cannot add text to UIFrame because it was not initialized")
-       return false
-  end
-  
-  obj.anchorX, obj.anchorY = 0, 0.5
-  positionObject(obj, options, true)
+function frame.toString()
+    local frameObjects = frame.frameObjects
+    local counter = 1
+    print("Header Frame Contents: ")
+    for k,v in pairs(frameObjects) do
+      print("Object "..counter.." name : "..k)
+    end
 end
+
 
 function simpleHeader()
 	local headerFrame = display.newRoundedRect(header.position.x, header.position.y, header.size.width, header.size.height, 10)
