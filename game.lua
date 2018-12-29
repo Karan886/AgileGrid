@@ -469,20 +469,20 @@ function scroll(options, group)
 end
 
 function parallaxScroll()
-    if (parallax_clouds_one.y > parallax_clouds_one.height) then
-        parallax_clouds_one.y = parallaxWrapPosition.y + 40
+    if (parallax_clouds_one.y > parallax_clouds_one.height + 50) then
+        parallax_clouds_one.y = parallaxWrapPosition.y - 70
     else
         parallax_clouds_one.y = parallax_clouds_one.y + 0.5
     end
 
-    if (parallax_clouds_two.y > parallax_clouds_two.height) then
-        parallax_clouds_two.y = parallaxWrapPosition.y + 40
+    if (parallax_clouds_two.y > parallax_clouds_two.height + 50) then
+        parallax_clouds_two.y = parallaxWrapPosition.y - 70
     else
         parallax_clouds_two.y = parallax_clouds_two.y + 0.5
     end
 
-    if (parallax_clouds_three.y > parallax_clouds_three.height) then
-        parallax_clouds_three.y = parallaxWrapPosition.y + 40
+    if (parallax_clouds_three.y > parallax_clouds_three.height + 50) then
+        parallax_clouds_three.y = parallaxWrapPosition.y - 70
     else
         parallax_clouds_three.y = parallax_clouds_three.y + 0.5
     end
@@ -496,7 +496,8 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local mainBackground = display.newImage("./Images/Backgrounds/sky_game.png", centerX, centerY)
+    local mainBackground = display.newRect(centerX, centerY, actualWidth, actualHeight)
+    mainBackground: setFillColor(0.02, 0.91, 1.0)
 
     parallax_clouds_one = display.newImage("./Images/Parallax/parallax_clouds_one.png", centerX, centerY)
     parallax_clouds_two = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
@@ -538,7 +539,7 @@ function scene:show( event )
         scoreText = display.newText("Score: 0 pts", 0, 0, "Fonts/BigBook-Heavy", 10)
         scoreText: setFillColor(0.5, 0.5, 0.5)
         score.new("score", scoreText, 0)
-        frame.add(scoreText.name, scoreText)
+        frame.add(scoreText.name, scoreText, { xpos = centerX - (scoreText.width/2)})
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen

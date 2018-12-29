@@ -23,16 +23,19 @@ local header = {
 
 local displayGroup = nil
 
-function positionObject(obj)
+function positionObject(obj, options)
     local xpos = obj.offsetLeft or 5
-    local width = obj.width
 
-    if (previousObj ~= nil) then
-       xpos = previousObj.x + previousObj.width + (obj.offsetRight or 5)
-   end 
-   
+    if (options ~= nil) then
+       xpos = options.xpos or centerX
+    elseif (previousObj ~= nil) then
+       xpos = previousObj.x + previousObj.width + (obj.offsetRight or 5)  
+    end
+
+   local width = obj.width
    obj.x = xpos
    obj.y = header.position.y
+   previousObj = obj
 end
 
 function frame.init(options, group)
@@ -79,7 +82,6 @@ function frame.addText(name, text, options)
    if (displayGroup ~= nil) then
        displayGroup: insert(text)
    end
-   previousObj = text
    return text
 end
 
@@ -98,21 +100,19 @@ function frame.addButton(name, options)
     if (displayGroup ~= nil) then
         displayGroup: insert(button)
     end
-    previousObj = button
     button.name = name
-    return button
+    
 end
 
-function frame.add(name, obj)
+function frame.add(name, obj, options)
   local frameObjects = frame.frameObjects
   if (init == false) then
        print("Cannot add text to UIFrame because it was not initialized")
        return false
   end
-
+  
   obj.anchorX, obj.anchorY = 0, 0.5
-  positionObject(obj)
-  return true
+  positionObject(obj, options)
 end
 
 function simpleHeader()
