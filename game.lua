@@ -66,7 +66,7 @@ end
 
 function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
-       scoreText.add("Score: ", value)
+       scoreText.add("", value)
        scoreText.poke(pokeOptions)
     end
 end
@@ -536,9 +536,9 @@ function scene:show( event )
         local headerFrame = frame.init({alpha = 0.6}, sceneGroup)
 
         -- customize header bar
-        scoreText = display.newText("Score: 0 pts", 0, 0, "Fonts/BigBook-Heavy", 10)
+        scoreText = display.newText("0", 0, 0, "Fonts/BigBook-Heavy", 30)
         scoreText: setFillColor(0.5, 0.5, 0.5)
-        score.new("score", scoreText, 0)
+        score.new("", scoreText, 0)
         headerFrame.add(scoreText.name, scoreText, { xpos = centerX - (scoreText.width/2)})
 
     elseif ( phase == "did" ) then
