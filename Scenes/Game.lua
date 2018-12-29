@@ -19,6 +19,7 @@ local height = display.contentHeight
 
 -- global variables
 local upperBoundary
+local headerFrame
 local scoreText
 
 local parallax_clouds_one
@@ -88,6 +89,10 @@ function removeMatchedBlocks(blocks, score)
       updateScore(#blocks / 3, {
           startColor = {0.28, 0.52, 0.34}
       })
+      -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
+      if (headerFrame ~= nil) then
+          headerFrame.fixPosition("score")
+      end
   end
   return true
 end
@@ -223,7 +228,10 @@ function onUpperSensorCollide(event)
       updateScore(matchesLeft * -2, {
           startColor = {1, 0, 0}
       })
-
+      -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
+      if (headerFrame ~= nil) then
+          headerFrame.fixPosition("score")
+      end
       removeGridFromGlobalTable(event.other.id)
   end
 end
@@ -527,7 +535,7 @@ function scene:show( event )
 
         -- Insert elements on the screen in proper order
         sceneGroup: insert(spawnLayer)
-        local headerFrame = frame.init({alpha = 0.6}, sceneGroup)
+        headerFrame = frame.init({alpha = 0.6}, sceneGroup)
 
         -- customize header bar
         scoreText = display.newText("0", 0, 0, "Fonts/BigBook-Heavy", 30)

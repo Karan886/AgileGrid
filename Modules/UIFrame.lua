@@ -22,13 +22,20 @@ local header = {
 
 local displayGroup = nil
 
+function isObjectValid(name)
+    if (frameObjects[name] == nil) then
+      return false
+    end
+    return true
+end
+
 function addToGroup(obj)
   if (displayGroup ~= nil) then
     displayGroup: insert(obj)
   end
 end
 
-function positionObject(obj, options)
+function positionObject(obj, options, isPrevious)
     local xpos = obj.offsetLeft or 5
 
     if (options ~= nil) then
@@ -40,7 +47,10 @@ function positionObject(obj, options)
    local width = obj.width
    obj.x = xpos
    obj.y = header.position.y
-   previousObj = obj
+
+   if (isPrevious) then
+      previousObj = obj
+   end
 end
 
 function frame.init(options, group)
@@ -60,9 +70,17 @@ function frame.init(options, group)
 
   headerFrame.add = function(name, obj, options)
       obj.anchorX, obj.anchorY = 0, 0.5
-      positionObject(obj, options)
+      positionObject(obj, options, true)
       frameObjects[name] = obj
       addToGroup(obj)  
+  end
+
+  headerFrame.fixPosition = function(name)
+      if (isObjectValid(name)) then
+          positionObject(frameObjects[name], nil, false)
+      else
+        print("Warning: the object name specified is invalid in function UIFrame.init.fixPosition")
+      end
   end
     
   addToGroup(headerFrame)
@@ -84,7 +102,7 @@ function frame.addText(name, text, options)
     text.anchorX, text.anchorY = 0, 0.5
     text.name = name
    
-    positionObject(text)
+    positionObject(text, nil, true)
 
     frameObjects[name] = text
     addToGroup(text)
@@ -98,7 +116,7 @@ function frame.addButton(name, options)
     end
     local button = widget.newButton(options)
     button.anchorX, button.anchorY = 0, 0.5
-    positionObject(button)
+    positionObject(button, nil, true)
     
     frameObjects[name] = button
 
@@ -117,7 +135,7 @@ function frame.add(name, obj, options)
   end
   
   obj.anchorX, obj.anchorY = 0, 0.5
-  positionObject(obj, options)
+  positionObject(obj, options, true)
 end
 
 function simpleHeader()
