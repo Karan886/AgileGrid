@@ -2,12 +2,13 @@ local score = {}
 local scoreObjects = {}
 
 local file = require "Modules.File"
+local exception = require "Modules.Exception"
 local json = require "json"
 
 
 function isObjectValid(name)
     if (scoreObjects[name] == nil) then
-        print("Error: could not find score object with name: "..name)
+        exception.new(exception.error, "Could not find score object with name: "..name)
         return false
     end
     return true

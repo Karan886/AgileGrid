@@ -6,6 +6,7 @@ local data = require "data"
 local frame = require "Modules.UIFrame"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
+local exception = require "Modules.Exception"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -60,7 +61,7 @@ function removeGridFromGlobalTable(id)
          globalTable[i].id = i
        end
    else
-       print("no grid to remove")
+       excpetion.new(exception.warning, "No grids to remove at Game.removeGridFromGlobalTable")
    end
 end
 
