@@ -52,7 +52,6 @@ function removeGridFromGlobalTable(id)
    local gridToRemove = bin.grids[id]
 
    if (gridToRemove ~= nil) then
-       print "Grid exists, removing now..."
        table.remove(globalTable, id)
        spawnLayer: remove(gridToRemove)
        display.remove(gridToRemove)
@@ -61,7 +60,7 @@ function removeGridFromGlobalTable(id)
          globalTable[i].id = i
        end
    else
-       excpetion.new(exception.warning, "No grids to remove at Game.removeGridFromGlobalTable")
+       exception.new(exception.warning, "No grids to remove at Game.removeGridFromGlobalTable")
    end
 end
 
@@ -221,7 +220,8 @@ function onUpperSensorCollide(event)
   if (event.other.name == "GridContainer" and event.phase == 'ended') then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
       local matchesLeft = event.other.numOfBlocks / 3
-      updateScore(matchesLeft * -2, {
+      print("test: "..numOfBlocks)
+      updateScore((matchesLeft * -2), {
           startColor = {1, 0, 0}
       })
 
