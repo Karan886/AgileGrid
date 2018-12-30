@@ -3,9 +3,11 @@ local scene = composer.newScene()
 
 -- Include files
 local data = require "data"
+local widget = require "widget"
 local frame = require "Modules.UIFrame"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
+local exception = require "Modules.Exception"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -21,12 +23,25 @@ local height = display.contentHeight
 local upperBoundary
 local headerFrame
 local scoreText
+local pausePlayButton
 
 local parallax_clouds_one
 local parallax_clouds_two
 local parallax_clouds_three
 
 local parallaxWrapPosition
+
+--initialized globals
+local pauseTexture = {
+    type = "image",
+    filename = "./Images/UI/pause_button.png"
+}
+
+local playTexture = {
+    type = "image",
+    filename = "./Images/UI/play_button.png"
+}
+
 local smokeAffect = particles.new("./ParticleAffects/SmokeExplosion.json")
 
 
@@ -485,6 +500,16 @@ function parallaxScroll()
     end
 end
 
+function changePausePlay(event)
+    if (event.target.id == "play") then
+        event.target.fill = pauseTexture
+        event.target.id = "pause"
+    elseif (event.target.id == "pause") then
+        event.target.fill = playTexture
+        event.target.id = "play"
+    end
+end
+
 function imageTransition(firstImage, secondImage, duration)
     if (firstImage == nil or secondImage == nil) then
         print("Warning: Game.imageTransition has invalid arguments")
@@ -552,6 +577,16 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         headerFrame.add("score", scoreText, { xpos = centerX - (scoreText.width/2)})
 
+        pausePlayButton = display.newRect(centerX, centerY, 31, 40)
+        pausePlayButton.fill = pauseTexture
+        pausePlayButton.width, pausePlayButton.height = 15, 15
+        pausePlayButton.alpha = 0.8
+        pausePlayButton.id = "pause"
+
+        headerFrame.add("pause", pausePlayButton, { xpos = width - 32, ypos = -28})
+        --headerFrame.add("play", playButton, { xpos = width - 32, ypos = -28})
+        pausePlayButton: addEventListener("tap", changePausePlay)
+
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
        
@@ -571,7 +606,7 @@ function scene:hide( event )
         timer.cancel(gridSpawnTimer)
         
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
-        physics.removeBody(upperBoundary, "static")
+        pausePlayButton: removeEventListener("touch", changePausePlay)
     end
 end
  

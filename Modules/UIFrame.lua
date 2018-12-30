@@ -31,16 +31,18 @@ end
 
 function positionObject(obj, options, isPrevious)
     local xpos = obj.offsetLeft or 5
+    local ypos = header.position.y
 
     if (options ~= nil) then
        xpos = options.xpos or centerX
+       ypos = options.ypos or header.position.y
     elseif (previousObj ~= nil) then
        xpos = previousObj.x + previousObj.width + (obj.offsetRight or 5)  
     end
 
    local width = obj.width
    obj.x = xpos
-   obj.y = header.position.y
+   obj.y = ypos
 
    if (isPrevious) then
       previousObj = obj
@@ -82,47 +84,23 @@ function frame.init(options, group)
   return headerFrame
 end
 
-function frame.addText(name, text, options)
-    local frameObjects = frame.frameObjects
-
-    local size = 10 
-    local font = "Fonts/BigBook-Heavy" 
-
-    if (options ~= nil) then
-        size = 10
-        font = "Fonts/BigBook-Heavy"
-    end
-
-    local text = display.newText(text, 0, header.position.y, font, size)
-    text.anchorX, text.anchorY = 0, 0.5
-    text.name = name
-   
-    positionObject(text, nil, true)
-
-    frameObjects[name] = text
-    addToGroup(text)
-end
-
-function frame.addButton(name, options)
-    local frameObjects = frame.frameObjects
-    local button = widget.newButton(options)
-    button.anchorX, button.anchorY = 0, 0.5
-    positionObject(button, nil, true)
-    
-    frameObjects[name] = button
-
-    if (displayGroup ~= nil) then
-        displayGroup: insert(button)
-    end
-    button.name = name
-end
-
 function frame.toString()
     local frameObjects = frame.frameObjects
     local counter = 1
     print("Header Frame Contents: ")
     for k,v in pairs(frameObjects) do
       print("Object "..counter.." name : "..k)
+    end
+end
+
+function frame.destroy(name)
+    local frameObjects = frame.frameObjects
+    if (frameObjects[name]) then
+        local toRemove = frameObjects[name]
+        frameObjects[name] = nil
+        display.remove(toRemove)
+    else
+      exception.new(exception.warning, "the object name specified is invalid in function UIFrame.destroy")
     end
 end
 
