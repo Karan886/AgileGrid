@@ -1,5 +1,6 @@
 local file = {}
 local json = require "json"
+local exception = require "Modules.Exception"
 
 function file.create(name, contents, location)
     local path = system.pathForFile(name, location)
@@ -14,11 +15,11 @@ function file.create(name, contents, location)
            return true
 
        end
-       print("Error: the file "..name.." could not be created, error message: "..errorMsg)
+       exception.new(exception.error, "The file "..name.." could not be created, error message: "..errorMsg)
        io.close()
        return false
     end
-    print("Error: the file "..name.." already exists, cannot create duplicate")
+    exception.new(exception.warning, "The file "..name.." already exists, cannot create duplicate")
     io.close()
     return false
 end
@@ -27,7 +28,7 @@ function file.save(name, contents, location)
     local path = system.pathForFile(name, location)
     local open, errorMsg = io.open(path, "w")
     if not open then
-    	print("Error: saving data to file "..name.." failed. Error message: "..errorMsg)
+      exception.new(exception.error, "Saving data to file "..name.." failed. Error message: "..errorMsg)
     	io.close()
     	return false
     end
@@ -41,7 +42,7 @@ function file.load(name, location)
 	local path = system.pathForFile(name, location)
 	local open, errorMsg = io.open(path, "r")
 	if not open then
-		print("Error: loading data from file "..name.." failed. Error message: "..errorMsg)
+    exception.new(exception.error, "Loading data from file "..name.." failed. "..errorMsg)
 		io.close()
 		return false
 	end
@@ -55,7 +56,7 @@ function file.loadJson(filename, property, location)
 	local decodedJson, position, msg = json.decodeFile(path)
 	local returnVal = nil
 	if not decodedJson then
-		print("Error: could not read json file "..filename.." at position "..position.. " with error message: "..msg)
+    exception.new(exception.error, "Could not read json file "..filename.." at position "..position.. " with error message: "..msg)
 		return returnVal
 	end
     

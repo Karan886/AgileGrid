@@ -3,6 +3,7 @@ local frame = {
 }
 
 local widget = require "widget"
+local exception = require "Modules.Exception"
 
 -- Dimensions
 local actualHeight = display.actualContentHeight
@@ -73,7 +74,7 @@ function frame.init(options, group)
       if (frameObjects[name]) then
           positionObject(frameObjects[name],{xpos = pos}, false)
       else
-         print("Warning: the object name specified is invalid in function UIFrame.init.fixPosition")
+         exception.new(exception.warning, "the object name specified is invalid in function UIFrame.init.fixPosition")
       end
   end
     
