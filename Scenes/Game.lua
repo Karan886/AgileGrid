@@ -66,11 +66,10 @@ end
 
 function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
-       scoreText.add("", value)
+       scoreText.add("", 1)
        scoreText.poke(pokeOptions)
         -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
       if (headerFrame ~= nil) then
-          frame.toString()
           headerFrame.fixPosition("score")
       end
     end
@@ -486,20 +485,16 @@ function parallaxScroll()
     end
 end
 
-function imageTransition(firstImg, secondImg, duration)
+function imageTransition(firstImage, secondImage, duration)
     if (firstImage == nil or secondImage == nil) then
         print("Warning: Game.imageTransition has invalid arguments")
         return false
     end
+    local secondFadeOutTransition
+    local firstFadeOutTransition = function () transition.fadeOut(secondImage, {time = duration, onComplete = secondFadeOutTransition}) end
+    secondFadeOutTransition = function() transition.fadeIn(secondImage, {time = duration, onComplete = firstFadeOutTransition}) end
 
-    local endAlpha = 0.0
-    if (secondImage.alpha == 0.0) then
-      endAlpha = 1.0
-    end
-    transition.to(secondImage, {
-         time = duration,
-         alpha = 0.0
-    })
+    firstFadeOutTransition()
 end
 
 -- -----------------------------------------------------------------------------------
@@ -512,8 +507,7 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local firstGradientSky = display.newImage("./Images/Backgrounds/sky_gradient_one.png", centerX, centerY)
     local secondGradientSky = display.newImage("./Images/Backgrounds/sky_gradient_two.png", centerX, centerY)
-
-    imageTransition(firstGradientSky, secondGradientSky, 8000)
+    imageTransition(firstGradientSky, secondGradientSky, 15000)
 
     parallax_clouds_one = display.newImage("./Images/Parallax/parallax_clouds_one.png", centerX, centerY)
     parallax_clouds_two = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
