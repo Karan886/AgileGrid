@@ -68,10 +68,10 @@ function frame.init(options, group)
       addToGroup(obj)  
   end
 
-  headerFrame.fixPosition = function(name)
+  headerFrame.fixPosition = function(name, pos)
       local frameObjects = frame.frameObjects
       if (frameObjects[name]) then
-          positionObject(frameObjects[name],{xpos = centerX - (frameObjects[name].width/2)}, false)
+          positionObject(frameObjects[name],{xpos = pos}, false)
       else
          print("Warning: the object name specified is invalid in function UIFrame.init.fixPosition")
       end
