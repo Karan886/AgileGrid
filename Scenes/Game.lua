@@ -66,7 +66,7 @@ end
 
 function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
-       scoreText.add("", 1000)
+       scoreText.add("", 1)
        scoreText.poke(pokeOptions)
         -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
       if (headerFrame ~= nil) then
