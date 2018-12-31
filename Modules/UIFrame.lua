@@ -56,6 +56,8 @@ function frame.init(options, group)
         end
 	end
 
+  displayGroup = group
+
   local headerFrame = nil
   if (header.image == nil) then
     	headerFrame = simpleHeader()

@@ -86,14 +86,15 @@ function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
        scoreText.add("", value)
        scoreText.poke(pokeOptions)
-        -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
+      -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
       if (headerFrame ~= nil) then
           headerFrame.fixPosition("score", centerX - (scoreText.width/2))
       end
 
       if (scoreText.value < 0) then
-          scoreText.display()
+          scoreText.display(nil, 1000)
           haltGameActivity()
+          changeScene("Scenes.GameOver", 500)
       end
     end
 end
@@ -532,6 +533,15 @@ function imageTransition(firstImage, secondImage, duration)
     secondFadeOutTransition = function() transition.fadeIn(secondImage, {time = duration, onComplete = firstFadeOutTransition}) end
 
     firstFadeOutTransition()
+end
+
+function changeScene(sceneName, duration)
+    timer.performWithDelay(2000, function()
+        composer.gotoScene(sceneName, {
+        effect = "fade",
+        time = duration
+       })
+    end, 1)
 end
 
 function haltGameActivity()
