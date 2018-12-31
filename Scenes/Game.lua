@@ -25,7 +25,7 @@ local headerFrame
 local scoreText
 local pausePlayButton
 local pauseGameText
-local pauseGameOverlay
+local gameOverLay
 
 local parallax_clouds_one
 local parallax_clouds_two
@@ -89,6 +89,11 @@ function updateScore(value, pokeOptions)
         -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
       if (headerFrame ~= nil) then
           headerFrame.fixPosition("score", centerX - (scoreText.width/2))
+      end
+
+      if (scoreText.value < 0) then
+          scoreText.display()
+          haltGameActivity()
       end
     end
 end
@@ -529,6 +534,23 @@ function imageTransition(firstImage, secondImage, duration)
     firstFadeOutTransition()
 end
 
+function haltGameActivity()
+    displayOverLay()
+    physics.pause()
+end
+
+function displayOverLay(color)
+    if (color ~= nil) then
+        gameOverLay: setFillColor(unpack(color))
+    end
+    gameOverLay.isVisible = true
+end
+
+function hideOverLay()
+    gameOverLay: setFillColor(0, 0, 0, 0.5)
+    gameOverLay.isVisible = false
+end
+
 function pauseGame()
     if (gridSpawnTimer ~= nil) then
         timer.pause(gridSpawnTimer)
@@ -537,7 +559,7 @@ function pauseGame()
     physics.pause()
     gameState = "PAUSED"
     pauseGameText.isVisible = true
-    pauseGameOverlay.isVisible = true
+    displayOverLay()
 end
 
 function resumeGame()
@@ -548,7 +570,7 @@ function resumeGame()
     physics.start()
     gameState = "PLAY"
     pauseGameText.isVisible = false
-    pauseGameOverlay.isVisible = false
+    hideOverLay()
 end
 
 function createPausePlayButton()
@@ -614,14 +636,14 @@ function scene:show( event )
         pauseGameText: setFillColor(0.93, 0.57, 0.13)
         pauseGameText.isVisible = false
 
-        pauseGameOverlay = display.newRect(centerX, centerY, actualWidth, actualHeight)
-        pauseGameOverlay: setFillColor(0, 0, 0, 0.5)
-        pauseGameOverlay.isVisible = false
+        gameOverLay = display.newRect(centerX, centerY, actualWidth, actualHeight)
+        gameOverLay: setFillColor(0, 0, 0, 0.5)
+        gameOverLay.isVisible = false
 
         -- Insert elements on the screen in proper order
         sceneGroup: insert(spawnLayer)
         headerFrame = frame.init({alpha = 0.6}, sceneGroup)
-        sceneGroup: insert(pauseGameOverlay)
+        sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
 
         -- customize header bar

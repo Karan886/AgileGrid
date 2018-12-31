@@ -5,6 +5,8 @@ local file = require "Modules.File"
 local exception = require "Modules.Exception"
 local json = require "json"
 
+local centerX = display.contentCenterX
+local centerY = display.contentCenterY
 
 function isObjectValid(name)
     if (scoreObjects[name] == nil) then
@@ -47,6 +49,23 @@ function score.new(name, obj, value)
             end
         })
 
+    end
+
+    obj.display = function(scaleFactor, duration, color)
+        print("score.display called")
+        local scale, elapsedTime = scaleFactor or 2, duration or 2000
+        local fillColor = color or {1, 0, 0} 
+
+        transition.to(obj, {
+            time = elapsedTime,
+            x = centerX - obj.width,
+            y = centerY,
+            xScale = scale,
+            yScale = scale,
+            onComplete = function(target)
+                target: setFillColor(unpack(fillColor))
+            end
+        })     
     end
     scoreObjects[name] = obj
     return obj
