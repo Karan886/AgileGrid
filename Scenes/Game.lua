@@ -584,12 +584,11 @@ function scene:show( event )
         pausePlayButton.id = "pause"
 
         headerFrame.add("pause", pausePlayButton, { xpos = width - 32, ypos = -28})
-        --headerFrame.add("play", playButton, { xpos = width - 32, ypos = -28})
         pausePlayButton: addEventListener("tap", changePausePlay)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-       
+        
        
     end 
 end
@@ -607,6 +606,8 @@ function scene:hide( event )
         
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
         pausePlayButton: removeEventListener("touch", changePausePlay)
+        frame.cleanUp()
+        score.cleanUp()
     end
 end
  

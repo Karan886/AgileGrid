@@ -93,15 +93,10 @@ function frame.toString()
     end
 end
 
-function frame.destroy(name)
+function frame.cleanUp()
     local frameObjects = frame.frameObjects
-    if (frameObjects[name]) then
-        local toRemove = frameObjects[name]
-        frameObjects[name] = nil
-        display.remove(toRemove)
-    else
-      exception.new(exception.warning, "the object name specified is invalid in function UIFrame.destroy")
-    end
+    table.remove(frameObjects)
+    frame.frameObjects = nil
 end
 
 

@@ -67,4 +67,9 @@ function score.load(name, property)
      return nil
 end
 
+function score.cleanUp()
+   table.remove(scoreObjects)
+   scoreObjects = nil
+end
+
 return score
