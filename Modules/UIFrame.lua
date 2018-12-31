@@ -65,10 +65,12 @@ function frame.init(options, group)
 
   headerFrame.add = function(name, obj, options)
       local frameObjects = frame.frameObjects
-      obj.anchorX, obj.anchorY = 0, 0.5
-      positionObject(obj, options, true)
-      frameObjects[name] = obj
-      addToGroup(obj)  
+      if (frameObjects ~= nil) then
+          obj.anchorX, obj.anchorY = 0, 0.5
+          positionObject(obj, options, true)
+          frameObjects[name] = obj
+          addToGroup(obj)  
+      end
   end
 
   headerFrame.fixPosition = function(name, pos)
@@ -95,8 +97,10 @@ end
 
 function frame.cleanUp()
     local frameObjects = frame.frameObjects
-    table.remove(frameObjects)
-    frame.frameObjects = nil
+    if (frameObjects ~= nil) then
+        table.remove(frameObjects)
+        frame.frameObjects = nil
+    end
 end
 
 

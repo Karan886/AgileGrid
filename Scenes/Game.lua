@@ -24,6 +24,8 @@ local upperBoundary
 local headerFrame
 local scoreText
 local pausePlayButton
+local pauseGameText
+local pauseGameOverlay
 
 local parallax_clouds_one
 local parallax_clouds_two
@@ -43,9 +45,10 @@ local playTexture = {
 }
 
 local smokeAffect = particles.new("./ParticleAffects/SmokeExplosion.json")
+local gameState = "PLAY"
 
 
---scene garbage for objects that are not latched on to the scene
+--container for grids and other game objects
 local bin = { 
   grids = {}
 }
@@ -245,6 +248,7 @@ function onUpperSensorCollide(event)
       removeGridFromGlobalTable(event.other.id)
   end
 end
+
 function isBlockOnRightEdge (block)
     local parentGroup = block.parent
     local gridSize = parentGroup.size
@@ -315,6 +319,9 @@ function getGridlocation(gridGroup)
 end
 
 function blockSwipe(event)
+   if (gameState == "PAUSED") then
+       return true
+   end
    local parentGroup = event.target.parent
    local slotContainer = parentGroup.slotContainer
 
@@ -389,8 +396,6 @@ function spawnGrid(x, y, rows, cols)
       offsetY = blockOffset,
       blockCornerRadius = 5,
    }
-
-   print("rows: "..type(rows).."cols: "..type(cols))
    
    if (type(x) == 'number') then
        defaultOptions['xpos'] = x
@@ -504,9 +509,11 @@ function changePausePlay(event)
     if (event.target.id == "play") then
         event.target.fill = pauseTexture
         event.target.id = "pause"
+        resumeGame()
     elseif (event.target.id == "pause") then
         event.target.fill = playTexture
         event.target.id = "play"
+        pauseGame()
     end
 end
 
@@ -520,6 +527,42 @@ function imageTransition(firstImage, secondImage, duration)
     secondFadeOutTransition = function() transition.fadeIn(secondImage, {time = duration, onComplete = firstFadeOutTransition}) end
 
     firstFadeOutTransition()
+end
+
+function pauseGame()
+    if (gridSpawnTimer ~= nil) then
+        timer.pause(gridSpawnTimer)
+    end
+    Runtime: removeEventListener("enterFrame", parallaxScroll)
+    physics.pause()
+    gameState = "PAUSED"
+    pauseGameText.isVisible = true
+    pauseGameOverlay.isVisible = true
+end
+
+function resumeGame()
+    if (gridSpawnTimer ~= nil) then
+        timer.resume(gridSpawnTimer)
+    end
+    Runtime: addEventListener("enterFrame", parallaxScroll)
+    physics.start()
+    gameState = "PLAY"
+    pauseGameText.isVisible = false
+    pauseGameOverlay.isVisible = false
+end
+
+function createPausePlayButton()
+   -- adding delay because this button is enabled before all related objects are initialized.
+    timer.performWithDelay(1000, function()
+        pausePlayButton = display.newRect(centerX, centerY, 31, 40)
+        pausePlayButton.fill = pauseTexture
+        pausePlayButton.width, pausePlayButton.height = 15, 15
+        pausePlayButton.alpha = 0.8
+        pausePlayButton.id = "pause" 
+
+        headerFrame.add("pause", pausePlayButton, { xpos = width - 32, ypos = -28}) 
+        pausePlayButton: addEventListener("tap", changePausePlay) 
+    end, 1)    
 end
 
 -- -----------------------------------------------------------------------------------
@@ -567,9 +610,19 @@ function scene:show( event )
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
         Runtime: addEventListener("enterFrame", parallaxScroll)
 
+        pauseGameText = display.newText("PAUSED", centerX, centerY, "Fonts/BigBook-Heavy", 20)
+        pauseGameText: setFillColor(0.93, 0.57, 0.13)
+        pauseGameText.isVisible = false
+
+        pauseGameOverlay = display.newRect(centerX, centerY, actualWidth, actualHeight)
+        pauseGameOverlay: setFillColor(0, 0, 0, 0.5)
+        pauseGameOverlay.isVisible = false
+
         -- Insert elements on the screen in proper order
         sceneGroup: insert(spawnLayer)
         headerFrame = frame.init({alpha = 0.6}, sceneGroup)
+        sceneGroup: insert(pauseGameOverlay)
+        sceneGroup: insert(pauseGameText)
 
         -- customize header bar
         scoreText = display.newText("0", 0, 0, "Fonts/BigBook-Heavy", 30)
@@ -577,14 +630,7 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         headerFrame.add("score", scoreText, { xpos = centerX - (scoreText.width/2)})
 
-        pausePlayButton = display.newRect(centerX, centerY, 31, 40)
-        pausePlayButton.fill = pauseTexture
-        pausePlayButton.width, pausePlayButton.height = 15, 15
-        pausePlayButton.alpha = 0.8
-        pausePlayButton.id = "pause"
-
-        headerFrame.add("pause", pausePlayButton, { xpos = width - 32, ypos = -28})
-        pausePlayButton: addEventListener("tap", changePausePlay)
+        createPausePlayButton()
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -606,6 +652,7 @@ function scene:hide( event )
         
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
         pausePlayButton: removeEventListener("touch", changePausePlay)
+        Runtime: removeEventListener("enterFrame", parallaxScroll)
         frame.cleanUp()
         score.cleanUp()
     end
