@@ -11,9 +11,12 @@ local centerY = display.contentCenterY
 local width = display.contentWidth
 local height = display.contentHeight
 
+local widget = require "widget"
+
 --global variables
 local gameOverClipboard
 local gameOverText
+local backButton
 
 local dataObjects = display.newGroup()
 
@@ -56,12 +59,28 @@ function scene:create( event )
     gameOverClipboard.y = centerY - gameOverClipboard.height - 45
     gameOverClipboard.width, gameOverClipboard.height =  300, 380
 
-    gameOverText = display.newText("Game Over", centerX, 0, "./Fonts/BigBook-Heavy", 30)
+    gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2, "./Fonts/BigBook-Heavy", 30)
+    gameOverText.y = gameOverText.y + gameOverText.height / 2 + 3
     gameOverText: setFillColor(0, 0, 0.2)
+
+    backButton = widget.newButton({
+        label = "Main Menu",
+        font = "./Fonts/BigBook-Heavy",
+        shape = "roundedRect",
+        cornerRadius = 5,
+        fillColor = {default = {0.55, 0.35, 0.17}, over = {0.55, 0.35, 0.17, 0.5}},
+        labelColor = {default = {1, 1, 1}, over = {1, 1, 1, 0.5}},
+        strokeWidth = 2,
+        strokeColor = {default = {0.8, 0.5, 0.2, 0.8}, over = {0.8, 0.5, 0.2, 0.5}},
+        x = centerX,
+        y = centerY + actualHeight/2
+    })
+    backButton.y = backButton.y - backButton.height / 2 - 3
 
     sceneGroup: insert(bg)
     sceneGroup: insert(gameOverClipboard)
     sceneGroup: insert(gameOverText)
+    sceneGroup: insert(backButton)
 end
 
 function scene:show( event )

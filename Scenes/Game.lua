@@ -545,19 +545,18 @@ function changeScene(sceneName, duration)
 end
 
 function haltGameActivity()
-    displayOverLay()
+    displayOverLay({
+        color = {0, 0, 0, 0.5}
+    })
     physics.pause()
 end
 
-function displayOverLay(color)
-    if (color ~= nil) then
-        gameOverLay: setFillColor(unpack(color))
-    end
+function displayOverLay(options)
+    gameOverLay: setFillColor(unpack(options.color))
     gameOverLay.isVisible = true
 end
 
 function hideOverLay()
-    gameOverLay: setFillColor(0, 0, 0, 0.5)
     gameOverLay.isVisible = false
 end
 
@@ -569,7 +568,9 @@ function pauseGame()
     physics.pause()
     gameState = "PAUSED"
     pauseGameText.isVisible = true
-    displayOverLay()
+    displayOverLay({
+        color = {0, 0, 0, 0.5}
+    })
 end
 
 function resumeGame()
@@ -592,7 +593,7 @@ function createPausePlayButton()
         pausePlayButton.alpha = 0.8
         pausePlayButton.id = "pause" 
 
-        headerFrame.add("pause", pausePlayButton, { xpos = width - 32, ypos = -28}) 
+        headerFrame.add("pause", pausePlayButton, { xpos = width - 32}) 
         pausePlayButton: addEventListener("tap", changePausePlay) 
     end, 1)    
 end

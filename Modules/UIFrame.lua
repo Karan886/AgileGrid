@@ -17,7 +17,7 @@ local header = {
 	size = { width = actualWidth, height = 45},
 	color = {red = 0.9, green = 0.4, blue = 0.7},
 	image = nil,
-	position = {x = centerX, y = -30},
+	position = {x = centerX, y = centerY - actualHeight/2 + 15},
   alpha = 1.0
 }
 
