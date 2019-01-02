@@ -4,7 +4,6 @@ local scene = composer.newScene()
 -- Include files
 local data = require "data"
 local widget = require "widget"
-local frame = require "Modules.UIFrame"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
 local exception = require "Modules.Exception"
@@ -50,7 +49,8 @@ local gameState = "PLAY"
 
 --container for grids and other game objects
 local bin = { 
-  grids = {}
+  grids = {},
+  UI = {}
 }
 
 local spawnLayer = display.newGroup()
@@ -86,10 +86,7 @@ function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
        scoreText.add("", value)
        scoreText.poke(pokeOptions)
-      -- Re-Position the score text relative to the screen. ie. digit increase may cause it to lean towards the right side
-      if (headerFrame ~= nil) then
-          headerFrame.fixPosition("score", centerX - (scoreText.width/2))
-      end
+
 
       if (scoreText.value < 0) then
           scoreText.display(nil, 1000)
@@ -584,18 +581,15 @@ function resumeGame()
     hideOverLay()
 end
 
-function createPausePlayButton()
-   -- adding delay because this button is enabled before all related objects are initialized.
-    timer.performWithDelay(1000, function()
-        pausePlayButton = display.newRect(centerX, centerY, 31, 40)
-        pausePlayButton.fill = pauseTexture
-        pausePlayButton.width, pausePlayButton.height = 15, 15
-        pausePlayButton.alpha = 0.8
-        pausePlayButton.id = "pause" 
-
-        headerFrame.add("pause", pausePlayButton, { xpos = width - 32}) 
-        pausePlayButton: addEventListener("tap", changePausePlay) 
-    end, 1)    
+function cleanUpScene()
+    local ui = bin.UI
+    local grids = bin.grids
+    for i = 1, #ui do
+        display.remove(ui[i])
+    end
+    for i = 1, #grids do
+        display.remove(grids[i])
+    end
 end
 
 -- -----------------------------------------------------------------------------------
@@ -636,6 +630,7 @@ function scene:show( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         --spawn the first grid then apply the delay
+        physics.start()
         spawnGrid(centerX - 100, centerY, 4, 3)
         gridSpawnTimer = timer.performWithDelay(10000, spawnGrid, 0)
         
@@ -643,27 +638,35 @@ function scene:show( event )
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
         Runtime: addEventListener("enterFrame", parallaxScroll)
 
+        local ui = bin.UI
+
         pauseGameText = display.newText("PAUSED", centerX, centerY, "Fonts/BigBook-Heavy", 20)
         pauseGameText: setFillColor(0.93, 0.57, 0.13)
         pauseGameText.isVisible = false
+        ui[#ui + 1] = pauseGameText
 
         gameOverLay = display.newRect(centerX, centerY, actualWidth, actualHeight)
         gameOverLay: setFillColor(0, 0, 0, 0.5)
         gameOverLay.isVisible = false
+        ui[#ui + 1] = gameOverLay
 
         -- Insert elements on the screen in proper order
         sceneGroup: insert(spawnLayer)
-        headerFrame = frame.init({alpha = 0.6}, sceneGroup)
+        headerFrame = display.newRoundedRect(centerX, centerY - actualHeight/2 + 15, actualWidth, 45, 10)
+        headerFrame: setFillColor(0.4, 0.9, 0.7, 0.6)
+        ui[#ui + 1] = headerFrame
+
+        sceneGroup: insert(headerFrame)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
 
         -- customize header bar
-        scoreText = display.newText("0", 0, 0, "Fonts/BigBook-Heavy", 30)
+        scoreText = display.newText("0", centerX, headerFrame.y, "Fonts/BigBook-Heavy", 30)
         scoreText: setFillColor(0.5, 0.5, 0.5)
         scoreText = score.new("", scoreText, 0)
-        headerFrame.add("score", scoreText, { xpos = centerX - (scoreText.width/2)})
+        ui[#ui + 1] = scoreText
 
-        createPausePlayButton()
+        sceneGroup: insert(scoreText)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -681,16 +684,23 @@ function scene:hide( event )
         -- Code here runs when the scene is on screen (but is about to go off screen)
  
     elseif ( phase == "did" ) then
-        timer.cancel(gridSpawnTimer)
+        local ui = bin.UI
+        local grids = bin.grids
         
+        timer.cancel(gridSpawnTimer)
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
-        pausePlayButton: removeEventListener("touch", changePausePlay)
+        --pausePlayButton: removeEventListener("touch", changePausePlay)
         Runtime: removeEventListener("enterFrame", parallaxScroll)
-        frame.cleanUp()
         score.cleanUp()
+      
+        for i = 1, #ui do
+            display.remove(ui[i])
+        end
+        for i = 1, #grids do
+            display.remove(grids[i])
+        end
     end
 end
- 
  
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners

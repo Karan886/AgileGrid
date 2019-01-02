@@ -19,6 +19,11 @@ local gameOverText
 local backButton
 
 local dataObjects = display.newGroup()
+local bin = {}
+
+function goToMainMenu()
+    composer.gotoScene("Scenes.Menu", {time = 500, effect = "fade"})
+end
 
 function showGameStats(data)
 	local pos = {x = gameOverClipboard.x, y = gameOverClipboard.y - (gameOverClipboard.y/2) - 33}
@@ -44,6 +49,9 @@ function showGameStats(data)
         dataObjects: insert(dataBackground)
         dataObjects: insert(keyText)
         dataObjects: insert(valueText)
+        bin[#bin + 1] = dataBackground
+        bin[#bin + 1] = keyText
+        bin[#bin + 1] = valueText
     end
 end
 
@@ -73,7 +81,8 @@ function scene:create( event )
         strokeWidth = 2,
         strokeColor = {default = {0.8, 0.5, 0.2, 0.8}, over = {0.8, 0.5, 0.2, 0.5}},
         x = centerX,
-        y = centerY + actualHeight/2
+        y = centerY + actualHeight/2,
+        onPress = goToMainMenu
     })
     backButton.y = backButton.y - backButton.height / 2 - 3
 
@@ -81,6 +90,12 @@ function scene:create( event )
     sceneGroup: insert(gameOverClipboard)
     sceneGroup: insert(gameOverText)
     sceneGroup: insert(backButton)
+end
+
+function cleanUpScene()
+   for i = 1, #bin do
+	     display.remove(bin[i])
+	end 
 end
 
 function scene:show( event )
@@ -112,7 +127,7 @@ end
 function scene:hide( event )
     local sceneGroup = self.view
 	if (event.phase == "will") then
-
+	    cleanUpScene()
 	elseif (event.phase == "did") then
 
 	end
