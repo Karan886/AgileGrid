@@ -64,7 +64,7 @@ function scene:create( event )
     local bg = display.newImage("./Images/Backgrounds/sky_main_two.png", centerX, centerY)
 
     gameOverClipboard = display.newImage("./Images/Misc/clipboard.png", centerX, centerY)
-    gameOverClipboard.y = centerY - gameOverClipboard.height - 45
+    gameOverClipboard.y = centerY - gameOverClipboard.height - 60
     gameOverClipboard.width, gameOverClipboard.height =  300, 380
 
     gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2, "./Fonts/BigBook-Heavy", 30)
@@ -84,7 +84,7 @@ function scene:create( event )
         y = centerY + actualHeight/2,
         onPress = goToMainMenu
     })
-    backButton.y = backButton.y - backButton.height / 2 - 3
+    backButton.y = backButton.y - backButton.height / 2 - 7
 
     sceneGroup: insert(bg)
     sceneGroup: insert(gameOverClipboard)

@@ -58,7 +58,7 @@ function score.new(name, obj, value)
 
         transition.to(obj, {
             time = elapsedTime,
-            x = centerX - obj.width,
+            x = centerX,
             y = centerY,
             xScale = scale,
             yScale = scale,
