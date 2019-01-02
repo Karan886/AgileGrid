@@ -22,7 +22,7 @@ local dataObjects = display.newGroup()
 local bin = {}
 
 function goToMainMenu()
-    composer.gotoScene("Scenes.Menu", {time = 500, effect = "fade"})
+    composer.gotoScene("Scenes.Menu", {time = 300, effect = "fade"})
 end
 
 function showGameStats(data)
@@ -113,7 +113,7 @@ function scene:show( event )
                 {key = "Final Score", value = -1}
 	        })
 	        for i = 1, dataObjects.numChildren do
-	            transition.to(dataObjects[i], {time = 300, alpha = 1.0})
+	            transition.to(dataObjects[i], {time = 100, alpha = 1.0})
 	        end
 	    end, 1)
 
