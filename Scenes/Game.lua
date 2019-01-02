@@ -390,7 +390,7 @@ function blockSwipe(event)
 end
 
 function spawnGrid(x, y, rows, cols)
-   local sizeofBlock = centerX/5
+   local sizeofBlock = centerX/6
    local blockOffset = 5
 
    local defaultOptions = {
@@ -657,7 +657,7 @@ function scene:show( event )
         sceneGroup: insert(spawnLayer)
 
         headerFrame = display.newRoundedRect(centerX, centerY - actualHeight/2 + 15, actualWidth, 45, 10)
-        headerFrame: setFillColor(0.4, 0.9, 0.7, 0.6)
+        headerFrame: setFillColor(0.85, 0.65, 0.13, 0.6)
         ui[#ui + 1] = headerFrame
 
         scoreText = display.newText("0", centerX, headerFrame.y, "Fonts/BigBook-Heavy", 30)
