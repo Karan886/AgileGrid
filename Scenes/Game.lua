@@ -520,6 +520,20 @@ function changePausePlay(event)
     end
 end
 
+function createPausePlayButton(x, y, sceneGroup)
+   -- adding delay because this button is enabled before all related objects are initialized.
+    timer.performWithDelay(1000, function()
+        pausePlayButton = display.newRect(centerX, centerY, 31, 40)
+        pausePlayButton.fill = pauseTexture
+        pausePlayButton.width, pausePlayButton.height = 15, 15
+        pausePlayButton.alpha = 0.8
+        pausePlayButton.id = "pause" 
+        pausePlayButton: addEventListener("tap", changePausePlay) 
+        pausePlayButton.x, pausePlayButton.y = x, y 
+        sceneGroup: insert(pausePlayButton)
+    end, 1)    
+end
+
 function imageTransition(firstImage, secondImage, duration)
     if (firstImage == nil or secondImage == nil) then
         print("Warning: Game.imageTransition has invalid arguments")
@@ -581,16 +595,6 @@ function resumeGame()
     hideOverLay()
 end
 
-function cleanUpScene()
-    local ui = bin.UI
-    local grids = bin.grids
-    for i = 1, #ui do
-        display.remove(ui[i])
-    end
-    for i = 1, #grids do
-        display.remove(grids[i])
-    end
-end
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -650,23 +654,23 @@ function scene:show( event )
         gameOverLay.isVisible = false
         ui[#ui + 1] = gameOverLay
 
-        -- Insert elements on the screen in proper order
         sceneGroup: insert(spawnLayer)
+
         headerFrame = display.newRoundedRect(centerX, centerY - actualHeight/2 + 15, actualWidth, 45, 10)
         headerFrame: setFillColor(0.4, 0.9, 0.7, 0.6)
         ui[#ui + 1] = headerFrame
 
-        sceneGroup: insert(headerFrame)
-        sceneGroup: insert(gameOverLay)
-        sceneGroup: insert(pauseGameText)
-
-        -- customize header bar
         scoreText = display.newText("0", centerX, headerFrame.y, "Fonts/BigBook-Heavy", 30)
         scoreText: setFillColor(0.5, 0.5, 0.5)
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
+        sceneGroup: insert(headerFrame)
+        sceneGroup: insert(gameOverLay)
+        sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
+
+        createPausePlayButton(width - 28, headerFrame.y, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -686,10 +690,10 @@ function scene:hide( event )
     elseif ( phase == "did" ) then
         local ui = bin.UI
         local grids = bin.grids
-        
+
         timer.cancel(gridSpawnTimer)
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
-        --pausePlayButton: removeEventListener("touch", changePausePlay)
+        pausePlayButton: removeEventListener("touch", changePausePlay)
         Runtime: removeEventListener("enterFrame", parallaxScroll)
         score.cleanUp()
       
