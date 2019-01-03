@@ -7,6 +7,7 @@ local widget = require "widget"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
 local exception = require "Modules.Exception"
+local dialog = require "Modules.DialogBox"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -665,10 +666,13 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
+        local box = dialog.create()
+
         sceneGroup: insert(headerFrame)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
+        sceneGroup: insert(box)
 
         createPausePlayButton(width - 28, headerFrame.y + 3, sceneGroup)
 
