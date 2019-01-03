@@ -666,13 +666,14 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
-        local box = dialog.create()
+        local dialogBox = dialog.create()
+        ui[#ui + 1] = dialogBox
 
         sceneGroup: insert(headerFrame)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
-        sceneGroup: insert(box)
+        sceneGroup: insert(dialogBox.dialogGroup)
 
         createPausePlayButton(width - 28, headerFrame.y + 3, sceneGroup)
 
