@@ -6,7 +6,8 @@ local userData = {
 	name = "player",
 	highScore = 0,
 	doubleMatches = 0,
-	tripleMatches = 0
+	tripleMatches = 0,
+	highestPoint = 0
 }
 file.create('user.json', json.encode(userData), system.DocumentsDirectory)
 composer.gotoScene("Scenes.Menu")

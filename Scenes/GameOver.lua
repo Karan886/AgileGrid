@@ -12,6 +12,8 @@ local width = display.contentWidth
 local height = display.contentHeight
 
 local widget = require "widget"
+local file = require "Modules.File"
+local json = require "json"
 
 --global variables
 local gameOverClipboard
@@ -104,34 +106,52 @@ function scene:show( event )
 	if (event.phase == "will") then
         local params = event.params
         local currGameData = params.currentGameData
-        local hightScores = params.highScores
+        local highScores = params.highScores
+        for k,v in pairs(highScores) do
+            print(k..": "..v)
+        end
 
         local totalMatches = currGameData.totalMatches
         local doubleMatches = currGameData.doubleMatches
         local tripleMatches = currGameData.tripleMatches
         local belowZero = currGameData.score
+        local finalScore = totalMatches + doubleMatches + tripleMatches + belowZero
+        local highestPoint = currGameData.highestPoint
 
-        for key, value in pairs(currGameData) do
-            print(key..": "..currGameData[key])
+        local highScore = highScores.highScore 
+        local highestAchievedPoint = highScores.highestPoint
+       
+        if (highScore < finalScore) then
+            print("High Score Is: "..finalScore)
+            highScore = finalScore
+        end
+        -- Highest point refers to the overall highest point ever achieved (not just in the local game) 
+        if (highestAchievedPoint < highestPoint) then
+            print("highest Achieved Point Is: "..highestPoint)
+            highestAchievedPoint = highestPoint
         end
 
+        highScores.highScore = highScore
+        highScores.highestPoint = highestAchievedPoint
 
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
-            print("total matches: "..currGameData.totalMatches)
 	        showGameStats({
-                {key = "High Score", value = 0},
+                {key = "High Score", value = finalScore},
                 {key = "Total Matches", value = totalMatches},
-                {key = "Highest Point", value = 0},
+                {key = "Highest Point", value = highestPoint},
                 {key = "x2 Matches", value = doubleMatches},
                 {key = "x3 Matches", value = tripleMatches},
                 {key = "Below Zero", value = belowZero},
-                {key = "Final Score", value = 0}
+                {key = "Final Score", value = finalScore}
 	        })
 	        for i = 1, dataObjects.numChildren do
 	            transition.to(dataObjects[i], {time = 100, alpha = 1.0})
 	        end
 	    end, 1)
+
+        -- save latest high score data
+        file.save("user.json", json.encode(highScores), system.DocumentsDirectory)
 
 	elseif (event.phase == "did") then
 

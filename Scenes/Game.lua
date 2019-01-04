@@ -54,7 +54,8 @@ local gameData = {
   score = 0,
   doubleMatches = 0,
   tripleMatches = 0,
-  totalMatches = 0
+  totalMatches = 0,
+  highestPoint = 0
 }
 
 --container for grids and other game objects
@@ -100,6 +101,7 @@ end
 
 function updateGameData(value)
   if (value > 0) then gameData["totalMatches"] = gameData["totalMatches"] + value end
+  if (scoreText.value > gameData["highestPoint"]) then gameData["highestPoint"] = scoreText.value end
   if (value == 2) then
       gameData["doubleMatches"] = gameData["doubleMatches"] + 1
   elseif (value == 3) then
@@ -122,7 +124,7 @@ function updateScore(value, pokeOptions)
               sceneName = "Scenes.GameOver",
               duration = 500,
               delay = 3000,
-              params = { highscores = getUserGameData(), currentGameData = gameData}
+              params = { highScores = getUserGameData(), currentGameData = gameData}
           })
       end
     end
@@ -139,7 +141,6 @@ function removeMatchedBlocks(blocks, score)
     blocks[i].alpha = 0.5
     transition.to(blocks[i], {xScale = 0.5, yScale = 0.5, time = 350, onComplete = function() blocks[i].isVisible = false end})
     parentGrid.numOfBlocks = parentGrid.numOfBlocks - 1
-    print("blocks left: "..parentGrid.numOfBlocks)
   end
   if (score == true) then
       updateScore(#blocks / 3, {
