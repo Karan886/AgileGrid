@@ -50,6 +50,13 @@ local playTexture = {
 local smokeAffect = particles.new("./ParticleAffects/SmokeExplosion.json")
 local gameState = "PLAY"
 
+local gameData = {
+  score = 0,
+  doubleMatches = 0,
+  tripleMatches = 0,
+  totalMatches = 0
+}
+
 --container for grids and other game objects
 local bin = { 
   grids = {},
@@ -85,11 +92,27 @@ function removeGridFromGlobalTable(id)
    end
 end
 
+function resetGameData()
+  for key in pairs(gameData) do
+    gameData[key] = 0
+  end
+end
+
+function updateGameData(value)
+  gameData["totalMatches"] = gameData["totalMatches"] + value
+  if (value == 2) then
+      gameData["doubleMatches"] = gameData["doubleMatches"] + 1
+  elseif (value == 3) then
+    gameData["tripleMatches"] = gameData["tripleMatches"] + 1
+  end
+end
+
 function updateScore(value, pokeOptions)
     if (scoreText ~= nil) then
        scoreText.add("", value)
        scoreText.poke(pokeOptions)
-
+       
+       updateGameData(value)
 
       if (scoreText.value < 0) then
           scoreText.display(nil, 1000)
@@ -98,7 +121,7 @@ function updateScore(value, pokeOptions)
               sceneName = "Scenes.GameOver",
               duration = 500,
               delay = 3000,
-              params = { highscores = getUserGameData()}
+              params = { highscores = getUserGameData(), currentGameData = gameData}
           })
       end
     end
@@ -777,6 +800,8 @@ function scene:hide( event )
         for i = 1, #grids do
             display.remove(grids[i])
         end
+
+        resetGameData()
     end
 end
  
