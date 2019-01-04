@@ -583,11 +583,13 @@ function haltGameActivity()
         color = {0, 0, 0, 0.5}
     })
     physics.pause()
+    pausePlayButton: removeEventListener("tap", changePausePlay)
 end
 
-function unHaltGameActivity()
+function unhaltGameActivity()
     hideOverLay()
     physics.start()
+    pausePlayButton: addEventListener("tap", changePausePlay)
 end
 
 function displayOverLay(options)
@@ -610,6 +612,7 @@ function pauseGame()
     displayOverLay({
         color = {0, 0, 0, 0.5}
     })
+    quitGameButton: setEnabled(false)
 end
 
 function resumeGame()
@@ -622,6 +625,7 @@ function resumeGame()
     gameState = "PLAY"
     pauseGameText.isVisible = false
     hideOverLay()
+    quitGameButton: setEnabled(true)
 end
 
 -- -----------------------------------------------------------------------------------
@@ -705,7 +709,7 @@ function scene:show( event )
             end,
             onDeny = function()
                dialogBox.hide()
-               unHaltGameActivity()
+               unhaltGameActivity()
             end
         })
         ui[#ui + 1] = dialogBox
