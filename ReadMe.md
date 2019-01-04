@@ -11,7 +11,11 @@ before it goes offscreen.
 
 Structure:
 
-- ./game.lua - main/game scene
-- ./menu.lua - start menu
-- ./UIFrame.lua - self written module that controls menu options (play/pause) and score during game play
-- ./data.lua - self written module that provides size configurations for the grid  
+- ./Scenes contains all scene source code - ./Scenes/Game.lua contains the main game logic.
+- ./data.lua - contains all possible row/col combinations for spawning grids
+- ./Modules contains all self written modules that help improve code readability and organization.
+   - ./Modules/File.lua - module for file operations (such as create/save/load)
+   - ./Modules/Particles.lua - module for creating particle emitter object based on options defined in ./ParticleAffects
+   - ./Modules/Exception.lua - a simple module for creating helpful warning/error pront statements
+   - ./Modules/Score.lua - module that creates score objects by providing the object with helpful update score functions 
+     and also interactive transitions.
