@@ -102,6 +102,7 @@ function scene:show( event )
 	local sceneGroup = self.view
 	if (event.phase == "will") then
         local params = event.params
+        
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
 	        showGameStats({

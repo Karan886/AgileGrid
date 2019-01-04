@@ -51,7 +51,7 @@ function file.load(name, location)
 	return contents
 end
 
-function file.loadJson(filename, property, location)
+function file.loadJson(filename, location, property)
 	local path = system.pathForFile(filename, location)
 	local decodedJson, position, msg = json.decodeFile(path)
 	local returnVal = nil

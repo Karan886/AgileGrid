@@ -8,6 +8,7 @@ local score = require "Modules.Score"
 local particles = require "Modules.Particles"
 local exception = require "Modules.Exception"
 local dialog = require "Modules.DialogBox"
+local file = require "Modules.File"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -97,7 +98,7 @@ function updateScore(value, pokeOptions)
               sceneName = "Scenes.GameOver",
               duration = 500,
               delay = 3000,
-              params = {test = "hello world"}
+              params = { highscores = getUserGameData()}
           })
       end
     end
@@ -638,6 +639,10 @@ function resumeGame()
     pauseGameText.isVisible = false
     hideOverLay()
     quitGameButton: setEnabled(true)
+end
+ -- Get current user high scores etc.
+function getUserGameData()
+    return file.loadJson("user.json", system.DocumentsDirectory)
 end
 
 -- -----------------------------------------------------------------------------------
