@@ -104,9 +104,9 @@ function scene:show( event )
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
 	        showGameStats({
-                {key = "Matches", value = 0},
-                {key = "Mismatches", value = 0},
-                {key = "Highest Score", value = 0},
+                {key = "High Score", value = 0},
+                {key = "Total Matches", value = 0},
+                {key = "Highest Point", value = 0},
                 {key = "x2 Matches", value = 0},
                 {key = "x3 Matches", value = 0},
                 {key = "Below Zero", value = -1},

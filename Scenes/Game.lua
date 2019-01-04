@@ -49,7 +49,6 @@ local playTexture = {
 local smokeAffect = particles.new("./ParticleAffects/SmokeExplosion.json")
 local gameState = "PLAY"
 
-
 --container for grids and other game objects
 local bin = { 
   grids = {},
