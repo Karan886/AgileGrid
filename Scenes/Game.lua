@@ -99,12 +99,13 @@ function resetGameData()
 end
 
 function updateGameData(value)
-  gameData["totalMatches"] = gameData["totalMatches"] + value
+  if (value > 0) then gameData["totalMatches"] = gameData["totalMatches"] + value end
   if (value == 2) then
       gameData["doubleMatches"] = gameData["doubleMatches"] + 1
   elseif (value == 3) then
     gameData["tripleMatches"] = gameData["tripleMatches"] + 1
   end
+  gameData["score"] = scoreText.value
 end
 
 function updateScore(value, pokeOptions)

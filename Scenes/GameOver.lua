@@ -45,6 +45,7 @@ function showGameStats(data)
 
         local valueText = display.newText(data[i].value, 0, dataBackground.y, "./Fonts/BigBook-Heavy", 16)
         valueText.x = dataBackground.x + dataBackground.x/2 + valueText.width
+        --print(data[i].key.." : "..data[i].value)
 
         dataObjects: insert(dataBackground)
         dataObjects: insert(keyText)
@@ -102,17 +103,30 @@ function scene:show( event )
 	local sceneGroup = self.view
 	if (event.phase == "will") then
         local params = event.params
-        
+        local currGameData = params.currentGameData
+        local hightScores = params.highScores
+
+        local totalMatches = currGameData.totalMatches
+        local doubleMatches = currGameData.doubleMatches
+        local tripleMatches = currGameData.tripleMatches
+        local belowZero = currGameData.score
+
+        for key, value in pairs(currGameData) do
+            print(key..": "..currGameData[key])
+        end
+
+
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
+            print("total matches: "..currGameData.totalMatches)
 	        showGameStats({
                 {key = "High Score", value = 0},
-                {key = "Total Matches", value = 0},
+                {key = "Total Matches", value = totalMatches},
                 {key = "Highest Point", value = 0},
-                {key = "x2 Matches", value = 0},
-                {key = "x3 Matches", value = 0},
-                {key = "Below Zero", value = -1},
-                {key = "Final Score", value = -1}
+                {key = "x2 Matches", value = doubleMatches},
+                {key = "x3 Matches", value = tripleMatches},
+                {key = "Below Zero", value = belowZero},
+                {key = "Final Score", value = 0}
 	        })
 	        for i = 1, dataObjects.numChildren do
 	            transition.to(dataObjects[i], {time = 100, alpha = 1.0})
