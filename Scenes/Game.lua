@@ -24,8 +24,10 @@ local upperBoundary
 local headerFrame
 local scoreText
 local pausePlayButton
+local quitGameButton
 local pauseGameText
 local gameOverLay
+local dialogBox
 
 local parallax_clouds_one
 local parallax_clouds_two
@@ -92,7 +94,7 @@ function updateScore(value, pokeOptions)
       if (scoreText.value < 0) then
           scoreText.display(nil, 1000)
           haltGameActivity()
-          changeScene("Scenes.GameOver", 500)
+          changeScene("Scenes.GameOver", 500, 2000)
       end
     end
 end
@@ -523,6 +525,7 @@ end
 
 function createPausePlayButton(x, y, sceneGroup)
    -- adding delay because this button is enabled before all related objects are initialized.
+    local ui = bin.UI
     timer.performWithDelay(1000, function()
         pausePlayButton = display.newRect(centerX, centerY, 31, 40)
         pausePlayButton.fill = pauseTexture
@@ -531,8 +534,27 @@ function createPausePlayButton(x, y, sceneGroup)
         pausePlayButton.id = "pause" 
         pausePlayButton: addEventListener("tap", changePausePlay) 
         pausePlayButton.x, pausePlayButton.y = x, y 
+        ui[#ui + 1] = pausePlayButton
         sceneGroup: insert(pausePlayButton)
     end, 1)    
+end
+
+function createQuitGameButton(x, y, sceneGroup)
+    local ui = bin.UI
+    timer.performWithDelay(1000, function()
+        quitGameButton = widget.newButton({
+            defaultFile = "./Images/UI/close.png",
+            width = 15,
+            height = 15,
+            onPress = function()
+                haltGameActivity()
+                dialogBox.show()
+            end
+        })
+        quitGameButton.x, quitGameButton.y = x, y
+        ui[#ui + 1] = quitGameButton
+        sceneGroup: insert(quitGameButton)
+    end, 1)
 end
 
 function imageTransition(firstImage, secondImage, duration)
@@ -546,9 +568,9 @@ function imageTransition(firstImage, secondImage, duration)
 
     firstFadeOutTransition()
 end
-
-function changeScene(sceneName, duration)
-    timer.performWithDelay(2000, function()
+-- delay refers to when to start changing scene, while duration defines the amount of time it takes for the scene to fade
+function changeScene(sceneName, duration, delay)
+    timer.performWithDelay(delay, function()
         composer.gotoScene(sceneName, {
         effect = "fade",
         time = duration
@@ -561,6 +583,11 @@ function haltGameActivity()
         color = {0, 0, 0, 0.5}
     })
     physics.pause()
+end
+
+function unHaltGameActivity()
+    hideOverLay()
+    physics.start()
 end
 
 function displayOverLay(options)
@@ -666,7 +693,19 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
-        local dialogBox = dialog.create()
+        dialogBox = dialog.create({
+            bodyText = "Are you sure you want to quit ?",
+            height = height/8,
+            dialogType = dialog.confirmation,
+            onConfirm = function()
+               dialogBox.hide()
+               changeScene("Scenes.Menu", 300, 10)
+            end,
+            onDeny = function()
+               dialogBox.hide()
+               unHaltGameActivity()
+            end
+        })
         ui[#ui + 1] = dialogBox
 
         sceneGroup: insert(headerFrame)
@@ -676,6 +715,7 @@ function scene:show( event )
         sceneGroup: insert(dialogBox.dialogGroup)
 
         createPausePlayButton(width - 28, headerFrame.y + 3, sceneGroup)
+        createQuitGameButton(centerX - width/2 + (15/2) + 5, headerFrame.y + 3, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
