@@ -93,7 +93,12 @@ function updateScore(value, pokeOptions)
       if (scoreText.value < 0) then
           scoreText.display(nil, 1000)
           haltGameActivity()
-          changeScene("Scenes.GameOver", 500, 2000)
+           changeScene({
+              sceneName = "Scenes.GameOver",
+              duration = 500,
+              delay = 3000,
+              params = {test = "hello world"}
+          })
       end
     end
 end
@@ -568,11 +573,19 @@ function imageTransition(firstImage, secondImage, duration)
     firstFadeOutTransition()
 end
 -- delay refers to when to start changing scene, while duration defines the amount of time it takes for the scene to fade
-function changeScene(sceneName, duration, delay)
+function changeScene(options)
+    local ops = options or {}
+    local duration = ops.duration or 1000
+    local delay = ops.delay or 500
+    local sceneName = ops.sceneName or "Scenes.Menu"
+    local parameters = ops.params
+    local effect = ops.effect or "fade"
+
     timer.performWithDelay(delay, function()
         composer.gotoScene(sceneName, {
-        effect = "fade",
-        time = duration
+        effect = effect,
+        time = duration,
+        params = parameters
        })
     end, 1)
 end
@@ -704,7 +717,10 @@ function scene:show( event )
             alpha = 0.7,
             onConfirm = function()
                dialogBox.hide()
-               changeScene("Scenes.Menu", 300, 10)
+               changeScene({
+                   duration = 300,
+                   delay = 10
+               })
             end,
             onDeny = function()
                dialogBox.hide()
