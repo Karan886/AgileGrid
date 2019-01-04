@@ -694,9 +694,11 @@ function scene:show( event )
         ui[#ui + 1] = scoreText
 
         dialogBox = dialog.create({
-            bodyText = "Are you sure you want to quit ?",
+            bodyText = "Are You Sure You Want To Quit ?",
             height = height/8,
             dialogType = dialog.confirmation,
+            headerColor = {0.78, 0.47, 0.15},
+            alpha = 0.7,
             onConfirm = function()
                dialogBox.hide()
                changeScene("Scenes.Menu", 300, 10)

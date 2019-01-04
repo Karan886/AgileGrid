@@ -9,8 +9,6 @@ local height = display.contentHeight
 
 local widget = require "widget"
 
-local alpha = 0.7
-
 
 function dialog.create(options)
    local dialogBox = {
@@ -22,6 +20,7 @@ function dialog.create(options)
    local ypos = ops.ypos or centerY
    local bodyWidth, bodyHeight = ops.width or width/2, ops.height or height/4
    local headerHeight = ops.headerHeight or bodyHeight/5
+   local alpha = ops.alpha or 1.0
 
    local bodyColor = ops.bodyColor or {0.92, 0.92, 0.92, alpha}
    local headerColor = ops.headerColor or {0.42, 0.65, 0.80, alpha}
