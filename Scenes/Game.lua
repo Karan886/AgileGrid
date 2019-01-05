@@ -252,6 +252,10 @@ function createGridGroup(grid)
         block: setStrokeColor(0, 0, 0, 0.5)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
+
+        block.placeholder = display.newRect(block.x, block.y, block.width, block.height)
+        block.placeholder.isVisible = false
+        gridGroup: insert(block.placeholder)
         
         block.isEnabled = true
         block.id = #slotContainer + 1
@@ -328,15 +332,19 @@ function swapBlocks(blockA, blockB)
 
   local blockAID = blockA.id
   local blockBID = blockB.id
+  local blockAPlaceholder = blockA.placeholder
+  local blockBPlaceholder = blockB.placeholder
 
   blockA.id = blockBID
   blockB.id = blockAID
+  blockA.placeholder = blockBPlaceholder
+  blockB.placeholder = blockAPlaceholder
 
   slotContainer[blockAID] = blockB
   slotContainer[blockBID] = blockA
 
-  transition.to(blockA, {time = 500, x = blockB.x, y = blockB.y})
-  transition.to(blockB, {time = 500, x = blockA.x, y = blockA.y})
+  transition.to(blockA, {time = 500, x = blockA.placeholder.x, y = blockA.placeholder.y})
+  transition.to(blockB, {time = 500, x = blockB.placeholder.x, y = blockB.placeholder.y})
 
 end
 
