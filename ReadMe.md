@@ -6,16 +6,22 @@ before it goes offscreen.
 
 - Grids move vertically across the screen, where each grid is a mini match three game.
 - Player must match as many blocks as possible before grids go offscreen.
-- Future enhancements include adding perks that the player can unlock - ie. slow down time.
-- Player can move blocks on each grid by swapping in the playable area
+- Points are lost for missing matches and gained for completing matches.
+- Blocks are moved on each grid by swapping in the playable area.
+- The game is lost when points go below zero.
 
 Structure:
 
-- ./Scenes contains all scene source code - ./Scenes/Game.lua contains the main game logic.
+- ./Scenes - contains all scene source code
+   - ./Scenes/Game.lua - contains the main game logic.
+   - ./Scenes/Menu.lua - contains main menu logic.
+   - ./Scenes/GameOver.lua - contains game over logic, including displaying and saving game stats
 - ./data.lua - contains all possible row/col combinations for spawning grids
-- ./Modules contains all self written modules that help improve code readability and organization.
+- ./Modules - contains all self written modules that help improve code readability and organization.
    - ./Modules/File.lua - module for file operations (such as create/save/load)
    - ./Modules/Particles.lua - module for creating particle emitter object based on options defined in ./ParticleAffects
    - ./Modules/Exception.lua - a simple module for creating helpful warning/error pront statements
-   - ./Modules/Score.lua - module that creates score objects by providing the object with helpful update score functions 
+   - ./Modules/Score.lua - module that creates score objects by providing the developer with helpful update score functions 
      and also interactive transitions.
+   - ./Modules/DialogBox.lua - module that creates custom dialog box to prompt the user.
+- ./ParticleAffects - contains JSON files that defines options for different particle affects in the game.
