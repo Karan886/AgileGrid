@@ -13,6 +13,8 @@ Structure:
 
 - ./Scenes - contains all scene source code
    - ./Scenes/Game.lua - contains the main game logic.
+   - ./Scenes/Menu.lua - contains main menu logic.
+   - ./Scenes/GameOver.lua - contains game over logic, including displaying and saving game stats
 - ./data.lua - contains all possible row/col combinations for spawning grids
 - ./Modules - contains all self written modules that help improve code readability and organization.
    - ./Modules/File.lua - module for file operations (such as create/save/load)
