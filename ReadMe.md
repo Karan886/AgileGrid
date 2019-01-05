@@ -6,8 +6,9 @@ before it goes offscreen.
 
 - Grids move vertically across the screen, where each grid is a mini match three game.
 - Player must match as many blocks as possible before grids go offscreen.
-- Future enhancements include adding perks that the player can unlock - ie. slow down time.
-- Player can move blocks on each grid by swapping in the playable area
+- Player lose points for missing matches and gain points for matches.
+- Player can move blocks on each grid by swapping in the playable area.
+- The game is lost when points go below zero.
 
 Structure:
 
