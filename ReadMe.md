@@ -21,7 +21,7 @@ Structure:
    - ./Modules/File.lua - module for file operations (such as create/save/load)
    - ./Modules/Particles.lua - module for creating particle emitter object based on options defined in ./ParticleAffects
    - ./Modules/Exception.lua - a simple module for creating helpful warning/error pront statements
-   - ./Modules/Score.lua - module that creates score objects by providing the object with helpful update score functions 
+   - ./Modules/Score.lua - module that creates score objects by providing the developer with helpful update score functions 
      and also interactive transitions.
    - ./Modules/DialogBox.lua - module that creates custom dialog box to prompt the user.
 - ./ParticleAffects - contains JSON files that defines options for different particle affects in the game.
