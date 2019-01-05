@@ -28,9 +28,10 @@ function goToMainMenu()
 end
 
 function showGameStats(data)
-	local pos = {x = gameOverClipboard.x, y = gameOverClipboard.y - (gameOverClipboard.y/2) - 33}
+	local pos = {x = gameOverClipboard.x, y = gameOverClipboard.y - (gameOverClipboard.height/2)}
     for i = 1, #data do
-        local dataBackground = display.newRect(pos.x, pos.y, gameOverClipboard.width - 25, 50)
+        local dataBackground = display.newRect(pos.x, pos.y, gameOverClipboard.width - 15, 50)
+        dataBackground.y = pos.y + dataBackground.height/2 + 6
         if (dataObjects.numChildren > 0) then
         	local previous = dataObjects[dataObjects.numChildren]
             dataBackground.y = previous.y + previous.height + 25
@@ -67,9 +68,9 @@ function scene:create( event )
 
     gameOverClipboard = display.newImage("./Images/Misc/clipboard.png", centerX, centerY)
     gameOverClipboard.y = centerY - gameOverClipboard.height - 60
-    gameOverClipboard.width, gameOverClipboard.height =  300, 380
+    gameOverClipboard.width, gameOverClipboard.height =  300, 265
 
-    gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2, "./Fonts/BigBook-Heavy", 30)
+    gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2 + 10, "./Fonts/BigBook-Heavy", 30)
     gameOverText.y = gameOverText.y + gameOverText.height / 2 + 3
     gameOverText: setFillColor(0, 0, 0.2)
 
@@ -86,7 +87,7 @@ function scene:create( event )
         y = centerY + actualHeight/2,
         onPress = goToMainMenu
     })
-    backButton.y = backButton.y - backButton.height / 2 - 7
+    backButton.y = backButton.y - backButton.height / 2 - 15
 
     sceneGroup: insert(bg)
     sceneGroup: insert(gameOverClipboard)
@@ -106,16 +107,13 @@ function scene:show( event )
         local params = event.params
         local currGameData = params.currentGameData
         local highScores = params.highScores
-        for k,v in pairs(highScores) do
-            print(k..": "..v)
-        end
 
         local totalMatches = currGameData.totalMatches
         local doubleMatches = currGameData.doubleMatches
         local tripleMatches = currGameData.tripleMatches
         local belowZero = currGameData.score
-        local finalScore = totalMatches + doubleMatches + tripleMatches + belowZero
         local highestPoint = currGameData.highestPoint
+        local finalScore = doubleMatches + tripleMatches + belowZero + highestPoint
 
         local highScore = highScores.highScore 
         local highestAchievedPoint = highScores.highestPoint
@@ -136,8 +134,6 @@ function scene:show( event )
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
 	        showGameStats({
-                {key = "High Score", value = finalScore},
-                {key = "Total Matches", value = totalMatches},
                 {key = "Highest Point", value = highestPoint},
                 {key = "x2 Matches", value = doubleMatches},
                 {key = "x3 Matches", value = tripleMatches},

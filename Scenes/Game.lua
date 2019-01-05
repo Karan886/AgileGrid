@@ -54,7 +54,6 @@ local gameData = {
   score = 0,
   doubleMatches = 0,
   tripleMatches = 0,
-  totalMatches = 0,
   highestPoint = 0
 }
 
@@ -102,7 +101,6 @@ function resetGameData()
 end
 
 function updateGameData(value)
-  if (value > 0) then gameData["totalMatches"] = gameData["totalMatches"] + value end
   if (scoreText.value > gameData["highestPoint"]) then gameData["highestPoint"] = scoreText.value end
   if (value == 2) then
       gameData["doubleMatches"] = gameData["doubleMatches"] + 1
