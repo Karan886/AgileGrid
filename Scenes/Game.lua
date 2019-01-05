@@ -58,6 +58,8 @@ local gameData = {
   highestPoint = 0
 }
 
+local spawnTime = 8000
+
 --container for grids and other game objects
 local bin = { 
   grids = {},
@@ -710,7 +712,7 @@ function scene:show( event )
         --spawn the first grid then apply the delay
         physics.start()
         spawnGrid(centerX - 100, centerY, 4, 3)
-        gridSpawnTimer = timer.performWithDelay(10000, spawnGrid, 0)
+        gridSpawnTimer = timer.performWithDelay(spawnTime, spawnGrid, 0)
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
