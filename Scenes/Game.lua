@@ -120,8 +120,8 @@ function updateScore(value, pokeOptions)
        updateGameData(value)
 
       if (scoreText.value < 0) then
-          scoreText.display(nil, 1000)
           haltGameActivity()
+          scoreText.display(nil, 1000)
            changeScene({
               sceneName = "Scenes.GameOver",
               duration = 500,
@@ -357,7 +357,7 @@ function getGridlocation(gridGroup)
 end
 
 function blockSwipe(event)
-   if (gameState == "PAUSED") then
+   if (gameState == "PAUSED" or gameState == "HALT") then
        return true
    end
    local parentGroup = event.target.parent
@@ -619,17 +619,20 @@ function changeScene(options)
 end
 
 function haltGameActivity()
+    gameState = "HALT"
+    pausePlayButton: removeEventListener("tap", changePausePlay)
+
     displayOverLay({
         color = {0, 0, 0, 0.5}
     })
     physics.pause()
-    pausePlayButton: removeEventListener("tap", changePausePlay)
 end
 
 function unhaltGameActivity()
     hideOverLay()
     physics.start()
     pausePlayButton: addEventListener("tap", changePausePlay)
+    gameState = "PLAY"
 end
 
 function displayOverLay(options)
@@ -796,14 +799,11 @@ function scene:hide( event )
         -- cleaning up other scene objects
         score.cleanUp()
 
-        local ui = bin.UI
-        local grids = bin.grids
-        for i = 1, #ui do
-            display.remove(ui[i])
-        end
-        for i = 1, #grids do
-            display.remove(grids[i])
-        end
+        local ui, grids = bin.UI, bin.grids
+        for i = 1, #ui do  display.remove(ui[i]) end 
+        for i = 1, #grids do display.remove(grids[i]) end
+            
+        if (gameState == "HALT") then unhaltGameActivity() end
 
         resetGameData()
     end
