@@ -110,9 +110,11 @@ function updateGameData(value)
   gameData["score"] = scoreText.value
 end
 
-function updateScore(value, pokeOptions)
+function updateScore(val, pokeOptions)
     if (scoreText ~= nil) then
-       scoreText.add("", value)
+       scoreText.add({
+           value = val
+       })
        scoreText.poke(pokeOptions)
        
        updateGameData(value)

@@ -17,10 +17,15 @@ function isObjectValid(name)
 end
 
 function score.new(name, obj, value)
+    local currVal = obj.value
     obj.name = name or #scoreObjects
     obj.value = value
     obj.name = name
-    obj.add = function(text, value)
+    obj.add = function(options)
+        local ops = options or {}
+        local value = ops.value or 1
+        local text = ops.text or ""
+
         obj.value = obj.value + value
         obj.text = text..obj.value
     end

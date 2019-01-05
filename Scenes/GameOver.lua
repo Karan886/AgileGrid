@@ -14,6 +14,7 @@ local height = display.contentHeight
 local widget = require "widget"
 local file = require "Modules.File"
 local json = require "json"
+local score = require "Modules.Score"
 
 --global variables
 local gameOverClipboard
@@ -27,6 +28,15 @@ function goToMainMenu()
     composer.gotoScene("Scenes.Menu", {time = 300, effect = "fade"})
 end
 
+function animateScore(obj, val, delay)
+    if (val == 0) then val = 1 end 
+    local value = 0
+    timer.performWithDelay(delay, function() 
+        value = value + 1
+        obj.text = value
+    end, math.abs(val))
+
+end
 function showGameStats(data)
 	local pos = {x = gameOverClipboard.x, y = gameOverClipboard.y - (gameOverClipboard.height/2)}
     for i = 1, #data do
@@ -46,9 +56,10 @@ function showGameStats(data)
         keyText: setFillColor(1, 1, 1, 0.7)
         keyText.alpha = 0
 
-        local valueText = display.newText(data[i].value, 0, dataBackground.y, "./Fonts/BigBook-Heavy", 16)
+        local valueText = display.newText("", 0, dataBackground.y, "./Fonts/BigBook-Heavy", 16)
         valueText.x = dataBackground.x + dataBackground.x/2 + valueText.width
-
+        animateScore(valueText, data[i].value, 100)
+        
         dataObjects: insert(dataBackground)
         dataObjects: insert(keyText)
         dataObjects: insert(valueText)
