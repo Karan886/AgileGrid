@@ -47,7 +47,6 @@ function showGameStats(data)
 
         local valueText = display.newText(data[i].value, 0, dataBackground.y, "./Fonts/BigBook-Heavy", 16)
         valueText.x = dataBackground.x + dataBackground.x/2 + valueText.width
-        --print(data[i].key.." : "..data[i].value)
 
         dataObjects: insert(dataBackground)
         dataObjects: insert(keyText)
