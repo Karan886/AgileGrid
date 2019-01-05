@@ -19,3 +19,4 @@ Structure:
    - ./Modules/Exception.lua - a simple module for creating helpful warning/error pront statements
    - ./Modules/Score.lua - module that creates score objects by providing the object with helpful update score functions 
      and also interactive transitions.
+   - ./Modules/DialogBox.lua - module that creates custom dialog box to prompt the user.
