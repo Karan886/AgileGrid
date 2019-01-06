@@ -35,6 +35,7 @@ local parallax_clouds_two
 local parallax_clouds_three
 
 local parallaxWrapPosition
+local gameStatsText
 
 --initialized globals
 local pauseTexture = {
@@ -91,6 +92,38 @@ function removeGridFromGlobalTable(id)
        end
    else
        print("no grid to remove")
+   end
+end
+
+function createGameStatsText()
+    local pos = {x = 0, y = centerY - actualHeight/2 + headerFrame.height + 5}
+    local ui = bin.UI
+    local group = display.newGroup()
+    local count = 1
+    for key, value in pairs(gameData) do
+        local gameStat = display.newText(key..": "..value, pos.x, pos.y * count, "./Fonts/Carbon-Phyber", 10)
+        gameStat.x = gameStat.width/2 + 5
+        gameStat.alpha = 0.8
+        gameStat.isVisible = false
+        group: insert(gameStat)
+        ui[#ui + 1] = gameStat
+        count = count + 1
+    end
+    return group
+end
+
+function hideGameStatsText(group)
+   for i = 1, group.numChildren do
+       group[i].isVisible = false
+   end 
+end
+
+function showGameStatsText(group)
+   local count = 1
+   for key, value in pairs(gameData) do
+       group[count].text = key..": "..value
+       group[count].isVisible = true
+       count = count + 1
    end
 end
 
@@ -664,6 +697,7 @@ function pauseGame()
         color = {0, 0, 0, 0.5}
     })
     quitGameButton: setEnabled(false)
+    showGameStatsText(gameStatsText)
 end
 
 function resumeGame()
@@ -677,6 +711,7 @@ function resumeGame()
     pauseGameText.isVisible = false
     hideOverLay()
     quitGameButton: setEnabled(true)
+    hideGameStatsText(gameStatsText)
 end
  -- Get current user high scores etc.
 function getUserGameData()
@@ -772,11 +807,14 @@ function scene:show( event )
         })
         ui[#ui + 1] = dialogBox
 
+        gameStatsText = createGameStatsText()
+
         sceneGroup: insert(headerFrame)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
         sceneGroup: insert(dialogBox.dialogGroup)
+        sceneGroup: insert(gameStatsText)
 
         createPausePlayButton(width - 28, headerFrame.y + 3, sceneGroup)
         createQuitGameButton(centerX - width/2 + (15/2) + 5, headerFrame.y + 3, sceneGroup)
