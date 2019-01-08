@@ -101,7 +101,7 @@ function createGameStatsText()
     local group = display.newGroup()
     local count = 1
     for key, value in pairs(gameData) do
-        local gameStat = display.newText(key..": "..value, pos.x, pos.y * count, "./Fonts/Carbon-Phyber", 10)
+        local gameStat = display.newText(key..": "..value, pos.x, pos.y * count, actualWidth, 0,"./Fonts/Carbon-Phyber", 10)
         gameStat.x = gameStat.width/2 + 5
         gameStat.alpha = 0.8
         gameStat.isVisible = false
