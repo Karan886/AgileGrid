@@ -148,9 +148,10 @@ function updateScore(val, pokeOptions)
        scoreText.add({
            value = val
        })
+       print("score: "..val)
        scoreText.poke(pokeOptions)
        
-       updateGameData(value)
+       updateGameData(val)
 
       if (scoreText.value < 0) then
           haltGameActivity()
