@@ -29,8 +29,11 @@ function goToMainMenu()
 end
 
 function animateScore(obj, val, delay)
-    if (val == 0) then return end
     local value = 0
+     if (val == 0) then 
+        val = 1 
+        value = -1
+    end
     timer.performWithDelay(delay, function() 
         value = value + 1
         obj.text = value
