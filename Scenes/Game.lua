@@ -2,7 +2,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 -- Include files
-local data = require "data"
+local data = require "Data.Data"
 local widget = require "widget"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
