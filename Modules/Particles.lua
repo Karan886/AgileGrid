@@ -1,8 +1,7 @@
 local particles = {}
-local file = require "Modules.File"
-function particles.new(filepath)
+function particles.new(table)
 	 local emitterObject = {}
-     emitterObject.options = file.loadJson(filepath)
+     emitterObject.options = table
      emitterObject.start = function(x, y, sceneGroup)
          local emitter = display.newEmitter(emitterObject.options)
          emitter.x, emitter.y = x, y

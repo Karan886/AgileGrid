@@ -1,4 +1,4 @@
-local composer = require( "composer" )
+local composer = require("composer")
 local scene = composer.newScene()
 
 -- Include files
@@ -9,6 +9,7 @@ local particles = require "Modules.Particles"
 local exception = require "Modules.Exception"
 local dialog = require "Modules.DialogBox"
 local file = require "Modules.File"
+local smokeExplosion = require "ParticleAffects.SmokeExplosion"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -48,7 +49,7 @@ local playTexture = {
     filename = "./Images/UI/play_button.png"
 }
 
-local smokeAffect = particles.new("./ParticleAffects/SmokeExplosion.json")
+local smokeAffect = particles.new(smokeExplosion)
 local gameState = "PLAY"
 
 local gameData = {
@@ -160,7 +161,7 @@ function updateScore(val, pokeOptions)
               sceneName = "Scenes.GameOver",
               duration = 500,
               delay = 3000,
-              params = { highScores = getUserGameData(), currentGameData = gameData}
+              params = { highScores = {getUserGameData()}, currentGameData = gameData}
           })
       end
     end
@@ -716,7 +717,7 @@ function resumeGame()
 end
  -- Get current user high scores etc.
 function getUserGameData()
-    return file.loadJson("user.json", system.DocumentsDirectory)
+    return file.loadJson("AGUser.json", system.DocumentsDirectory)
 end
 
 -- -----------------------------------------------------------------------------------

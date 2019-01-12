@@ -1,4 +1,4 @@
-local composer = require( "composer" )
+local composer = require("composer")
  
 local scene = composer.newScene()
 
