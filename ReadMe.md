@@ -10,6 +10,8 @@ before it goes offscreen.
 - Blocks are moved on each grid by swapping in the playable area.
 - The game is lost when points go below zero.
 
+Note: This repository was imported from gitlab so some old issues may be missing.
+
 Structure:
 
 - ./Scenes - contains all scene source code
