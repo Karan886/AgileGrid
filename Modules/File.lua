@@ -65,6 +65,7 @@ function file.loadJson(filename, location, property)
 	else
 		returnVal = decodedJson
 	end
+  print("successfully loaded JSON from file "..filename)
 	return returnVal
 end 
 
