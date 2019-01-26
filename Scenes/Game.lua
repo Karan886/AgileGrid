@@ -161,7 +161,7 @@ function updateScore(val, pokeOptions)
               sceneName = "Scenes.GameOver",
               duration = 500,
               delay = 3000,
-              params = { highScores = {getUserGameData()}, currentGameData = gameData}
+              params = { highScores = getUserGameData(), currentGameData = gameData}
           })
       end
     end
