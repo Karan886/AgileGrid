@@ -1,7 +1,6 @@
 local composer = require "composer"
 local file = require "Modules.File"
 local json = require "json"
-
 --initialize user data
 local userData = {
 	name = "player",
