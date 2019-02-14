@@ -12,6 +12,8 @@ before it goes offscreen.
 
 Note: This repository was imported from gitlab so some old issues may be missing.
 
+First Look: https://www.dropbox.com/s/yo4126jejgdkolz/agilegrid_demo.mov?dl=0
+
 Structure:
 
 - ./Scenes - contains all scene source code
@@ -26,4 +28,4 @@ Structure:
    - ./Modules/Score.lua - module that creates score objects by providing the developer with helpful update score functions 
      and also interactive transitions.
    - ./Modules/DialogBox.lua - module that creates custom dialog box to prompt the user.
-- ./ParticleAffects - contains JSON files that defines options for different particle affects in the game.
+- ./ParticleAffects - contains lua files that define options for particle affects in the game.
