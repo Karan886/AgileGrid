@@ -12,8 +12,9 @@ before it goes offscreen.
 
 Note: This repository was imported from gitlab so some old issues may be missing.
 
-First Look: https://www.dropbox.com/s/yo4126jejgdkolz/agilegrid_demo.mov?dl=0
-            https://drive.google.com/open?id=1bA7Yma0HY3S-YP6SfKyWcErkyl2CyUKt
+Demos:
+- First Look: https://www.dropbox.com/s/yo4126jejgdkolz/agilegrid_demo.mov?dl=0
+- More:       https://drive.google.com/open?id=1bA7Yma0HY3S-YP6SfKyWcErkyl2CyUKt
 
 Structure:
 
