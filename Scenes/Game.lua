@@ -153,17 +153,6 @@ function updateScore(val, pokeOptions)
        scoreText.poke(pokeOptions)
        
        updateGameData(val)
-
-      if (scoreText.value < 0) then
-          haltGameActivity()
-          scoreText.display(nil, 1000)
-           changeScene({
-              sceneName = "Scenes.GameOver",
-              duration = 500,
-              delay = 3000,
-              params = { highScores = getUserGameData(), currentGameData = gameData}
-          })
-      end
     end
 end
 
@@ -314,14 +303,26 @@ function createGridGroup(grid)
    return gridGroup
 end
 
+function goToGameOver()
+  haltGameActivity()
+  scoreText.display(nil, 1000)
+  changeScene({
+    sceneName = "Scenes.GameOver",
+    duration = 500,
+    delay = 3000,
+    params = { highScores = getUserGameData(), currentGameData = gameData}
+  })
+end
+
 function onUpperSensorCollide(event)
   print("Collision occured with upper sensor")
   if (event.other.name == "GridContainer" and event.phase == 'ended') then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
-      local matchesLeft = event.other.numOfBlocks / 3
-      updateScore(matchesLeft * -2, {
-          startColor = {1, 0, 0}
-      })
+      local blocksLeft = event.other.numOfBlocks
+      if (blocksLeft > 0) then
+        goToGameOver()
+      end 
+      
       removeGridFromGlobalTable(event.other.id)
   end
 end
