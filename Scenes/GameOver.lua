@@ -54,12 +54,12 @@ function showGameStats(data)
         dataBackground: setStrokeColor(1, 1, 1, 0.5)
         dataBackground.alpha = 0
 
-        local keyText = display.newText(data[i].key..":", 0, dataBackground.y, "./Fonts/BigBook-Heavy", 16)
+        local keyText = display.newText(data[i].key..":", 0, dataBackground.y, "Fonts/BigBook-Heavy", 16)
         keyText.x = dataBackground.x - dataBackground.width/2 + keyText.width/2 + 5
         keyText: setFillColor(1, 1, 1, 0.7)
         keyText.alpha = 0
 
-        local valueText = display.newText("", 0, dataBackground.y, "./Fonts/BigBook-Heavy", 16)
+        local valueText = display.newText("", 0, dataBackground.y, "Fonts/BigBook-Heavy", 16)
         valueText.x = dataBackground.x + dataBackground.x/2 + valueText.width
         animateScore(valueText, data[i].value, 100)
         
@@ -78,19 +78,19 @@ end
 
 function scene:create( event )
     local sceneGroup = self.view
-    local bg = display.newImage("./Images/Backgrounds/sky_main_two.png", centerX, centerY)
+    local bg = display.newImage("Images/sky_main_two.png", centerX, centerY)
 
-    gameOverClipboard = display.newImage("./Images/Misc/clipboard.png", centerX, centerY)
+    gameOverClipboard = display.newImage("Images/clipboard.png", centerX, centerY)
     gameOverClipboard.y = centerY - gameOverClipboard.height - 60
     gameOverClipboard.width, gameOverClipboard.height =  300, 265
 
-    gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2 + 10, "./Fonts/BigBook-Heavy", 30)
+    gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2 + 10, "Fonts/BigBook-Heavy", 30)
     gameOverText.y = gameOverText.y + gameOverText.height / 2 + 3
     gameOverText: setFillColor(0, 0, 0.2)
 
     backButton = widget.newButton({
         label = "Main Menu",
-        font = "./Fonts/BigBook-Heavy",
+        font = "Fonts/BigBook-Heavy",
         shape = "roundedRect",
         cornerRadius = 5,
         fillColor = {default = {0.55, 0.35, 0.17}, over = {0.55, 0.35, 0.17, 0.5}},

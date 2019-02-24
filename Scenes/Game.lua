@@ -41,12 +41,12 @@ local gameStatsText
 --initialized globals
 local pauseTexture = {
     type = "image",
-    filename = "./Images/UI/pause_button.png"
+    filename = "Images/pause_button.png"
 }
 
 local playTexture = {
     type = "image",
-    filename = "./Images/UI/play_button.png"
+    filename = "Images/play_button.png"
 }
 
 local smokeAffect = particles.new(smokeExplosion)
@@ -102,7 +102,7 @@ function createGameStatsText()
     local group = display.newGroup()
     local count = 1
     for key, value in pairs(gameData) do
-        local gameStat = display.newText(key..": "..value, pos.x, pos.y * count, actualWidth, 0,"./Fonts/Carbon-Phyber", 10)
+        local gameStat = display.newText(key..": "..value, pos.x, pos.y * count, actualWidth, 0,"Fonts/Carbon-Phyber", 10)
         gameStat.x = gameStat.width/2 + 5
         gameStat.alpha = 0.8
         gameStat.isVisible = false
@@ -618,7 +618,7 @@ function createQuitGameButton(x, y, sceneGroup)
     local ui = bin.UI
     timer.performWithDelay(1000, function()
         quitGameButton = widget.newButton({
-            defaultFile = "./Images/UI/close.png",
+            defaultFile = "Images/close.png",
             width = 15,
             height = 15,
             onPress = function()
@@ -728,13 +728,13 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local firstGradientSky = display.newImage("./Images/Backgrounds/sky_gradient_one.png", centerX, centerY)
-    local secondGradientSky = display.newImage("./Images/Backgrounds/sky_gradient_two.png", centerX, centerY)
+    local firstGradientSky = display.newImage("Images/sky_gradient_one.png", centerX, centerY)
+    local secondGradientSky = display.newImage("Images/sky_gradient_two.png", centerX, centerY)
     imageTransition(firstGradientSky, secondGradientSky, 15000)
 
-    parallax_clouds_one = display.newImage("./Images/Parallax/parallax_clouds_one.png", centerX, centerY)
-    parallax_clouds_two = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
-    parallax_clouds_three = display.newImage("./Images/Parallax/parallax_clouds_two.png", centerX, centerY - parallax_clouds_two.height)
+    parallax_clouds_one = display.newImage("Images/parallax_clouds_one.png", centerX, centerY)
+    parallax_clouds_two = display.newImage("Images/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
+    parallax_clouds_three = display.newImage("Images/parallax_clouds_two.png", centerX, centerY - parallax_clouds_two.height)
 
     parallaxWrapPosition = {x = parallax_clouds_two.x, y = parallax_clouds_two.y}
      
