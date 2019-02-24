@@ -378,8 +378,8 @@ function swapBlocks(blockA, blockB)
   slotContainer[blockAID] = blockB
   slotContainer[blockBID] = blockA
 
-  transition.to(blockA, {time = 500, x = blockA.placeholder.x, y = blockA.placeholder.y})
-  transition.to(blockB, {time = 500, x = blockB.placeholder.x, y = blockB.placeholder.y})
+  transition.to(blockA, {time = 200, x = blockA.placeholder.x, y = blockA.placeholder.y})
+  transition.to(blockB, {time = 200, x = blockB.placeholder.x, y = blockB.placeholder.y})
 
 end
 
