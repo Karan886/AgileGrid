@@ -120,39 +120,15 @@ function scene:show( event )
 	if (event.phase == "will") then
         local params = event.params
         local currGameData = params.currentGameData
-        local highScores = params.highScores
-
-        local totalMatches = currGameData.totalMatches
-        local doubleMatches = currGameData.doubleMatches
-        local tripleMatches = currGameData.tripleMatches
-        local belowZero = currGameData.score
-        local highestPoint = currGameData.highestPoint
-        local finalScore = doubleMatches + tripleMatches + belowZero + highestPoint
-
-        local highScore = highScores.highScore 
-        local highestAchievedPoint = highScores.highestPoint
-       
-        if (highScore < finalScore) then
-            print("High Score Is: "..finalScore)
-            highScore = finalScore
-        end
-        -- Highest point refers to the overall highest point ever achieved (not just in the local game) 
-        if (highestAchievedPoint < highestPoint) then
-            print("highest Achieved Point Is: "..highestPoint)
-            highestAchievedPoint = highestPoint
-        end
-
-        highScores.highScore = highScore
-        highScores.highestPoint = highestAchievedPoint
-
+              
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
 	        showGameStats({
-                {key = "Highest Point", value = highestPoint},
-                {key = "x2 Matches", value = doubleMatches},
-                {key = "x3 Matches", value = tripleMatches},
-                {key = "Below Zero", value = belowZero},
-                {key = "Final Score", value = finalScore}
+                {key = "Matches", value = 0},
+                {key = "x2 Matches", value = 0},
+                {key = "x3 Matches", value = 0},
+                {key = "Shape Matches", value = 0},
+                {key = "Final Score", value = 0}
 	        })
 	        for i = 1, dataObjects.numChildren do
 	            transition.to(dataObjects[i], {time = 100, alpha = 1.0})
@@ -160,7 +136,7 @@ function scene:show( event )
 	    end, 1)
 
         -- save latest high score data
-        file.save("user.json", json.encode(highScores), system.DocumentsDirectory)
+        --file.save("user.json", json.encode(highScores), system.DocumentsDirectory)
 
 	elseif (event.phase == "did") then
 
