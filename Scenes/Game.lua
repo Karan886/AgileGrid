@@ -55,8 +55,7 @@ local gameState = "PLAY"
 local gameData = {
   score = 0,
   doubleMatches = 0,
-  tripleMatches = 0,
-  highestPoint = 0
+  tripleMatches = 0
 }
 
 local spawnTime = 8000
@@ -135,7 +134,6 @@ function resetGameData()
 end
 
 function updateGameData(value)
-  if (scoreText.value > gameData["highestPoint"]) then gameData["highestPoint"] = scoreText.value end
   if (value == 2) then
       gameData["doubleMatches"] = gameData["doubleMatches"] + 1
   elseif (value == 3) then
@@ -153,18 +151,18 @@ function updateScore(val, pokeOptions)
        scoreText.poke(pokeOptions)
        
        updateGameData(val)
-
-      if (scoreText.value < 0) then
-          haltGameActivity()
-          scoreText.display(nil, 1000)
-           changeScene({
-              sceneName = "Scenes.GameOver",
-              duration = 500,
-              delay = 3000,
-              params = { highScores = getUserGameData(), currentGameData = gameData}
-          })
-      end
     end
+end
+
+function gameOverTrigger()
+  haltGameActivity()
+      scoreText.display(nil, 1000)
+      changeScene({
+         sceneName = "Scenes.GameOver",
+         duration = 500,
+         delay = 3000,
+         params = { highScores = getUserGameData(), currentGameData = gameData}
+  })
 end
 
 function removeMatchedBlocks(blocks, score)
@@ -318,10 +316,10 @@ function onUpperSensorCollide(event)
   print("Collision occured with upper sensor")
   if (event.other.name == "GridContainer" and event.phase == 'ended') then
       print("Grid Container Detected By Upper Sensor with id: "..event.other.id)
-      local matchesLeft = event.other.numOfBlocks / 3
-      updateScore(matchesLeft * -2, {
-          startColor = {1, 0, 0}
-      })
+      local matchesLeft = event.other.numOfBlocks
+      if (matchesLeft > 0) then
+        gameOverTrigger()
+      end
       removeGridFromGlobalTable(event.other.id)
   end
 end

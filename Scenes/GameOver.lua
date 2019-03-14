@@ -122,36 +122,26 @@ function scene:show( event )
         local currGameData = params.currentGameData
         local highScores = params.highScores
 
-        local totalMatches = currGameData.totalMatches
         local doubleMatches = currGameData.doubleMatches
         local tripleMatches = currGameData.tripleMatches
-        local belowZero = currGameData.score
-        local highestPoint = currGameData.highestPoint
-        local finalScore = doubleMatches + tripleMatches + belowZero + highestPoint
+        local score = currGameData.score
+        local finalScore = doubleMatches + tripleMatches + score
 
         local highScore = highScores.highScore 
-        local highestAchievedPoint = highScores.highestPoint
        
         if (highScore < finalScore) then
             print("High Score Is: "..finalScore)
             highScore = finalScore
         end
-        -- Highest point refers to the overall highest point ever achieved (not just in the local game) 
-        if (highestAchievedPoint < highestPoint) then
-            print("highest Achieved Point Is: "..highestPoint)
-            highestAchievedPoint = highestPoint
-        end
-
+       
         highScores.highScore = highScore
-        highScores.highestPoint = highestAchievedPoint
 
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
 	        showGameStats({
-                {key = "Highest Point", value = highestPoint},
+                {key = "Score", value = score},
                 {key = "x2 Matches", value = doubleMatches},
                 {key = "x3 Matches", value = tripleMatches},
-                {key = "Below Zero", value = belowZero},
                 {key = "Final Score", value = finalScore}
 	        })
 	        for i = 1, dataObjects.numChildren do
