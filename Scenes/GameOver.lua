@@ -127,15 +127,6 @@ function scene:show( event )
         local score = currGameData.score
         local finalScore = doubleMatches + tripleMatches + score
 
-        local highScore = highScores.highScore 
-       
-        if (highScore < finalScore) then
-            print("High Score Is: "..finalScore)
-            highScore = finalScore
-        end
-       
-        highScores.highScore = highScore
-
 	    transition.to(gameOverClipboard, {time = 500, x = centerX, y = centerY})
 	    timer.performWithDelay(1000, function()
 	        showGameStats({
@@ -150,7 +141,14 @@ function scene:show( event )
 	    end, 1)
 
         -- save latest high score data
-        file.save("user.json", json.encode(highScores), system.DocumentsDirectory)
+        local highScore = highScores.highScore 
+       
+        if (highScore < finalScore) then
+            print("High Score Is: "..finalScore)
+            highScore = finalScore
+            highScores.highScore = highScore
+            file.save("user.json", json.encode(highScores), system.DocumentsDirectory)
+        end   
 
 	elseif (event.phase == "did") then
 
