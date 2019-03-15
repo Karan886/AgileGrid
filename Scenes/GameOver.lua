@@ -21,6 +21,10 @@ local gameOverClipboard
 local gameOverText
 local backButton
 
+local rowHeight = 50
+local rowWidth = 300 
+local numOfStatItems = 4
+
 local dataObjects = display.newGroup()
 local bin = {}
 
@@ -81,8 +85,8 @@ function scene:create( event )
     local bg = display.newImage("Images/sky_main_two.png", centerX, centerY)
 
     gameOverClipboard = display.newImage("Images/clipboard.png", centerX, centerY)
-    gameOverClipboard.y = centerY - gameOverClipboard.height - 60
-    gameOverClipboard.width, gameOverClipboard.height =  300, 265
+    gameOverClipboard.y = centerY 
+    gameOverClipboard.width, gameOverClipboard.height =  rowWidth, (rowHeight * numOfStatItems) + 15
 
     gameOverText = display.newText("Game Over", centerX, centerY - actualHeight/2 + 10, "Fonts/BigBook-Heavy", 30)
     gameOverText.y = gameOverText.y + gameOverText.height / 2 + 3
@@ -101,7 +105,7 @@ function scene:create( event )
         y = centerY + actualHeight/2,
         onPress = goToMainMenu
     })
-    backButton.y = backButton.y - backButton.height / 2 - 15
+    backButton.y = gameOverClipboard.y + gameOverClipboard.height/2 + backButton.height/2 + 20
 
     sceneGroup: insert(bg)
     sceneGroup: insert(gameOverClipboard)
