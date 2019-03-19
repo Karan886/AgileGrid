@@ -5,7 +5,6 @@ local rawSizeCombinations = {
 	{rows = 3, cols = 3},
     {rows = 3, cols = 4},
     {rows = 3, cols = 5},
-    {rows = 3, cols = 6},
     {rows = 2, cols = 6}
 }
 

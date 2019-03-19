@@ -49,6 +49,7 @@ local playTexture = {
     filename = "Images/play_button.png"
 }
 
+
 local smokeAffect = particles.new(smokeExplosion)
 local gameState = "PLAY"
 
@@ -243,6 +244,22 @@ function assignRandomColorsToBlocks(slotContainer)
   end
 end
 
+-- Returns an array of random numbers between 1 - 15, each number represents a unique block in an image sheet frame
+function getFramesArray(numOfBlocks)
+    local framesArray, randomNumbersSet = {},{}
+    print("numblocks: "..numOfBlocks)
+    for i = 1, 15 do randomNumbersSet[i] = i end
+    for i = 1, (numOfBlocks/3) do
+      local frame = math.random(1, #randomNumbersSet)
+      framesArray[#framesArray + 1] = randomNumbersSet[frame]
+      framesArray[#framesArray + 1] = randomNumbersSet[frame]
+      framesArray[#framesArray + 1] = randomNumbersSet[frame]
+      print(framesArray[#framesArray])
+      table.remove(randomNumbersSet, frame)
+    end
+    return framesArray
+end
+
 -- This function gets a random set of colors such that every color has triplets 
 function getColorMatrix(numOfBlocks)
   local colorMatrix = {}
@@ -277,14 +294,26 @@ function createGridGroup(grid)
 
    local gridXPos = grid.xpos or randomX
    local gridYPos = grid.ypos or (height + 35)
+   
+   frameIdx = 1
+   frameCounter = 1
+   local frameNumbers = getFramesArray(cols * rows)
+   print("test: "..#frameNumbers)
 
    for i=1, cols do
      for j=1, rows do
-        local block = display.newRoundedRect(100, 100, grid.blockSize, grid.blockSize, grid.blockCornerRadius)
-        block.strokeWidth = 2
-        block: setStrokeColor(0, 0, 0, 0.5)
+        --local block = display.newRoundedRect(100, 100, grid.blockSize, grid.blockSize, grid.blockCornerRadius)
+        --block.strokeWidth = 2
+        --block: setStrokeColor(0, 0, 0, 0.5)
+        local randIdx = math.random(1, #frameNumbers)
+        local path = "Images/Blocks/Block-"..frameNumbers[randIdx]..".png"
+      
+        local block = display.newImage(path, 0, 0)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
+        block.width, block.height = grid.blockSize, grid.blockSize
+        block.colorId = frameNumbers[randIdx]
+        table.remove(frameNumbers, randIdx)
 
         block.placeholder = display.newRect(block.x, block.y, block.width, block.height)
         block.placeholder.isVisible = false
@@ -295,13 +324,14 @@ function createGridGroup(grid)
         block.isFocus = false
         
         block:addEventListener("touch", blockSwipe)
-        slotContainer[#slotContainer + 1] = block           
+        slotContainer[#slotContainer + 1] = block
+
+        frameCounter = frameCounter + 1           
      end
    end
    
    gridGroup.topLeft = {x = slotContainer[1].x, y = slotContainer[1].y}
    gridGroup.numOfBlocks = cols * rows
-   assignRandomColorsToBlocks(slotContainer)
 
    local slotContainers = bin.slotContainers
    gridGroup.slotContainer = slotContainer
