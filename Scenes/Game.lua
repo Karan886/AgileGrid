@@ -23,7 +23,7 @@ local height = display.contentHeight
 
 -- global variables
 local upperBoundary
-local headerFrame
+local headerrandomID
 local scoreText
 local pausePlayButton
 local quitGameButton
@@ -97,7 +97,7 @@ function removeGridFromGlobalTable(id)
 end
 
 function createGameStatsText()
-    local pos = {x = 0, y = centerY - actualHeight/2 + headerFrame.height + 5}
+    local pos = {x = 0, y = centerY - actualHeight/2 + headerrandomID.height + 5}
     local ui = bin.UI
     local group = display.newGroup()
     local count = 1
@@ -229,50 +229,22 @@ end
   return matchedBlocks
 end
 
-function assignRandomColorsToBlocks(slotContainer)   
-   local numOfColors = #slotContainer
-   local colors = getColorMatrix(numOfColors)
 
-  for i = 1, #slotContainer do
-    local block = slotContainer[i]
-    local randomColorIndex = math.random(1, #colors)
-    local colorToAssign = colors[randomColorIndex]
-  
-    table.remove(colors, randomColorIndex)
-    block:setFillColor(colorToAssign.red, colorToAssign.green, colorToAssign.blue)
-    block.colorId = colorToAssign.id
-  end
-end
-
--- Returns an array of random numbers between 1 - 15, each number represents a unique block in an image sheet frame
-function getFramesArray(numOfBlocks)
-    local framesArray, randomNumbersSet = {},{}
-    print("numblocks: "..numOfBlocks)
+-- Returns an array of random numbers between 1 - 15, each number represents a unique block
+function getBlocksImageIDArray(numOfBlocks)
+    local imageIdArray, randomNumbersSet = {},{}
     for i = 1, 15 do randomNumbersSet[i] = i end
     for i = 1, (numOfBlocks/3) do
-      local frame = math.random(1, #randomNumbersSet)
-      framesArray[#framesArray + 1] = randomNumbersSet[frame]
-      framesArray[#framesArray + 1] = randomNumbersSet[frame]
-      framesArray[#framesArray + 1] = randomNumbersSet[frame]
-      print(framesArray[#framesArray])
-      table.remove(randomNumbersSet, frame)
+      local randomID = math.random(1, #randomNumbersSet)
+      imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
+      imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
+      imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
+      print(imageIdArray[#imageIdArray])
+      table.remove(randomNumbersSet, randomID)
     end
-    return framesArray
+    return imageIdArray
 end
 
--- This function gets a random set of colors such that every color has triplets 
-function getColorMatrix(numOfBlocks)
-  local colorMatrix = {}
-  --math.random() gives me a random number between 0 and 1
-  for i = 1, (numOfBlocks / 3) do
-    local uniqueId = #colorMatrix
-    local color = {math.random(), math.random(), math.random()}
-    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3], id = uniqueId}
-    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3], id = uniqueId}
-    colorMatrix[#colorMatrix + 1] = {red = color[1], blue = color[2], green = color[3], id = uniqueId}
-  end
-  return colorMatrix
-end
 
 function createGridGroup(grid)
    local gridGroup = display.newGroup()
@@ -295,25 +267,23 @@ function createGridGroup(grid)
    local gridXPos = grid.xpos or randomX
    local gridYPos = grid.ypos or (height + 35)
    
-   frameIdx = 1
-   frameCounter = 1
-   local frameNumbers = getFramesArray(cols * rows)
-   print("test: "..#frameNumbers)
+   randomIDIdx = 1
+   randomIDCounter = 1
+   -- array with random id that represents an image of a block
+   local randomIDNumbers = getBlocksImageIDArray(cols * rows)
+   print("test: "..#randomIDNumbers)
 
    for i=1, cols do
      for j=1, rows do
-        --local block = display.newRoundedRect(100, 100, grid.blockSize, grid.blockSize, grid.blockCornerRadius)
-        --block.strokeWidth = 2
-        --block: setStrokeColor(0, 0, 0, 0.5)
-        local randIdx = math.random(1, #frameNumbers)
-        local path = "Images/Blocks/Block-"..frameNumbers[randIdx]..".png"
+        local randIdx = math.random(1, #randomIDNumbers)
+        local path = "Images/Blocks/Block-"..randomIDNumbers[randIdx]..".png"
       
         local block = display.newImage(path, 0, 0)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
         block.width, block.height = grid.blockSize, grid.blockSize
-        block.colorId = frameNumbers[randIdx]
-        table.remove(frameNumbers, randIdx)
+        block.colorId = randomIDNumbers[randIdx]
+        table.remove(randomIDNumbers, randIdx)
 
         block.placeholder = display.newRect(block.x, block.y, block.width, block.height)
         block.placeholder.isVisible = false
@@ -326,7 +296,7 @@ function createGridGroup(grid)
         block:addEventListener("touch", blockSwipe)
         slotContainer[#slotContainer + 1] = block
 
-        frameCounter = frameCounter + 1           
+        randomIDCounter = randomIDCounter + 1           
      end
    end
    
@@ -719,7 +689,7 @@ function pauseGame()
     if (gridSpawnTimer ~= nil) then
         timer.pause(gridSpawnTimer)
     end
-    Runtime: removeEventListener("enterFrame", parallaxScroll)
+    Runtime: removeEventListener("enterrandomID", parallaxScroll)
     physics.pause()
     gameState = "PAUSED"
     pauseGameText.isVisible = true
@@ -734,7 +704,7 @@ function resumeGame()
     if (gridSpawnTimer ~= nil) then
         timer.resume(gridSpawnTimer)
     end
-    Runtime: addEventListener("enterFrame", parallaxScroll)
+    Runtime: addEventListener("enterrandomID", parallaxScroll)
     physics.start()
 
     gameState = "PLAY"
@@ -792,7 +762,7 @@ function scene:show( event )
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
-        Runtime: addEventListener("enterFrame", parallaxScroll)
+        Runtime: addEventListener("enterrandomID", parallaxScroll)
 
         local ui = bin.UI
 
@@ -808,11 +778,11 @@ function scene:show( event )
 
         sceneGroup: insert(spawnLayer)
 
-        headerFrame = display.newRoundedRect(centerX, centerY - actualHeight/2 + 10, actualWidth + 7, 35, 10)
-        headerFrame: setFillColor(0.85, 0.65, 0.13, 0.6)
-        ui[#ui + 1] = headerFrame
+        headerrandomID = display.newRoundedRect(centerX, centerY - actualHeight/2 + 10, actualWidth + 7, 35, 10)
+        headerrandomID: setFillColor(0.85, 0.65, 0.13, 0.6)
+        ui[#ui + 1] = headerrandomID
 
-        scoreText = display.newText("0", centerX, headerFrame.y, "Fonts/BigBook-Heavy", 22)
+        scoreText = display.newText("0", centerX, headerrandomID.y, "Fonts/BigBook-Heavy", 22)
         scoreText: setFillColor(0.5, 0.5, 0.5)
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
@@ -839,15 +809,15 @@ function scene:show( event )
 
         gameStatsText = createGameStatsText()
 
-        sceneGroup: insert(headerFrame)
+        sceneGroup: insert(headerrandomID)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
         sceneGroup: insert(dialogBox.dialogGroup)
         sceneGroup: insert(gameStatsText)
 
-        createPausePlayButton(width - 28, headerFrame.y + 3, sceneGroup)
-        createQuitGameButton(centerX - width/2 + (15/2) + 5, headerFrame.y + 3, sceneGroup)
+        createPausePlayButton(width - 28, headerrandomID.y + 3, sceneGroup)
+        createQuitGameButton(centerX - width/2 + (15/2) + 5, headerrandomID.y + 3, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -870,7 +840,7 @@ function scene:hide( event )
         -- removing event listeners
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
         pausePlayButton: removeEventListener("touch", changePausePlay)
-        Runtime: removeEventListener("enterFrame", parallaxScroll)
+        Runtime: removeEventListener("enterrandomID", parallaxScroll)
        
         -- cleaning up other scene objects
         score.cleanUp()
