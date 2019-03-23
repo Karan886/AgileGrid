@@ -6,7 +6,7 @@ before it goes offscreen.
 
 - Grids move vertically across the screen, where each grid is a mini match three game.
 - Player must match as many blocks as possible before grids go offscreen.
-- Points are lost for missing matches and gained for completing matches.
+- Player loses the game if any matches are missed.
 - Blocks are moved on each grid by swapping in the playable area.
 - The game is lost when points go below zero.
 
