@@ -10,6 +10,7 @@ local exception = require "Modules.Exception"
 local dialog = require "Modules.DialogBox"
 local file = require "Modules.File"
 local smokeExplosion = require "ParticleAffects.SmokeExplosion"
+local blur = require "Modules.Blur"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -29,7 +30,6 @@ local pausePlayButton
 local quitGameButton
 local pauseGameText
 local gameOverLay
-local dialogBox
 
 local parallax_clouds_one
 local parallax_clouds_two
@@ -620,8 +620,25 @@ function createQuitGameButton(x, y, sceneGroup)
             width = 15,
             height = 15,
             onPress = function()
-                haltGameActivity()
-                dialogBox.show()
+
+                  --[[blur.start({
+                      xmin = 0,
+                      xmax = width,
+                      ymin = 0,
+                      ymax = height
+                  })--]]
+                  local bounds = {
+                      xMin = 0,
+                      xMax = width,
+                      yMin = 0,
+                      yMax = height
+                   }
+                   local screenCapture = display.captureBounds(bounds, false)
+                   screenCapture.fill.effect = "filter.blurGaussian"
+                   screenCapture.fill.horizontalBlurSize = 20
+                   screenCapture.verticalBlurSize = 20
+
+                --local message = display.newText("Are You Sure ?", centerX, centerY, "Fonts/BigBook-Heavy", 10)
             end
         })
         quitGameButton.x, quitGameButton.y = x, y
@@ -659,21 +676,31 @@ function changeScene(options)
     end, 1)
 end
 
-function haltGameActivity()
-    gameState = "HALT"
+function pauseGameActivity(state)
+    local gState = state or "PAUSED"
+    gameState = gState
     pausePlayButton: removeEventListener("tap", changePausePlay)
-
-    displayOverLay({
-        color = {0, 0, 0, 0.5}
-    })
     physics.pause()
+end
+
+function resumeGameActivity(state)
+    local gState = state or "PLAY"
+    physics.start()
+    pausePlayButton: addEventListener("tap", changePausePlay)
+    gameState = gState
+end
+
+function haltGameActivity(alpha)
+    local visibility = alpha or 0.5
+    displayOverLay({
+        color = {0, 0, 0, visibility}
+    })
+    pauseGameActivity("HALT")
 end
 
 function unhaltGameActivity()
     hideOverLay()
-    physics.start()
-    pausePlayButton: addEventListener("tap", changePausePlay)
-    gameState = "PLAY"
+    resumeGameActivity("PLAY")
 end
 
 function displayOverLay(options)
@@ -787,25 +814,6 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
-        dialogBox = dialog.create({
-            bodyText = "Are You Sure You Want To Quit ?",
-            height = height/8,
-            dialogType = dialog.confirmation,
-            headerColor = {0.78, 0.47, 0.15},
-            alpha = 0.7,
-            onConfirm = function()
-               dialogBox.hide()
-               changeScene({
-                   duration = 300,
-                   delay = 10
-               })
-            end,
-            onDeny = function()
-               dialogBox.hide()
-               unhaltGameActivity()
-            end
-        })
-        ui[#ui + 1] = dialogBox
 
         gameStatsText = createGameStatsText()
 
@@ -813,7 +821,6 @@ function scene:show( event )
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
-        sceneGroup: insert(dialogBox.dialogGroup)
         sceneGroup: insert(gameStatsText)
 
         createPausePlayButton(width - 28, headerrandomID.y + 3, sceneGroup)
