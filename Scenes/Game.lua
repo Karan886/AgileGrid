@@ -24,7 +24,7 @@ local height = display.contentHeight
 
 -- global variables
 local upperBoundary
-local headerrandomID
+local headerBar
 local scoreText
 local pausePlayButton
 local quitGameButton
@@ -67,6 +67,8 @@ local bin = {
   UI = {}
 }
 
+local gameMenuObjects = {}
+
 local spawnLayer = display.newGroup()
 
 --physics setup
@@ -97,7 +99,7 @@ function removeGridFromGlobalTable(id)
 end
 
 function createGameStatsText()
-    local pos = {x = 0, y = centerY - actualHeight/2 + headerrandomID.height + 5}
+    local pos = {x = 0, y = centerY - actualHeight/2 + headerBar.height + 5}
     local ui = bin.UI
     local group = display.newGroup()
     local count = 1
@@ -156,7 +158,7 @@ function updateScore(val, pokeOptions)
 end
 
 function gameOverTrigger()
-  haltGameActivity()
+  pauseGameActivity()
       scoreText.display(nil, 1000)
       changeScene({
          sceneName = "Scenes.GameOver",
@@ -620,24 +622,16 @@ function createQuitGameButton(x, y, sceneGroup)
             width = 15,
             height = 15,
             onPress = function()
-
-                  --[[blur.start({
-                      xmin = 0,
-                      xmax = width,
-                      ymin = 0,
-                      ymax = height
-                  })--]]
-                  local bounds = {
-                      xMin = 0,
-                      xMax = width,
-                      yMin = 0,
-                      yMax = height
-                   }
-                   local screenCapture = display.captureBounds(bounds, false)
-                   screenCapture.fill.effect = "filter.blurGaussian"
-                   screenCapture.fill.horizontalBlurSize = 20
-                   screenCapture.verticalBlurSize = 20
-
+                  if (gameState == "PLAY") then
+                      stopGameActivity()
+                      blur.start({
+                          xmin = 0,
+                          xmax = actualWidth,
+                          ymin = -15,
+                          ymax = actualHeight,
+                          group = ui
+                      })
+                  end
                 --local message = display.newText("Are You Sure ?", centerX, centerY, "Fonts/BigBook-Heavy", 10)
             end
         })
@@ -676,7 +670,8 @@ function changeScene(options)
     end, 1)
 end
 
-function pauseGameActivity(state)
+--Freeze all current game activity including physics, all objects stop where they are
+function stopGameActivity(state)
     local gState = state or "PAUSED"
     gameState = gState
     pausePlayButton: removeEventListener("tap", changePausePlay)
@@ -690,15 +685,15 @@ function resumeGameActivity(state)
     gameState = gState
 end
 
-function haltGameActivity(alpha)
+function pauseGameActivity(alpha)
     local visibility = alpha or 0.5
     displayOverLay({
         color = {0, 0, 0, visibility}
     })
-    pauseGameActivity("HALT")
+    stopGameActivity("HALT")
 end
 
-function unhaltGameActivity()
+function unpauseGameActivity()
     hideOverLay()
     resumeGameActivity("PLAY")
 end
@@ -805,11 +800,11 @@ function scene:show( event )
 
         sceneGroup: insert(spawnLayer)
 
-        headerrandomID = display.newRoundedRect(centerX, centerY - actualHeight/2 + 10, actualWidth + 7, 35, 10)
-        headerrandomID: setFillColor(0.85, 0.65, 0.13, 0.6)
-        ui[#ui + 1] = headerrandomID
+        headerBar = display.newRoundedRect(centerX, centerY - actualHeight/2 + 10, actualWidth + 7, 35, 10)
+        headerBar: setFillColor(0.85, 0.65, 0.13, 0.6)
+        ui[#ui + 1] = headerBar
 
-        scoreText = display.newText("0", centerX, headerrandomID.y, "Fonts/BigBook-Heavy", 22)
+        scoreText = display.newText("0", centerX, headerBar.y, "Fonts/BigBook-Heavy", 22)
         scoreText: setFillColor(0.5, 0.5, 0.5)
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
@@ -817,14 +812,14 @@ function scene:show( event )
 
         gameStatsText = createGameStatsText()
 
-        sceneGroup: insert(headerrandomID)
+        sceneGroup: insert(headerBar)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
         sceneGroup: insert(gameStatsText)
 
-        createPausePlayButton(width - 28, headerrandomID.y + 3, sceneGroup)
-        createQuitGameButton(centerX - width/2 + (15/2) + 5, headerrandomID.y + 3, sceneGroup)
+        createPausePlayButton(width - 28, headerBar.y + 3, sceneGroup)
+        createQuitGameButton(centerX - width/2 + (15/2) + 5, headerBar.y + 3, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -856,7 +851,7 @@ function scene:hide( event )
         for i = 1, #ui do  display.remove(ui[i]) end 
         for i = 1, #grids do display.remove(grids[i]) end
             
-        if (gameState == "HALT") then unhaltGameActivity() end
+        if (gameState == "HALT") then unpauseGameActivity() end
 
         resetGameData()
     end
