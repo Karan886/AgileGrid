@@ -10,7 +10,6 @@ local exception = require "Modules.Exception"
 local dialog = require "Modules.DialogBox"
 local file = require "Modules.File"
 local smokeExplosion = require "ParticleAffects.SmokeExplosion"
-local blur = require "Modules.Blur"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -624,13 +623,14 @@ function createQuitGameButton(x, y, sceneGroup)
             onPress = function()
                   if (gameState == "PLAY") then
                       stopGameActivity()
-                      blur.start({
-                          xmin = 0,
-                          xmax = actualWidth,
-                          ymin = -15,
-                          ymax = actualHeight,
-                          group = ui
-                      })
+                      local dummyStats = {
+                        {item = "Item 1", value = "value 1"}, 
+                        {item = "Item 2", value = "value 2"},
+                        {item = "Item 3", value = "value 3"},
+                        {item = "Item 4", value = "value 4"},
+                        {item = "Item 5", value = "value 5"}
+                    }
+                      composer.showOverlay("Scenes.PauseMenuOverlay", {params = dummyStats})
                   end
                 --local message = display.newText("Are You Sure ?", centerX, centerY, "Fonts/BigBook-Heavy", 10)
             end
@@ -711,7 +711,7 @@ function pauseGame()
     if (gridSpawnTimer ~= nil) then
         timer.pause(gridSpawnTimer)
     end
-    Runtime: removeEventListener("enterrandomID", parallaxScroll)
+    Runtime: removeEventListener("enterFrame", parallaxScroll)
     physics.pause()
     gameState = "PAUSED"
     pauseGameText.isVisible = true
@@ -726,7 +726,7 @@ function resumeGame()
     if (gridSpawnTimer ~= nil) then
         timer.resume(gridSpawnTimer)
     end
-    Runtime: addEventListener("enterrandomID", parallaxScroll)
+    Runtime: addEventListener("enterFrame", parallaxScroll)
     physics.start()
 
     gameState = "PLAY"
@@ -761,6 +761,8 @@ function scene:create( event )
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary.isVisible = false
 
+    print("actual width: "..actualWidth.." actualHeight: "..actualHeight)
+
      --adding display elements to scene group
     sceneGroup: insert(firstGradientSky)
     sceneGroup: insert(secondGradientSky)
@@ -784,7 +786,7 @@ function scene:show( event )
         
         physics.addBody(upperBoundary, "static")
         upperBoundary: addEventListener("collision", onUpperSensorCollide)
-        Runtime: addEventListener("enterrandomID", parallaxScroll)
+        Runtime: addEventListener("enterFrame", parallaxScroll)
 
         local ui = bin.UI
 
@@ -842,7 +844,7 @@ function scene:hide( event )
         -- removing event listeners
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
         pausePlayButton: removeEventListener("touch", changePausePlay)
-        Runtime: removeEventListener("enterrandomID", parallaxScroll)
+        Runtime: removeEventListener("enterFrame", parallaxScroll)
        
         -- cleaning up other scene objects
         score.cleanUp()
