@@ -97,6 +97,15 @@ function removeGridFromGlobalTable(id)
    end
 end
 
+function formatGameData()
+  local data = {}
+  for key in pairs(gameData) do
+    print(data[key])
+    data[#data + 1] = {item = key, value = gameData[key]}
+  end
+  return data
+end
+
 function createGameStatsText()
     local pos = {x = 0, y = centerY - actualHeight/2 + headerBar.height + 5}
     local ui = bin.UI
@@ -625,14 +634,8 @@ function createQuitGameButton(x, y, sceneGroup)
             onPress = function()
                   if (gameState == "PLAY") then
                       stopGameActivity()
-                      local dummyStats = {
-                        {item = "Item 1", value = "value 1"}, 
-                        {item = "Item 2", value = "value 2"},
-                        {item = "Item 3", value = "value 3"},
-                        {item = "Item 4", value = "value 4"},
-                        {item = "Item 5", value = "value 5"}
-                    }
-                      composer.showOverlay("Scenes.PauseMenuOverlay", {params = dummyStats})
+                      
+                      composer.showOverlay("Scenes.PauseMenuOverlay", {params = formatGameData()})
                   end
                 --local message = display.newText("Are You Sure ?", centerX, centerY, "Fonts/BigBook-Heavy", 10)
             end
