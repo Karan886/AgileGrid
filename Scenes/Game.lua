@@ -53,7 +53,7 @@ local smokeAffect = particles.new(smokeExplosion)
 local gameState = "PLAY"
 
 local gameData = {
-  score = 0,
+  matches = 0,
   doubleMatches = 0,
   tripleMatches = 0
 }
@@ -150,7 +150,7 @@ function updateGameData(value)
   elseif (value == 3) then
     gameData["tripleMatches"] = gameData["tripleMatches"] + 1
   end
-  gameData["score"] = scoreText.value
+  gameData["matches"] = scoreText.value
 end
 
 function updateScore(val, pokeOptions)
@@ -166,14 +166,14 @@ function updateScore(val, pokeOptions)
 end
 
 function gameOverTrigger()
-  pauseGameActivity()
+  --[[pauseGameActivity()
       scoreText.display(nil, 1000)
       changeScene({
          sceneName = "Scenes.GameOver",
          duration = 500,
          delay = 3000,
          params = { highScores = getUserGameData(), currentGameData = gameData}
-  })
+  })--]]
 end
 
 function removeMatchedBlocks(blocks, score)
@@ -635,7 +635,14 @@ function createQuitGameButton(x, y, sceneGroup)
                   if (gameState == "PLAY") then
                       stopGameActivity()
                       
-                      composer.showOverlay("Scenes.PauseMenuOverlay", {params = formatGameData()})
+                      composer.showOverlay(
+                        "Scenes.PauseMenuOverlay", 
+                        {
+                          params = gameData,
+                          isModal = true,
+                          effect = "fade"
+                        }
+                      )
                   end
                 --local message = display.newText("Are You Sure ?", centerX, centerY, "Fonts/BigBook-Heavy", 10)
             end
@@ -683,7 +690,7 @@ function stopGameActivity(state)
     physics.pause()
 end
 
-function resumeGameActivity(state)
+function scene:resumeGameActivity(state)
     local gState = state or "PLAY"
     physics.start()
     pausePlayButton: addEventListener("tap", changePausePlay)

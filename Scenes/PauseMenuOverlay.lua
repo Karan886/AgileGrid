@@ -69,7 +69,15 @@ function onRowRender(event)
     alignRight(value, rowWidth, 5)
     alignCenter(value, rowHeight)
 
+end
 
+function formatGameData(table)
+    print("formatting game data...")
+    local formattedData = {}
+    for item in pairs(table) do
+        formattedData[#formattedData + 1] = {item = item, value = table[item]}
+    end
+    return formattedData
 end
 
  
@@ -78,7 +86,6 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local params = event.params
-    local menuHeight = #params * rowHeight
     local blurOverlay = blur.getBlurredImage({
         xmin = 0,
         xmax = actualWidth,
@@ -86,6 +93,9 @@ function scene:create( event )
         ymax = actualHeight,
     })
     blurLayer: insert(blurOverlay)
+
+    local gameData = formatGameData(params)
+    local menuHeight = #gameData * rowHeight + 15
 
     local listBox = widget.newTableView({
         left = centerX - (menuWidth/2),
@@ -101,9 +111,8 @@ function scene:create( event )
         lineColor = {0.5, 0.5, 0.5, 0.5},
     }
 
-    for i = 1, #params do
-        if (i == #params) then rowOps.lineColor = {0, 0, 0, 0} end
-        rowOps.params = params[i]
+    for i = 1, #gameData do
+        rowOps.params = gameData[i]
         listBox:insertRow(rowOps)
     end
 
@@ -118,7 +127,8 @@ function scene:create( event )
         fillColor = {default = {0.2, 0.6, 0}, over = {0.2, 0.6, 0, 0.5}},
         font = "Fonts/BigBook-Heavy",
         fontSize = 24,
-        labelColor = {default = {1, 1, 1}, over = {1, 1, 1}}
+        labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
+        onEvent = function() composer.hideOverlay() end
     })
 
     resumeButton.height, resumeButton.width = rowHeight, menuWidth/2
@@ -142,10 +152,11 @@ function scene:create( event )
 
     
     sceneGroup:insert(blurLayer)
-    sceneGroup: insert(listBox)
+    sceneGroup:insert(listBox)
     sceneGroup:insert(menuTitle)
-    sceneGroup: insert(menuTitleText)
+    sceneGroup:insert(menuTitleText)
     sceneGroup:insert(resumeButton)
+    sceneGroup:insert(quitButton)
 end
  
  
@@ -169,10 +180,11 @@ function scene:hide( event )
  
     local sceneGroup = self.view
     local phase = event.phase
+    local parent = event.parent
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-
+        parent:resumeGameActivity("PLAY")
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
