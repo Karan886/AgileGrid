@@ -467,6 +467,7 @@ function blockSwipe(event)
 end
 
 function spawnGrid(x, y, rows, cols)
+   if (gameState ~= "PLAY") then return false end
    local sizeofBlock = centerX/6
    local blockOffset = 5
 
@@ -546,6 +547,7 @@ function spawnGrid(x, y, rows, cols)
        removeGridFromGlobalTable(grid_group.id)
        spawnGrid()
    end 
+   return true
 end
 
 function scroll(options, group)
