@@ -25,8 +25,7 @@ local height = display.contentHeight
 local upperBoundary
 local headerBar
 local scoreText
-local pausePlayButton
-local quitGameButton
+local pauseGameButton
 local pauseGameText
 local gameOverLay
 
@@ -166,7 +165,7 @@ function updateScore(val, pokeOptions)
 end
 
 function gameOverTrigger()
-  --[[pauseGameActivity()
+  --[[
       scoreText.display(nil, 1000)
       changeScene({
          sceneName = "Scenes.GameOver",
@@ -174,6 +173,11 @@ function gameOverTrigger()
          delay = 3000,
          params = { highScores = getUserGameData(), currentGameData = gameData}
   })--]]
+end
+
+function scene:gameOver()
+  stopGameActivity()
+  changeScene()
 end
 
 function removeMatchedBlocks(blocks, score)
@@ -596,62 +600,30 @@ function parallaxScroll()
     end
 end
 
-function changePausePlay(event)
-    if (event.target.id == "play") then
-        event.target.fill = pauseTexture
-        event.target.id = "pause"
-        resumeGame()
-    elseif (event.target.id == "pause") then
-        event.target.fill = playTexture
-        event.target.id = "play"
-        pauseGame()
-    end
-end
-
-function createPausePlayButton(x, y, sceneGroup)
-   -- adding delay because this button is enabled before all related objects are initialized.
+function createPauseButton(x, y, sceneGroup)
     local ui = bin.UI
     timer.performWithDelay(1000, function()
-        pausePlayButton = display.newRect(centerX, centerY, 31, 40)
-        pausePlayButton.fill = pauseTexture
-        pausePlayButton.width, pausePlayButton.height = 12, 12
-        pausePlayButton.alpha = 0.8
-        pausePlayButton.id = "pause" 
-        pausePlayButton: addEventListener("tap", changePausePlay) 
-        pausePlayButton.x, pausePlayButton.y = x, y 
-        ui[#ui + 1] = pausePlayButton
-        sceneGroup: insert(pausePlayButton)
-    end, 1)    
-end
-
-function createQuitGameButton(x, y, sceneGroup)
-    local ui = bin.UI
-    timer.performWithDelay(1000, function()
-        quitGameButton = widget.newButton({
-            defaultFile = "Images/close.png",
+        pauseGameButton = widget.newButton({
+            defaultFile = "Images/pause_button.png",
             width = 15,
             height = 15,
             onPress = function()
                   if (gameState == "PLAY") then
                       stopGameActivity()
-                      
                       composer.showOverlay(
                         "Scenes.PauseMenuOverlay", 
-                        {
-                          params = gameData,
-                          isModal = true,
-                          effect = "fade"
-                        }
+                        { params = gameData, isModal = true, effect = "fade"}
                       )
                   end
-                --local message = display.newText("Are You Sure ?", centerX, centerY, "Fonts/BigBook-Heavy", 10)
             end
         })
-        quitGameButton.x, quitGameButton.y = x, y
-        ui[#ui + 1] = quitGameButton
-        sceneGroup: insert(quitGameButton)
+        pauseGameButton.x, pauseGameButton.y = x, y
+        ui[#ui + 1] = pauseGameButton
+        sceneGroup: insert(pauseGameButton)
     end, 1)
 end
+
+
 
 function imageTransition(firstImage, secondImage, duration)
     if (firstImage == nil or secondImage == nil) then
@@ -686,28 +658,18 @@ end
 function stopGameActivity(state)
     local gState = state or "PAUSED"
     gameState = gState
-    pausePlayButton: removeEventListener("tap", changePausePlay)
     physics.pause()
 end
 
 function scene:resumeGameActivity(state)
     local gState = state or "PLAY"
     physics.start()
-    pausePlayButton: addEventListener("tap", changePausePlay)
     gameState = gState
-end
-
-function pauseGameActivity(alpha)
-    local visibility = alpha or 0.5
-    displayOverLay({
-        color = {0, 0, 0, visibility}
-    })
-    stopGameActivity("HALT")
 end
 
 function unpauseGameActivity()
     hideOverLay()
-    resumeGameActivity("PLAY")
+    scene:resumeGameActivity("PLAY")
 end
 
 function displayOverLay(options)
@@ -717,21 +679,6 @@ end
 
 function hideOverLay()
     gameOverLay.isVisible = false
-end
-
-function pauseGame()
-    if (gridSpawnTimer ~= nil) then
-        timer.pause(gridSpawnTimer)
-    end
-    Runtime: removeEventListener("enterFrame", parallaxScroll)
-    physics.pause()
-    gameState = "PAUSED"
-    pauseGameText.isVisible = true
-    displayOverLay({
-        color = {0, 0, 0, 0.5}
-    })
-    quitGameButton: setEnabled(false)
-    showGameStatsText(gameStatsText)
 end
 
 function resumeGame()
@@ -744,7 +691,7 @@ function resumeGame()
     gameState = "PLAY"
     pauseGameText.isVisible = false
     hideOverLay()
-    quitGameButton: setEnabled(true)
+    pauseGameButton: setEnabled(true)
     hideGameStatsText(gameStatsText)
 end
  -- Get current user high scores etc.
@@ -773,7 +720,7 @@ function scene:create( event )
     upperBoundary = display.newRect(centerX, -35, width, 5)
     upperBoundary.isVisible = false
 
-    print("actual width: "..actualWidth.." actualHeight: "..actualHeight)
+    print("game state: "..gameState)
 
      --adding display elements to scene group
     sceneGroup: insert(firstGradientSky)
@@ -832,8 +779,7 @@ function scene:show( event )
         sceneGroup: insert(scoreText)
         sceneGroup: insert(gameStatsText)
 
-        createPausePlayButton(width - 28, headerBar.y + 3, sceneGroup)
-        createQuitGameButton(centerX - width/2 + (15/2) + 5, headerBar.y + 3, sceneGroup)
+        createPauseButton(width - 28, headerBar.y + 3, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -855,7 +801,6 @@ function scene:hide( event )
 
         -- removing event listeners
         upperBoundary: removeEventListener("collision", onUpperSensorCollide)
-        pausePlayButton: removeEventListener("touch", changePausePlay)
         Runtime: removeEventListener("enterFrame", parallaxScroll)
        
         -- cleaning up other scene objects
@@ -865,7 +810,7 @@ function scene:hide( event )
         for i = 1, #ui do  display.remove(ui[i]) end 
         for i = 1, #grids do display.remove(grids[i]) end
             
-        if (gameState == "HALT") then unpauseGameActivity() end
+        if (gameState == "HALT" or gameState == "PAUSED") then unpauseGameActivity() end
 
         resetGameData()
     end

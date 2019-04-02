@@ -17,6 +17,12 @@ local menuTitleBarHeight = 30
 
 local menuTitleBarColor = {0.25, 0.25, 0.25}
 
+local state = "RESUME"
+local timesQuitClicked = 0
+
+local resumeButton
+local quitButton
+
 
 local blurLayer = display.newGroup()
 
@@ -51,6 +57,15 @@ function alignBelow(obj, parent)
     obj.anchorY = 0
     obj.y = parent.y + (parent.height/2)
     return true
+end
+
+function triggerHideMenuOverlay(gameState)
+    if (gameState == nil) then
+        print("cannot hide pause menu overlay because state is not defined")
+        return false
+    end
+    state = gameState
+    composer.hideOverlay() 
 end
 
 function onRowRender(event)
@@ -120,29 +135,65 @@ function scene:create( event )
     menuTitle: setFillColor(unpack(menuTitleBarColor))
     alignOnTop(menuTitle, listBox)
 
+    local messageBoxBackground = display.newRect(centerX, listBox.y - 150, 0, 25, 10)
+    messageBoxBackground:setFillColor(unpack(menuTitleBarColor))
+    messageBoxBackground.strokeWidth = 2
+    messageBoxBackground:setStrokeColor(0.78, 0.47, 0.15)
+    messageBoxBackground.isVisible = false
+
+    local messageBoxText = display.newText("Tap quit again to quit game.", 0, 0, "Fonts/BigBook-Heavy", 9)
+    messageBoxText.x = messageBoxBackground.x 
+    messageBoxText.y = messageBoxBackground.y
+    messageBoxText.isVisible = false
+
+    messageBoxBackground.width = messageBoxText.width + 50
+
+
     local menuTitleText = display.newText("Pause Menu", menuTitle.x, menuTitle.y, "Fonts/BigBook-Heavy", 16)
-    local resumeButton = widget.newButton({
+    resumeButton = widget.newButton({
         label = "Resume",
         shape = "rect",
         fillColor = {default = {0.2, 0.6, 0}, over = {0.2, 0.6, 0, 0.5}},
         font = "Fonts/BigBook-Heavy",
         fontSize = 24,
         labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
-        onEvent = function() composer.hideOverlay() end
+        onEvent = function(event) 
+            if (event.phase == "ended")then
+                triggerHideMenuOverlay("RESUME") 
+            end
+        end
     })
+
 
     resumeButton.height, resumeButton.width = rowHeight, menuWidth/2
     resumeButton.anchorX = 0
     resumeButton.x = listBox.x - (listBox.width/2)
     alignBelow(resumeButton, listBox)
 
-    local quitButton = widget.newButton({
+    timeQuitClicked = 0
+
+    quitButton = widget.newButton({
         label = "Quit",
         shape = "rect",
         fillColor = {default = {0.78, 0.47, 0.15}, over = {0.78, 0.47, 0.15, 0.5}},
         font = "Fonts/BigBook-Heavy",
         fontSize = 24,
-        labelColor = {default = {1, 1, 1}, over = {1, 1, 1}}
+        labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
+        onEvent = function(event)
+            if (event.phase == "ended")then
+                if (timesQuitClicked == 0) then
+                    local qButton = event.target
+                    qButton: setFillColor(0.78, 0.47, 0.15, 0.6)
+                    timesQuitClicked = timesQuitClicked + 1
+
+                    messageBoxBackground.isVisible = true
+                    messageBoxText.isVisible = true
+                else
+                    triggerHideMenuOverlay("QUIT")
+                end
+            end
+            
+        end
     })
 
     quitButton.height, quitButton.width = rowHeight, menuWidth/2
@@ -150,22 +201,22 @@ function scene:create( event )
     quitButton.x = listBox.x
     alignBelow(quitButton, listBox)
 
-    
     sceneGroup:insert(blurLayer)
     sceneGroup:insert(listBox)
     sceneGroup:insert(menuTitle)
     sceneGroup:insert(menuTitleText)
     sceneGroup:insert(resumeButton)
     sceneGroup:insert(quitButton)
+    sceneGroup:insert(messageBoxBackground)
+    sceneGroup:insert(messageBoxText)
 end
  
- 
-
 function scene:show( event )
  
     local sceneGroup = self.view
     local phase = event.phase
- 
+    
+    timesQuitClicked = 0
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen
  
@@ -184,7 +235,12 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        parent:resumeGameActivity("PLAY")
+        if (state == "RESUME") then
+             parent:resumeGameActivity("PLAY")
+        elseif(state == "QUIT") then
+            parent:gameOver()
+        end
+
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
