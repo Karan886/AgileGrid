@@ -177,7 +177,11 @@ end
 
 function scene:gameOver()
   stopGameActivity()
-  changeScene()
+  changeScene({
+    delay = 0, 
+    duration = 300,
+    sceneName = "Scenes.Menu"
+  })
 end
 
 function removeMatchedBlocks(blocks, score)
