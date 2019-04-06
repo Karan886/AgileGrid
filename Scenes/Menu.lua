@@ -12,10 +12,12 @@ function TransitionToGameScene()
 end
  
 function scene:create( event )
- 
+    print("Switched to menu scene...")
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local MainBackground = display.newImage("Images/sky_main.png", centerX, centerY)
+    local MainBackground = display.newImage("Images/sky_main.png", 0, 0)
+    MainBackground.anchorX, MainBackground.anchorY = 0, 0
+
 
     local GameTitle = display.newText("Agile Grid", centerX, centerY-150, "Fonts/BigBook-Heavy", 30)
     GameTitle: setFillColor(0.14, 0.19, 0.17)

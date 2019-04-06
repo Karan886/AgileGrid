@@ -26,7 +26,6 @@ local upperBoundary
 local headerBar
 local scoreText
 local pauseGameButton
-local pauseGameText
 local gameOverLay
 
 local parallax_clouds_one
@@ -180,7 +179,7 @@ function scene:gameOver()
   changeScene({
     delay = 0, 
     duration = 300,
-    sceneName = "Scenes.Menu"
+    sceneName = "Scenes.GameOver"
   })
 end
 
@@ -693,7 +692,6 @@ function resumeGame()
     physics.start()
 
     gameState = "PLAY"
-    pauseGameText.isVisible = false
     hideOverLay()
     pauseGameButton: setEnabled(true)
     hideGameStatsText(gameStatsText)
@@ -708,7 +706,7 @@ end
 -- -----------------------------------------------------------------------------------
 
 function scene:create( event )
- 
+    print("Switched to game scene...")
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local firstGradientSky = display.newImage("Images/sky_gradient_one.png", centerX, centerY)
@@ -753,11 +751,6 @@ function scene:show( event )
 
         local ui = bin.UI
 
-        pauseGameText = display.newText("PAUSED", centerX, centerY, "Fonts/BigBook-Heavy", 20)
-        pauseGameText: setFillColor(0.93, 0.57, 0.13)
-        pauseGameText.isVisible = false
-        ui[#ui + 1] = pauseGameText
-
         gameOverLay = display.newRect(centerX, centerY, actualWidth, actualHeight)
         gameOverLay: setFillColor(0, 0, 0, 0.5)
         gameOverLay.isVisible = false
@@ -765,11 +758,13 @@ function scene:show( event )
 
         sceneGroup: insert(spawnLayer)
 
-        headerBar = display.newRoundedRect(centerX, centerY - actualHeight/2 + 10, actualWidth + 7, 35, 10)
+        headerBar = display.newRoundedRect(0, -8, actualWidth + 7, 35, 10)
+        headerBar.anchorX, headerBar.anchorY = 0, 0
         headerBar: setFillColor(0.85, 0.65, 0.13, 0.6)
         ui[#ui + 1] = headerBar
 
-        scoreText = display.newText("0", centerX, headerBar.y, "Fonts/BigBook-Heavy", 22)
+        scoreText = display.newText("0", centerX, headerBar.y , "Fonts/BigBook-Heavy", 22)
+        scoreText.y = headerBar.y + scoreText.height/2
         scoreText: setFillColor(0.5, 0.5, 0.5)
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
@@ -779,11 +774,10 @@ function scene:show( event )
 
         sceneGroup: insert(headerBar)
         sceneGroup: insert(gameOverLay)
-        sceneGroup: insert(pauseGameText)
         sceneGroup: insert(scoreText)
         sceneGroup: insert(gameStatsText)
 
-        createPauseButton(width - 28, headerBar.y + 3, sceneGroup)
+        createPauseButton(width - 28, scoreText.y + 2, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen

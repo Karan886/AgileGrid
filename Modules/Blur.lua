@@ -12,7 +12,8 @@ function blur.getBlurredImage(options)
         yMax = options.ymax
     }
     local screenCapture = display.captureBounds(bounds, false)
-    screenCapture.x, screenCapture.y = centerX, centerY
+    screenCapture.anchorX, screenCapture.anchorY = 0, 0
+    screenCapture.x, screenCapture.y = 0, 0
     screenCapture.fill.effect = "filter.blurGaussian"
     screenCapture.fill.effect.horizontal.blurSize = 100
     
