@@ -164,22 +164,19 @@ function updateScore(val, pokeOptions)
 end
 
 function gameOverTrigger()
-  --[[
       scoreText.display(nil, 1000)
-      changeScene({
-         sceneName = "Scenes.GameOver",
-         duration = 500,
-         delay = 3000,
-         params = { highScores = getUserGameData(), currentGameData = gameData}
-  })--]]
+      scene:gameOver(1500)
 end
 
-function scene:gameOver()
-  stopGameActivity()
+function scene:gameOver(delay)
+  if (gameState ~= "PAUSED") then
+     stopGameActivity()
+  end
   changeScene({
-    delay = 0, 
+    delay = delay or 0, 
     duration = 300,
-    sceneName = "Scenes.GameOver"
+    sceneName = "Scenes.GameOver",
+    params = {GameData = formatGameData()}
   })
 end
 
@@ -615,7 +612,7 @@ function createPauseButton(x, y, sceneGroup)
                       stopGameActivity()
                       composer.showOverlay(
                         "Scenes.PauseMenuOverlay", 
-                        { params = gameData, isModal = true, effect = "fade"}
+                        { params = {gameData = formatGameData()}, isModal = true, effect = "fade"}
                       )
                   end
             end

@@ -22,6 +22,7 @@ local timesQuitClicked = 0
 
 local resumeButton
 local quitButton
+local gameData
 
 
 local blurLayer = display.newGroup()
@@ -86,15 +87,6 @@ function onRowRender(event)
 
 end
 
-function formatGameData(table)
-    print("formatting game data...")
-    local formattedData = {}
-    for item in pairs(table) do
-        formattedData[#formattedData + 1] = {item = item, value = table[item]}
-    end
-    return formattedData
-end
-
  
 function scene:create( event )
     print("Started pause menu overlay scene...")
@@ -109,7 +101,7 @@ function scene:create( event )
     })
     blurLayer: insert(blurOverlay)
 
-    local gameData = formatGameData(params)
+    local gameData = params.gameData
     local menuHeight = #gameData * rowHeight + 15
 
     local listBox = widget.newTableView({
@@ -238,7 +230,7 @@ function scene:hide( event )
         if (state == "RESUME") then
              parent:resumeGameActivity("PLAY")
         elseif(state == "QUIT") then
-            parent:gameOver()
+            parent:gameOver(0)
         end
 
  
