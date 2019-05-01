@@ -14,6 +14,7 @@ local centerY = display.contentCenterY
 local backgroundLayer = display.newGroup()
 local foregroundLayer = display.newGroup()
 
+local listRowHeight = 30
 local rowHeight = 30
 local gameStatsLength
 local gameObjectivesLength = 10
@@ -24,6 +25,9 @@ local statsList
 
 local leaderBoardsButton
 local mainMenuButton
+local titleBar
+local numTrophies = 0
+local numRevivalGems = 0
 
 local buttons = {leaderBoardsButton, mainMenuButton}
 
@@ -63,7 +67,7 @@ function insertToList(list, dataset)
     end
     for i=1, #dataset do
         list: insertRow({
-            rowHeight = rowHeight,
+            rowHeight = listRowHeight,
             params = dataset[i]
         })
     end
@@ -102,6 +106,73 @@ function enableButtons()
     end
 end
 
+function createdDataRow(name, prompt, value, yoffset)
+    local x,y = 0, yoffset
+    if (prompt == nil or value == nil) then
+        print("GameOver.lua: in function createdDataRow arguments #2 or #3 is nil. Setting defaults...")
+        prompt = "Item"
+        value = "Value"
+    end
+
+    local group = display.newGroup()
+    group.name = name
+
+    local row = display.newRect(x, y, actualWidth, rowHeight)
+    row.anchorX, row.anchorY = 0, 0
+    row: setFillColor(0.78, 0.47, 0.15, 0.5)
+    row.strokeWidth = 2
+    row: setStrokeColor(0, 0, 0, 0.7)
+
+    local promptText = display.newText(prompt, 5, row.y, "Fonts/BigBook-Heavy", 10)
+    promptText.anchorX, promptText.anchorY = 0, 0
+    promptText.y = row.y + (row.height/2) - (promptText.height/2)
+    promptText: setFillColor(0, 0, 0)
+
+    local valueText = display.newText(value, actualWidth - 5, row.y, "Fonts/BigBook-Heavy", 10)
+    valueText.anchorX, valueText.anchorY = 1, 0
+    valueText.y = row.y + (row.height/2) - (valueText.height/2)
+    valueText: setFillColor(0, 0, 0)
+
+    group.height = row.height
+    -- Trying to override (x,y) position on screen since we are packing into a group object
+    group.xpos = row.x
+    group.ypos = row.y
+
+    group: insert(row)
+    group: insert(promptText)
+    group: insert(valueText)
+
+    return group
+end
+
+function createImageDisplay(img, x, y, width, height, prompt, value)
+    local group = display.newGroup()
+    local bg = display.newImage(img, x, y)
+    bg.width, bg.height = width, height
+    bg.anchorX, bg.anchorY = 0, 0
+
+    local promptText = display.newText(prompt, x + bg.width/2, y + bg.height/3, "Fonts/BigBook-Heavy", 10)
+    promptText.anchorX, promptText.anchorY = 0, 0
+    promptText.x = promptText.x - promptText.width/2
+    promptText.y = promptText.y - promptText.height/2
+    promptText: setFillColor(0, 0, 0)
+
+    local valueText = display.newText(value, x + bg.width/2, bg.y + bg.height, "Fonts/BigBook-Heavy", 10)
+    valueText.anchorX, valueText.anchorY = 0, 1
+    valueText.x = valueText.x - valueText.width/2
+    valueText.y = valueText.y - bg.height/3
+    valueText: setFillColor(0, 0, 0)
+
+    group.xpos = bg.x
+    group.ypos = bg.y
+
+    group: insert(bg)
+    group: insert(promptText)
+    group: insert(valueText)
+
+    return group
+end
+
 function scene:create( event )
     print("Switched to Game Over scene....")
     local sceneGroup = self.view
@@ -117,7 +188,7 @@ function scene:create( event )
     whiteBg: setFillColor(0.9)
     backgroundLayer: insert(whiteBg)
     -- ta/bar on top of screen for dislpaying title
-    local titleBar = display.newRect(0, 0, actualWidth, 40)
+    titleBar = display.newRect(0, 0, actualWidth, 40)
     titleBar: setFillColor(0.3)
     titleBar.anchorX, titleBar.anchorY = 0, 0
     backgroundLayer: insert(titleBar)
@@ -126,38 +197,59 @@ function scene:create( event )
     titleText.anchorY = 0
     titleText: setFillColor(1)
     backgroundLayer: insert(titleText)
-    -- stats list object: when binded with the dialog box object can display player stats as a dialog box
-    statsList = widget.newTableView({
-        height = (gameStatsLength * rowHeight),
-        width = actualWidth - 25,
-        onRowRender = gameStatsRowRender,
-        isLocked = true
-    })
-   statsList.x = centerX
-   statsList.y = titleBar.y + titleBar.height + rowHeight + 10
 
-   insertToList(statsList, gameData)
-   -- objectives list object: when binded with the dialog box object can display player objectives and achievements 
-   objectivesList = widget.newTableView({
-       height = 6 * rowHeight,
-       width = actualWidth - 25,
-       onRowRender = onRowRender 
-   })
-   objectivesList.x = centerX
-   objectivesList.y = statsList.y + statsList.height + 50
+    local trophiesRow = createdDataRow("TrophiesEarned", "Trophies Earned:", numTrophies, titleBar.height)
+    foregroundLayer: insert(trophiesRow)
 
-   local statsDialog = dialogBox.infoList(statsList, {
-        title = "Game Stats"
-   })
-   foregroundLayer: insert(statsDialog)
+    local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", numRevivalGems, titleBar.height + trophiesRow.height)
+    foregroundLayer: insert(revivalGemRow)
 
-   local objectivesDialog = dialogBox.infoList(objectivesList, {
-        title = "Game Objectives"
-   })
-   foregroundLayer: insert(objectivesDialog)
+    local matchesDisplay = createImageDisplay(
+        "Images/SquareContainer.png", 
+        revivalGemRow.xpos, 
+        revivalGemRow.ypos + revivalGemRow.height, 
+        actualWidth/4, 
+        actualWidth/4,
+        "Matches",
+        0
+    )
+    foregroundLayer: insert(matchesDisplay)
 
-   sceneGroup: insert(backgroundLayer)
-   sceneGroup: insert(foregroundLayer) 
+    local doubleMatchesDisplay = createImageDisplay(
+        "Images/SquareContainer.png",
+        centerX - actualWidth/4 + 10,
+        revivalGemRow.ypos + revivalGemRow.height,
+        actualWidth/3,
+        actualWidth/4,
+        "x2 matches",
+        0
+    )
+    foregroundLayer: insert(doubleMatchesDisplay)
+
+    local tripleMatchesDisplay = createImageDisplay(
+        "Images/SquareContainer.png",
+         actualWidth - actualWidth/3,
+         revivalGemRow.ypos + revivalGemRow.height,
+         actualWidth/3,
+         actualWidth/4,
+         "x3 matches",
+         0
+    )
+    foregroundLayer: insert(tripleMatchesDisplay)
+
+    local finalScoreDisplay = createImageDisplay(
+        "Images/CircleContainer.png",
+        centerX - actualWidth/6,
+        doubleMatchesDisplay.y + doubleMatchesDisplay.height + actualWidth/3 + 10,
+        actualWidth/4,
+        actualWidth/4,
+        "Score",
+        0
+    )
+    foregroundLayer: insert(finalScoreDisplay)
+   
+    sceneGroup: insert(backgroundLayer)
+    sceneGroup: insert(foregroundLayer) 
 end
  
 function scene:show( event )
@@ -171,15 +263,6 @@ function scene:show( event )
     addFinalScoreParameter()
     gameStatsLength = #gameData
 
-    if (statsList ~= nil) then
-        updateList(statsList, gameData)
-    end
-
-    if (objectivesList ~= nil) then
-        --updateList(objectivesList, objectivesData)    
-    end
-
-
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen
  
@@ -191,13 +274,13 @@ function scene:show( event )
             shape = "roundedrect",
             fillColor = {default = {0.2, 0.6, 0}, over = {0.2, 0.6, 0, 0.5}},
             font = "Fonts/BigBook-Heavy",
-            width = (actualWidth - 10)/2,
+            width = (actualWidth - 10)/3,
             height = 50,
-            fontSize = 16,
+            fontSize = 10,
             emboss = true,
             cornerRadius = 10,
             strokeWidth = 3,
-            strokeColor = {default = {1, 1, 1}, over = {1, 1, 1}},
+            strokeColor = {default = {0, 0, 0, 0.5}, over = {0, 0, 0, 0.5}},
             labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
             onEvent = function(event) 
                 if (event.phase == "ended")then
@@ -215,13 +298,13 @@ function scene:show( event )
             shape = "roundedrect",
             fillColor = {default = {0.78, 0.47, 0.15}, over = {0.78, 0.47, 0.15, 0.5}},
             font = "Fonts/BigBook-Heavy",
-            width = (actualWidth - 15)/3,
+            width = (actualWidth - 15)/4,
             height = 50,
-            fontSize = 16,
+            fontSize = 10,
             emboss = true,
             cornerRadius = 10,
             strokeWidth = 3,
-            strokeColor = {default = {1, 1, 1}, over = {1, 1, 1}},
+            strokeColor = {default = {0, 0, 0, 0.5}, over = {0, 0, 0, 0.5}},
             labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
             onEvent = function(event) 
                 if (event.phase == "ended")then
