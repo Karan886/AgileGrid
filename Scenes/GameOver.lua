@@ -29,6 +29,11 @@ local titleBar
 local numTrophies = 0
 local numRevivalGems = 0
 
+local matchesDisplay
+local doubleMatchesDisplay
+local tripleMatchesDisplay
+local finalScoreDisplay
+
 local buttons = {leaderBoardsButton, mainMenuButton}
 
 function gameStatsRowRender(event)
@@ -173,6 +178,20 @@ function createImageDisplay(img, x, y, width, height, prompt, value)
     return group
 end
 
+function updateImageDisplay(obj, value)
+    if (obj == nil) then
+        print("GameOver.lua: in function updateImageDisplay argument #1 is nil.")
+        return false
+    end
+    if (value == nil) then
+        print("GameOver.lua: in function updateImageDisplay argument #2 is nil")
+        return false
+    end
+    -- 3rd element in object array is (which is actually a display group object) is the associated value text object
+    obj[3].text = value
+    return true
+end
+
 function scene:create( event )
     print("Switched to Game Over scene....")
     local sceneGroup = self.view
@@ -204,47 +223,47 @@ function scene:create( event )
     local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", numRevivalGems, titleBar.height + trophiesRow.height)
     foregroundLayer: insert(revivalGemRow)
 
-    local matchesDisplay = createImageDisplay(
+    matchesDisplay = createImageDisplay(
         "Images/SquareContainer.png", 
         revivalGemRow.xpos, 
         revivalGemRow.ypos + revivalGemRow.height, 
         actualWidth/4, 
         actualWidth/4,
         "Matches",
-        0
+        gameData[1].value
     )
     foregroundLayer: insert(matchesDisplay)
 
-    local doubleMatchesDisplay = createImageDisplay(
+    doubleMatchesDisplay = createImageDisplay(
         "Images/SquareContainer.png",
         centerX - actualWidth/4 + 10,
         revivalGemRow.ypos + revivalGemRow.height,
         actualWidth/3,
         actualWidth/4,
         "x2 matches",
-        0
+        gameData[2].value
     )
     foregroundLayer: insert(doubleMatchesDisplay)
 
-    local tripleMatchesDisplay = createImageDisplay(
+    tripleMatchesDisplay = createImageDisplay(
         "Images/SquareContainer.png",
          actualWidth - actualWidth/3,
          revivalGemRow.ypos + revivalGemRow.height,
          actualWidth/3,
          actualWidth/4,
          "x3 matches",
-         0
+         gameData[3].value
     )
     foregroundLayer: insert(tripleMatchesDisplay)
 
-    local finalScoreDisplay = createImageDisplay(
+    finalScoreDisplay = createImageDisplay(
         "Images/CircleContainer.png",
         centerX - actualWidth/6,
         doubleMatchesDisplay.y + doubleMatchesDisplay.height + actualWidth/3 + 10,
         actualWidth/4,
         actualWidth/4,
         "Score",
-        0
+        gameData[1].value + gameData[2].value + gameData[3].value
     )
     foregroundLayer: insert(finalScoreDisplay)
    
@@ -267,6 +286,12 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen
  
     elseif ( phase == "did" ) then
+
+        -- update score display
+        updateImageDisplay(matchesDisplay, gameData[1].value)
+        updateImageDisplay(doubleMatchesDisplay, gameData[2].value)
+        updateImageDisplay(tripleMatchesDisplay, gameData[3].value)
+        updateImageDisplay(finalScoreDisplay, gameData[1].value + gameData[2].value + gameData[3].value)
 
     -- screen buttons
        leaderBoardsButton = widget.newButton({

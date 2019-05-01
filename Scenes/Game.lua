@@ -285,7 +285,6 @@ function createGridGroup(grid)
    randomIDCounter = 1
    -- array with random id that represents an image of a block
    local randomIDNumbers = getBlocksImageIDArray(cols * rows)
-   print("test: "..#randomIDNumbers)
 
    for i=1, cols do
      for j=1, rows do
