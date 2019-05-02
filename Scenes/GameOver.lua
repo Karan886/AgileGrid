@@ -19,7 +19,6 @@ local rowHeight = 30
 local gameStatsLength
 local gameObjectivesLength = 10
 
-local gameData
 local objectivesList
 local statsList
 
@@ -54,15 +53,6 @@ function gameStatsRowRender(event)
     value.anchorX = 1
     value.x = rowWidth - 5
     value.y = rowHeight/2
-end
-
-function addFinalScoreParameter()
-    if (gameData ~= nil) then
-        gameData[#gameData + 1] = {
-            item = "final score",
-            value = gameData[1].value + gameData[2].value + gameData[3].value
-        }
-    end
 end
 
 function insertToList(list, dataset) 
@@ -192,13 +182,27 @@ function updateImageDisplay(obj, value)
     return true
 end
 
+function onRowRender(event)
+    local row = event.row
+    local rowWidth, rowHeight = row.contentWidth, row.contentHeight
+
+    local rowBg = display.newRect(row, 0, 0, actualWidth, listRowHeight)
+    rowBg.anchorX, rowBg.anchorY = 0, 0
+    rowBg: setFillColor(0.2)
+    rowBg: setStrokeColor(0.9)
+    rowBg.strokeWidth = 2
+
+    local itemText = display.newText(row, "Objective "..row.index, 5, rowBg.y + rowBg.height/2, "Fonts/BigBook-Heavy", 10)
+    itemText.anchorX = 0, 0
+
+end
+
 function scene:create( event )
     print("Switched to Game Over scene....")
     local sceneGroup = self.view
     local params = event.params
-    gameData = params.GameData
+    local gameData = params.GameData
     --Add final score to the stats list
-    addFinalScoreParameter()
     gameStatsLength = #gameData
 
     -- screen background
@@ -223,25 +227,27 @@ function scene:create( event )
     local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", numRevivalGems, titleBar.height + trophiesRow.height)
     foregroundLayer: insert(revivalGemRow)
 
+    --print(gameData["matches"].." "..gameData["doubleMatches"].." "..gameData["tripleMatches"])
+
     matchesDisplay = createImageDisplay(
         "Images/SquareContainer.png", 
         revivalGemRow.xpos, 
         revivalGemRow.ypos + revivalGemRow.height, 
-        actualWidth/4, 
+        actualWidth/3, 
         actualWidth/4,
         "Matches",
-        gameData[1].value
+        gameData["matches"]
     )
     foregroundLayer: insert(matchesDisplay)
 
     doubleMatchesDisplay = createImageDisplay(
         "Images/SquareContainer.png",
-        centerX - actualWidth/4 + 10,
+        centerX - actualWidth/6,
         revivalGemRow.ypos + revivalGemRow.height,
         actualWidth/3,
         actualWidth/4,
-        "x2 matches",
-        gameData[2].value
+        "x2 Matches",
+        gameData["doubleMatches"]
     )
     foregroundLayer: insert(doubleMatchesDisplay)
 
@@ -251,8 +257,8 @@ function scene:create( event )
          revivalGemRow.ypos + revivalGemRow.height,
          actualWidth/3,
          actualWidth/4,
-         "x3 matches",
-         gameData[3].value
+         "x3 Matches",
+         gameData["tripleMatches"]
     )
     foregroundLayer: insert(tripleMatchesDisplay)
 
@@ -263,7 +269,7 @@ function scene:create( event )
         actualWidth/4,
         actualWidth/4,
         "Score",
-        gameData[1].value + gameData[2].value + gameData[3].value
+        gameData["matches"] + gameData["doubleMatches"] + gameData["tripleMatches"]
     )
     foregroundLayer: insert(finalScoreDisplay)
    
@@ -276,22 +282,19 @@ function scene:show( event )
     local sceneGroup = self.view
     local phase = event.phase
 
-    local params = event.params
-    gameData = params.GameData
-
-    addFinalScoreParameter()
-    gameStatsLength = #gameData
-
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen
  
     elseif ( phase == "did" ) then
 
+        local params = event.params
+        local gameData = params.GameData
+
         -- update score display
-        updateImageDisplay(matchesDisplay, gameData[1].value)
-        updateImageDisplay(doubleMatchesDisplay, gameData[2].value)
-        updateImageDisplay(tripleMatchesDisplay, gameData[3].value)
-        updateImageDisplay(finalScoreDisplay, gameData[1].value + gameData[2].value + gameData[3].value)
+        updateImageDisplay(matchesDisplay, gameData["matches"])
+        updateImageDisplay(doubleMatchesDisplay, gameData["doubleMatches"])
+        updateImageDisplay(tripleMatchesDisplay, gameData["tripleMatches"])
+        updateImageDisplay(finalScoreDisplay, gameData["matches"] + gameData["doubleMatches"] + gameData["tripleMatches"])
 
     -- screen buttons
        leaderBoardsButton = widget.newButton({
@@ -300,12 +303,12 @@ function scene:show( event )
             fillColor = {default = {0.2, 0.6, 0}, over = {0.2, 0.6, 0, 0.5}},
             font = "Fonts/BigBook-Heavy",
             width = (actualWidth - 10)/3,
-            height = 50,
+            height = 30,
             fontSize = 10,
             emboss = true,
             cornerRadius = 10,
             strokeWidth = 3,
-            strokeColor = {default = {0, 0, 0, 0.5}, over = {0, 0, 0, 0.5}},
+            strokeColor = {default = {0, 0, 0}, over = {0, 0, 0}},
             labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
             onEvent = function(event) 
                 if (event.phase == "ended")then
@@ -324,12 +327,12 @@ function scene:show( event )
             fillColor = {default = {0.78, 0.47, 0.15}, over = {0.78, 0.47, 0.15, 0.5}},
             font = "Fonts/BigBook-Heavy",
             width = (actualWidth - 15)/4,
-            height = 50,
+            height = 30,
             fontSize = 10,
             emboss = true,
             cornerRadius = 10,
             strokeWidth = 3,
-            strokeColor = {default = {0, 0, 0, 0.5}, over = {0, 0, 0, 0.5}},
+            strokeColor = {default = {0, 0, 0}, over = {0, 0, 0}},
             labelColor = {default = {1, 1, 1}, over = {1, 1, 1}},
             onEvent = function(event) 
                 if (event.phase == "ended")then
@@ -348,6 +351,39 @@ function scene:show( event )
 
        enableButtons()
 
+       local objectivesTitleBar = display.newRect(
+        centerX, 
+        finalScoreDisplay.ypos + finalScoreDisplay.height + 2,
+        actualWidth,
+        rowHeight 
+       )
+       objectivesTitleBar.anchorY = 0
+       objectivesTitleBar: setFillColor(0, 0, 0, 0.7)
+       objectivesTitleBar: setStrokeColor(0)
+       objectivesTitleBar.strokeWidth = 1
+
+       local objectivesTitle = display.newText("Objectives/Achievements", 5, objectivesTitleBar.y, "Fonts/BigBook-Heavy", 14)
+       objectivesTitle.anchorX, objectivesTitle.anchorY = 0, 0
+
+        --objectives/achievements list
+       local objectivesList = widget.newTableView({
+            height = actualHeight - (objectivesTitle.y + objectivesTitle.height),
+            width = actualWidth,
+            onRowRender = onRowRender,
+       })
+       objectivesList.anchorX, objectivesList.anchorY = 0, 0
+       objectivesList.x = centerX - actualWidth/2
+       objectivesList.y = objectivesTitle.y + objectivesTitle.height
+
+       for i=1, 10 do
+        objectivesList: insertRow({
+            rowHeight = listRowHeight,
+        })
+       end
+       
+       sceneGroup: insert(objectivesTitleBar)
+       sceneGroup: insert(objectivesTitle)
+       sceneGroup: insert(objectivesList)
        sceneGroup: insert(leaderBoardsButton)
        sceneGroup: insert(mainMenuButton)
     end

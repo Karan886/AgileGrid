@@ -176,7 +176,13 @@ function scene:gameOver(delay)
     delay = delay or 0, 
     duration = 300,
     sceneName = "Scenes.GameOver",
-    params = {GameData = formatGameData()}
+    params = {
+      GameData = {
+        matches = gameData["matches"], 
+        doubleMatches = gameData["doubleMatches"], 
+        tripleMatches = gameData["tripleMatches"]
+        }
+     }
   })
 end
 
