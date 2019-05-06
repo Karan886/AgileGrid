@@ -73,6 +73,10 @@ function onRowRender(event)
     local row = event.row
     local rowWidth, rowHeight = row.contentWidth, row.contentHeight
 
+    if (row.params.item == nil) then
+        return false
+    end
+
     local rowItem = display.newText(row, row.params.item..":", 0, 0, "Fonts/BigBook-Heavy", 12)
     rowItem.alpha = 0.7
     rowItem:setFillColor(0)
@@ -85,9 +89,10 @@ function onRowRender(event)
     alignRight(value, rowWidth, 5)
     alignCenter(value, rowHeight)
 
+    return true
+
 end
 
- 
 function scene:create( event )
     print("Started pause menu overlay scene...")
     local sceneGroup = self.view
@@ -102,6 +107,7 @@ function scene:create( event )
     blurLayer: insert(blurOverlay)
 
     local gameData = params.gameData
+    print("item: "..gameData[#gameData].item)
     local menuHeight = #gameData * rowHeight + 15
 
     local listBox = widget.newTableView({
@@ -119,6 +125,7 @@ function scene:create( event )
     }
 
     for i = 1, #gameData do
+        print(gameData[i].item)
         rowOps.params = gameData[i]
         listBox:insertRow(rowOps)
     end

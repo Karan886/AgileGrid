@@ -168,6 +168,57 @@ function createImageDisplay(img, x, y, width, height, prompt, value)
     return group
 end
 
+function createFinalScoreDisplay(x, y, gameData)
+    if (gameData == nil) then
+        print("GameOver.lua: in function createFinalScoreDisplay gameData object is nil.")
+        return nil
+    end
+    local group = display.newGroup()
+
+    local imgbg = display.newImage("Images/RectangleContainer.png", x, y)
+    imgbg.anchorX, imgbg.anchorY = 0, 0
+    imgbg.width = actualWidth
+    imgbg.height = actualWidth/4
+
+    local prefix = display.newText(
+        "Final Score = "..gameData["matches"].." + "..gameData["doubleMatches"].." + "..gameData["tripleMatches"].." = ",
+        15,
+        imgbg.y + imgbg.height/2, 
+        "Fonts/BigBook-Heavy",
+        12
+    )
+    prefix.anchorX, prefix.anchorY = 0, 0
+    prefix.y = prefix.y - prefix.height/2
+    prefix: setFillColor(0)
+
+    local score = display.newText(
+        gameData["matches"] + gameData["doubleMatches"] + gameData["tripleMatches"],
+        prefix.x + prefix.width + 3,
+        prefix.y,
+        "Fonts/BigBook-Heavy",
+        12
+    )
+    score.anchorX, score.anchorY = 0, 0
+    score: setFillColor(1, 0, 0)
+
+    group.ypos = imgbg.y
+    group: insert(imgbg)
+    group: insert(prefix)
+    group: insert(score)
+
+    return group
+end
+
+function updateFinalScoreDisplay(prefix, value)
+    if (finalScoreDisplay == nil) then
+        print("GameOver.lua: in function updateFinalScoreDisplay finalScoreDisplay object is nil.")
+        return false
+    end
+    finalScoreDisplay[2].text = prefix
+    finalScoreDisplay[3].text = value
+    return true
+end
+
 function updateImageDisplay(obj, value)
     if (obj == nil) then
         print("GameOver.lua: in function updateImageDisplay argument #1 is nil.")
@@ -182,7 +233,7 @@ function updateImageDisplay(obj, value)
     return true
 end
 
-function onRowRender(event)
+function onObjectivesRowRender(event)
     local row = event.row
     local rowWidth, rowHeight = row.contentWidth, row.contentHeight
 
@@ -227,7 +278,7 @@ function scene:create( event )
     local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", numRevivalGems, titleBar.height + trophiesRow.height)
     foregroundLayer: insert(revivalGemRow)
 
-    --print(gameData["matches"].." "..gameData["doubleMatches"].." "..gameData["tripleMatches"])
+    -- create interacive blocks that display user stats for previously finished game
 
     matchesDisplay = createImageDisplay(
         "Images/SquareContainer.png", 
@@ -262,16 +313,11 @@ function scene:create( event )
     )
     foregroundLayer: insert(tripleMatchesDisplay)
 
-    finalScoreDisplay = createImageDisplay(
-        "Images/CircleContainer.png",
-        centerX - actualWidth/6,
-        doubleMatchesDisplay.y + doubleMatchesDisplay.height + actualWidth/3 + 10,
-        actualWidth/4,
-        actualWidth/4,
-        "Score",
-        gameData["matches"] + gameData["doubleMatches"] + gameData["tripleMatches"]
-    )
+    -- create a final score data block (diff from the data blocks above so cannot use same function)
+    finalScoreDisplay = createFinalScoreDisplay(0, tripleMatchesDisplay.ypos + tripleMatchesDisplay.height, gameData)
     foregroundLayer: insert(finalScoreDisplay)
+    
+
    
     sceneGroup: insert(backgroundLayer)
     sceneGroup: insert(foregroundLayer) 
@@ -294,7 +340,11 @@ function scene:show( event )
         updateImageDisplay(matchesDisplay, gameData["matches"])
         updateImageDisplay(doubleMatchesDisplay, gameData["doubleMatches"])
         updateImageDisplay(tripleMatchesDisplay, gameData["tripleMatches"])
-        updateImageDisplay(finalScoreDisplay, gameData["matches"] + gameData["doubleMatches"] + gameData["tripleMatches"])
+        
+        updateFinalScoreDisplay(
+            "Final Score = "..gameData["matches"].." + "..gameData["doubleMatches"].." + "..gameData["tripleMatches"].." = ",
+            gameData["matches"] + gameData["doubleMatches"] + gameData["tripleMatches"]
+        )
 
     -- screen buttons
        leaderBoardsButton = widget.newButton({
@@ -369,7 +419,7 @@ function scene:show( event )
        local objectivesList = widget.newTableView({
             height = actualHeight - (objectivesTitle.y + objectivesTitle.height),
             width = actualWidth,
-            onRowRender = onRowRender,
+            onRowRender = onObjectivesRowRender,
        })
        objectivesList.anchorX, objectivesList.anchorY = 0, 0
        objectivesList.x = centerX - actualWidth/2

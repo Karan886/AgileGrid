@@ -98,7 +98,7 @@ end
 function formatGameData()
   local data = {}
   for key in pairs(gameData) do
-    print(data[key])
+    print("key: "..key)
     data[#data + 1] = {item = key, value = gameData[key]}
   end
   return data
@@ -617,7 +617,13 @@ function createPauseButton(x, y, sceneGroup)
                       stopGameActivity()
                       composer.showOverlay(
                         "Scenes.PauseMenuOverlay", 
-                        { params = {gameData = formatGameData()}, isModal = true, effect = "fade"}
+                        { 
+                          params = {
+                            gameData = formatGameData()
+                          }, 
+                          isModal = true, 
+                          effect = "fade"
+                        }
                       )
                   end
             end
