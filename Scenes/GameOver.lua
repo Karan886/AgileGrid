@@ -175,10 +175,8 @@ function createFinalScoreDisplay(x, y, gameData)
     end
     local group = display.newGroup()
 
-    local imgbg = display.newImage("Images/RectangleContainer.png", x, y)
+    local imgbg = display.newRect(x, y, actualWidth, actualWidth/4)
     imgbg.anchorX, imgbg.anchorY = 0, 0
-    imgbg.width = actualWidth
-    imgbg.height = actualWidth/4
 
     local prefix = display.newText(
         "Final Score = "..gameData["matches"].." + "..gameData["doubleMatches"].." + "..gameData["tripleMatches"].." = ",

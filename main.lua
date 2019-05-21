@@ -8,5 +8,11 @@ local userData = {
 	doubleMatches = 0,
 	tripleMatches = 0
 }
+
+local actualHeight = display.actualContentHeight
+local actualWidth = display.actualContentWidth
+
+print(actualHeight.." "..actualWidth)
+
 file.create('AGUser.json', json.encode(userData), system.DocumentsDirectory)
 composer.gotoScene("Scenes.Menu")
