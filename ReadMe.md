@@ -18,7 +18,8 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 </li>
 </ul>
 
-<strong>Note:</strong> This repository was imported from gitlab so some old issues may be missing.</aside>
+<strong>Note:</strong> This repository was imported from gitlab so some old 
+<a href="https://github.com/Karan886/AgileGrid/issues?utf8=✓&q=is%3Aissue+is%3Aall">issues</a> may be missing.</aside>
 
 <hr/>
 
