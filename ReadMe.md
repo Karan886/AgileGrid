@@ -24,9 +24,9 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 <hr/>
 
 <h2>Demos</h2>
-<ol>
+<ul>
 <li><b><a href="https://www.dropbox.com/s/cz41pbit82be7qt/AG_Demo_One.mov?dl=0">First Look</a></b></li>
-</ol>
+</ul>
 
 <hr/>
 
