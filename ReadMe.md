@@ -62,6 +62,8 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 <dd>contains lua files that define options for particle affects in the game.</dd>
 </dl>
 
+<hr/>
+
 <h2>Testing</h2>
 <ol>
 <li>Download and install <cite><a href="https://coronalabs.com">Corona SDK.</a></cite></li>
