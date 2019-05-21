@@ -18,7 +18,8 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 </li>
 </ul>
 
-<strong>Note:</strong> This repository was imported from gitlab so some old issues may be missing.</aside>
+<strong>Note:</strong> This repository was imported from gitlab so some old 
+<a href="https://github.com/Karan886/AgileGrid/issues?utf8=✓&q=is%3Aissue+is%3Aall">issues</a> may be missing.</aside>
 
 <hr/>
 
@@ -31,8 +32,8 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 <hr/>
 
 <h2>Structure</h2>
-<dl>
-   
+
+<dl>  
 <dt><em>./Scenes</em> - contains all source code</dt>
 <dd>
 <ul>
@@ -61,3 +62,16 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 <dt><em>./ParticleAffects</em></dt>
 <dd>contains lua files that define options for particle affects in the game.</dd>
 </dl>
+
+<hr/>
+
+<h2>Testing</h2>
+<ol>
+<li>Download and install <cite><a href="https://coronalabs.com">Corona SDK.</a></cite></li>
+<li>Clone the <em><b>repository</b></em>, you may choose to remove all icon images from the cloned folder but <em><b>building onto the device</b></em> may require them.</li>
+<li>
+Open Corona SDK (you may have to make a <em>free account</em>) and select the <strong>Open Project</strong> option.
+</li>
+<li>Navigate to <strong>./main.lua</strong> this will fire up the <em><b>Corona Simulator</b></em>, and you can test the game.</li>
+</ol>
+
