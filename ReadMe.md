@@ -25,8 +25,7 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 
 <h2>Demos</h2>
 <ol>
-<li><b><a href="https://www.dropbox.com/s/yo4126jejgdkolz/agilegrid_demo.mov?dl=0">First Look</a></b></li>
-<li><b><a href="https://drive.google.com/open?id=1bA7Yma0HY3S-YP6SfKyWcErkyl2CyUKt">More...</a></b></li>
+<li><b><a href="https://www.dropbox.com/s/cz41pbit82be7qt/AG_Demo_One.mov?dl=0">First Look</a></b></li>
 </ol>
 
 <hr/>
