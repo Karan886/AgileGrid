@@ -64,7 +64,7 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 
 <hr/>
 
-<h2>Testing</h2>
+<h2>Compiling and Testing</h2>
 <ol>
 <li>Download and install <cite><a href="https://coronalabs.com">Corona SDK.</a></cite></li>
 <li>Clone the <em><b>repository</b></em>, you may choose to remove all icon images from the cloned folder but <em><b>building onto the device</b></em> may require them.</li>
@@ -72,5 +72,6 @@ Every match is awarded a single point, while <em><b>double matches</b></em> are 
 Open Corona SDK (you may have to make a <em>free account</em>) and select the <strong>Open Project</strong> option.
 </li>
 <li>Navigate to <strong>./main.lua</strong> this will fire up the <em><b>Corona Simulator</b></em>, and you can test the game.</li>
+<li>Since this app is developed for android devices, please make sure that your hardware is set to an android device <em>(ie. Kindle Fire HD 7" works very well)</em>. You can do this by navigating to the toolbar and select <em><b>Window > View As > Kindle Fire HD 7"</b></em> </li>
 </ol>
 
