@@ -101,7 +101,14 @@ function enableButtons()
     end
 end
 
-function createdDataRow(name, prompt, value, yoffset, imgsrc)
+function createdDataRow(ops)
+    -- Parse options
+    local name = ops.name or "Data-row"
+    local prompt = ops.prompt or "Prompt Text"
+    local value = ops.value or 0
+    local yoffset = ops.yoffset or 0
+    local imgsrc = ops.imgsrc or nil
+
     local x,y = 0, yoffset
     if (prompt == nil or value == nil) then
         print("GameOver.lua: in function createdDataRow arguments #2 or #3 is nil. Setting defaults...")
@@ -278,10 +285,21 @@ function scene:create( event )
     titleText: setFillColor(1)
     backgroundLayer: insert(titleText)
 
-    local trophiesRow = createdDataRow("TrophiesEarned", "Trophies Earned:", numTrophies, titleBar.height, nil)
+    local trophiesRow = createdDataRow({
+        name = "TrophiesEarned",
+        prompt = "Trophies Earned:",
+        value = numTrophies,
+        yoffset = titleBar.height,
+    })
     foregroundLayer: insert(trophiesRow)
-
-    local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", "x"..numRevivalGems, titleBar.height + trophiesRow.height, "Images/ruby.png")
+    
+    local revivalGemRow = createdDataRow({
+        name = "GemsEarned",
+        prompt = "Revival Gems:",
+        value = "x"..numRevivalGems,
+        yoffset = titleBar.height + trophiesRow.height,
+        imgsrc = "Images/ruby.png"
+    })
     foregroundLayer: insert(revivalGemRow)
 
     -- create interacive blocks that display user stats for previously finished game
