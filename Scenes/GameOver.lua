@@ -101,7 +101,7 @@ function enableButtons()
     end
 end
 
-function createdDataRow(name, prompt, value, yoffset)
+function createdDataRow(name, prompt, value, yoffset, imgsrc)
     local x,y = 0, yoffset
     if (prompt == nil or value == nil) then
         print("GameOver.lua: in function createdDataRow arguments #2 or #3 is nil. Setting defaults...")
@@ -123,20 +123,28 @@ function createdDataRow(name, prompt, value, yoffset)
     promptText.y = row.y + (row.height/2) - (promptText.height/2)
     promptText: setFillColor(0, 0, 0)
 
-    local valueText = display.newText(value, actualWidth - 5, row.y, "Fonts/BigBook-Heavy", 10)
+    local valueText = display.newText(value, actualWidth - 20, row.y, "Fonts/BigBook-Heavy", 10)
     valueText.anchorX, valueText.anchorY = 1, 0
     valueText.y = row.y + (row.height/2) - (valueText.height/2)
     valueText: setFillColor(0, 0, 0)
-
-    group.height = row.height
-    -- Trying to override (x,y) position on screen since we are packing into a group object
-    group.xpos = row.x
-    group.ypos = row.y
 
     group: insert(row)
     group: insert(promptText)
     group: insert(valueText)
 
+    if (imgsrc ~= nil) then
+        local icon = display.newImage(imgsrc)
+        icon.anchorX, icon.anchorY = 1, 0
+        icon.width, icon.height = 15, 18
+        icon.x, icon.y = valueText.x + 15, valueText.y
+        group: insert(icon)
+    end
+
+    group.height = row.height
+
+    -- Trying to override (x,y) position on screen since we are packing into a group object
+    group.xpos = row.x
+    group.ypos = row.y
     return group
 end
 
@@ -270,10 +278,10 @@ function scene:create( event )
     titleText: setFillColor(1)
     backgroundLayer: insert(titleText)
 
-    local trophiesRow = createdDataRow("TrophiesEarned", "Trophies Earned:", numTrophies, titleBar.height)
+    local trophiesRow = createdDataRow("TrophiesEarned", "Trophies Earned:", numTrophies, titleBar.height, nil)
     foregroundLayer: insert(trophiesRow)
 
-    local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", numRevivalGems, titleBar.height + trophiesRow.height)
+    local revivalGemRow = createdDataRow("GemsEarned", "Revival Gems:", "x"..numRevivalGems, titleBar.height + trophiesRow.height, "Images/ruby.png")
     foregroundLayer: insert(revivalGemRow)
 
     -- create interacive blocks that display user stats for previously finished game
