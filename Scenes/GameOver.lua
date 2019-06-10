@@ -3,7 +3,7 @@ local scene = composer.newScene()
 
 local widget = require("widget")
 local blur = require "Modules.Blur"
-local dialogBox = require "Modules.DialogBox"
+local slidingList = require "Modules.SlidingList"
 
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -101,7 +101,7 @@ function enableButtons()
     end
 end
 
-function createdDataRow(ops)
+function createDataRow(ops)
     -- Parse options
     local name = ops.name or "Data-row"
     local prompt = ops.prompt or "Prompt Text"
@@ -111,7 +111,7 @@ function createdDataRow(ops)
 
     local x,y = 0, yoffset
     if (prompt == nil or value == nil) then
-        print("GameOver.lua: in function createdDataRow arguments #2 or #3 is nil. Setting defaults...")
+        print("GameOver.lua: in function createDataRow arguments #2 or #3 is nil. Setting defaults...")
         prompt = "Item"
         value = "Value"
     end
@@ -245,21 +245,7 @@ function updateImageDisplay(obj, value)
     obj[3].text = value
     return true
 end
-
-function onObjectivesRowRender(event)
-    local row = event.row
-    local rowWidth, rowHeight = row.contentWidth, row.contentHeight
-
-    local rowBg = display.newRect(row, 0, 0, actualWidth, listRowHeight)
-    rowBg.anchorX, rowBg.anchorY = 0, 0
-    rowBg: setFillColor(0.2)
-    rowBg: setStrokeColor(0.9)
-    rowBg.strokeWidth = 2
-
-    local itemText = display.newText(row, "Objective "..row.index, 5, rowBg.y + rowBg.height/2, "Fonts/BigBook-Heavy", 10)
-    itemText.anchorX = 0, 0
-
-end
+ 
 
 function scene:create( event )
     print("Switched to Game Over scene....")
@@ -285,7 +271,7 @@ function scene:create( event )
     titleText: setFillColor(1)
     backgroundLayer: insert(titleText)
 
-    local trophiesRow = createdDataRow({
+    local trophiesRow = createDataRow({
         name = "TrophiesEarned",
         prompt = "Trophies Earned:",
         value = numTrophies,
@@ -293,7 +279,7 @@ function scene:create( event )
     })
     foregroundLayer: insert(trophiesRow)
     
-    local revivalGemRow = createdDataRow({
+    local revivalGemRow = createDataRow({
         name = "GemsEarned",
         prompt = "Revival Gems:",
         value = "x"..numRevivalGems,
@@ -340,8 +326,29 @@ function scene:create( event )
     -- create a final score data block (diff from the data blocks above so cannot use same function)
     finalScoreDisplay = createFinalScoreDisplay(0, tripleMatchesDisplay.ypos + tripleMatchesDisplay.height, gameData)
     foregroundLayer: insert(finalScoreDisplay)
-    
 
+    local objectivesTitleBar = display.newRect(
+        centerX, 
+        finalScoreDisplay.ypos + finalScoreDisplay.height + 2,
+        actualWidth,
+        rowHeight 
+       )
+       objectivesTitleBar.anchorY = 0
+       objectivesTitleBar: setFillColor(0, 0, 0, 0.7)
+       objectivesTitleBar: setStrokeColor(0)
+       objectivesTitleBar.strokeWidth = 1
+
+    local objectivesTitle = display.newText("Objectives/Achievements", 5, objectivesTitleBar.y, "Fonts/BigBook-Heavy", 14)
+    objectivesTitle.anchorX, objectivesTitle.anchorY = 0, 0
+    foregroundLayer: insert(objectivesTitleBar)
+    foregroundLayer: insert(objectivesTitle)
+
+    
+    local objectivesList = slidingList.createSlidingList({
+        x = 0,
+        y = objectivesTitleBar.y + objectivesTitleBar.height + 15
+    })
+    foregroundLayer:insert(objectivesList)
    
     sceneGroup: insert(backgroundLayer)
     sceneGroup: insert(foregroundLayer) 
@@ -424,40 +431,7 @@ function scene:show( event )
        mainMenuButton.y = actualHeight - 10
 
        enableButtons()
-
-       local objectivesTitleBar = display.newRect(
-        centerX, 
-        finalScoreDisplay.ypos + finalScoreDisplay.height + 2,
-        actualWidth,
-        rowHeight 
-       )
-       objectivesTitleBar.anchorY = 0
-       objectivesTitleBar: setFillColor(0, 0, 0, 0.7)
-       objectivesTitleBar: setStrokeColor(0)
-       objectivesTitleBar.strokeWidth = 1
-
-       local objectivesTitle = display.newText("Objectives/Achievements", 5, objectivesTitleBar.y, "Fonts/BigBook-Heavy", 14)
-       objectivesTitle.anchorX, objectivesTitle.anchorY = 0, 0
-
-        --objectives/achievements list
-       local objectivesList = widget.newTableView({
-            height = actualHeight - (objectivesTitle.y + objectivesTitle.height),
-            width = actualWidth,
-            onRowRender = onObjectivesRowRender,
-       })
-       objectivesList.anchorX, objectivesList.anchorY = 0, 0
-       objectivesList.x = centerX - actualWidth/2
-       objectivesList.y = objectivesTitle.y + objectivesTitle.height
-
-       for i=1, 10 do
-        objectivesList: insertRow({
-            rowHeight = listRowHeight,
-        })
-       end
        
-       sceneGroup: insert(objectivesTitleBar)
-       sceneGroup: insert(objectivesTitle)
-       sceneGroup: insert(objectivesList)
        sceneGroup: insert(leaderBoardsButton)
        sceneGroup: insert(mainMenuButton)
     end
