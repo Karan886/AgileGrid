@@ -2,7 +2,7 @@ local composer = require("composer")
 local scene = composer.newScene()
 
 -- Include files
-local data = require "Data.Data"
+local rowCombos = require "Data.RowCombinations"
 local widget = require "widget"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
@@ -268,7 +268,7 @@ function createGridGroup(grid)
    local gridGroup = display.newGroup()
    local slotContainer = {}
 
-   local sizeCombinations = data.sizeCombinations
+   local sizeCombinations = rowCombos.sizeCombinations
    local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
 
    local rows = grid.rows or randomSize.rows
