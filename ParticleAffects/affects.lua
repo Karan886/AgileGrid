@@ -1,4 +1,6 @@
-local affectOps = {
+local affects = {}
+
+affects.smokeExplosion = {
     startColorAlpha = 0.5,
     startParticleSizeVariance = 0,
     blendFuncSource = 775,
@@ -16,4 +18,4 @@ local affectOps = {
     finishColorGreen = 1.0,
     finishColorBlue = 1.0
 }
-return affectOps
+return affects

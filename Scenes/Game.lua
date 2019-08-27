@@ -6,10 +6,8 @@ local data = require "Data.Data"
 local widget = require "widget"
 local score = require "Modules.Score"
 local particles = require "Modules.Particles"
-local exception = require "Modules.Exception"
-local dialog = require "Modules.DialogBox"
 local file = require "Modules.File"
-local smokeExplosion = require "ParticleAffects.SmokeExplosion"
+local affects = require "ParticleAffects.affects"
  
 --some dimensions
 local actualHeight = display.actualContentHeight
@@ -47,7 +45,7 @@ local playTexture = {
 }
 
 
-local smokeAffect = particles.new(smokeExplosion)
+local smokeAffect = particles.new(affects.smokeExplosion)
 local gameState = "PLAY"
 
 local gameData = {
