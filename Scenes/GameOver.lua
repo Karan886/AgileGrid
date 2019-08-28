@@ -1,14 +1,16 @@
 local composer = require("composer")
 local scene = composer.newScene()
+
+local colors = require "Data.Colors"
  
 
 function scene:create( event )
     print("Switched to Game Over scene....")
     
-    
-    
-
-   
+    -- local result = colors.populateDimensions(4, 3)
+    -- for i = 1, #result do
+    --     print(result[i].r..","..result[i].g..","..result[i].b)
+    -- end
     
 end
  

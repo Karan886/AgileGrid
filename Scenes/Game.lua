@@ -8,7 +8,7 @@ local score = require "Modules.Score"
 local particles = require "Modules.Particles"
 local file = require "Modules.File"
 local affects = require "ParticleAffects.affects"
- 
+local colors = require "Data.Colors"
 --some dimensions
 local actualHeight = display.actualContentHeight
 local actualWidth = display.actualContentWidth
@@ -249,19 +249,19 @@ end
 
 
 -- Returns an array of random numbers between 1 - 15, each number represents a unique block
-function getBlocksImageIDArray(numOfBlocks)
-    local imageIdArray, randomNumbersSet = {},{}
-    for i = 1, 15 do randomNumbersSet[i] = i end
-    for i = 1, (numOfBlocks/3) do
-      local randomID = math.random(1, #randomNumbersSet)
-      imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
-      imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
-      imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
-      print(imageIdArray[#imageIdArray])
-      table.remove(randomNumbersSet, randomID)
-    end
-    return imageIdArray
-end
+-- function getBlocksImageIDArray(numOfBlocks)
+--     local imageIdArray, randomNumbersSet = {},{}
+--     for i = 1, 15 do randomNumbersSet[i] = i end
+--     for i = 1, (numOfBlocks/3) do
+--       local randomID = math.random(1, #randomNumbersSet)
+--       imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
+--       imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
+--       imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
+--       print(imageIdArray[#imageIdArray])
+--       table.remove(randomNumbersSet, randomID)
+--     end
+--     return imageIdArray
+-- end
 
 
 function createGridGroup(grid)
@@ -270,36 +270,39 @@ function createGridGroup(grid)
 
    local sizeCombinations = rowCombos.sizeCombinations
    local randomSize = sizeCombinations[math.random(1, #sizeCombinations)]
-
    local rows = grid.rows or randomSize.rows
    local cols = grid.cols or randomSize.cols
-
    local size = {rows = rows, cols = cols}
 
    gridGroup.totalShapeWidth = (grid.blockSize + grid.offsetX) * (cols - 1) + grid.blockSize
    gridGroup.totalShapeHeight = (grid.blockSize + grid.offsetY) * (rows - 1) + grid.blockSize
-
    gridGroup.size = size
-   local randomX = math.random(0, width - gridGroup.totalShapeWidth)
 
+   local randomX = math.random(0, width - gridGroup.totalShapeWidth)
    local gridXPos = grid.xpos or randomX
    local gridYPos = grid.ypos or (height + 35)
    
-   randomIDIdx = 1
-   randomIDCounter = 1
+  -- randomIDIdx = 1
+  -- randomIDCounter = 1
    -- array with random id that represents an image of a block
    local randomIDNumbers = getBlocksImageIDArray(cols * rows)
-
+   local mColors = colors.populateDimensions(cols, rows)
+   
+   local colorIdx = 1
    for i=1, cols do
      for j=1, rows do
         local randIdx = math.random(1, #randomIDNumbers)
-        local path = "Images/Blocks/Block-"..randomIDNumbers[randIdx]..".png"
+        --local path = "Images/Blocks/Block-"..randomIDNumbers[randIdx]..".png"
       
-        local block = display.newImage(path, 0, 0)
+        local block = display.newRect(0, 0, 0, 0)
+        local color = mColors[colorIdx]
+        colorIdx = colorIdx + 1
+
+        block: setFillColor(color.r, color.g, color.b)
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
         block.width, block.height = grid.blockSize, grid.blockSize
-        block.colorId = randomIDNumbers[randIdx]
+        block.colorId = color.id
         table.remove(randomIDNumbers, randIdx)
 
         block.placeholder = display.newRect(block.x, block.y, block.width, block.height)
@@ -313,7 +316,7 @@ function createGridGroup(grid)
         block:addEventListener("touch", blockSwipe)
         slotContainer[#slotContainer + 1] = block
 
-        randomIDCounter = randomIDCounter + 1           
+        --randomIDCounter = randomIDCounter + 1           
      end
    end
    
