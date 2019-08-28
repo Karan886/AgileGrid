@@ -84,7 +84,7 @@ function removeGridFromGlobalTable(id)
        table.remove(globalTable, id)
        spawnLayer: remove(gridToRemove)
        display.remove(gridToRemove)
-       print "Grid is successfully removed"
+       print("Grid is successfully removed")
        for i=1,#globalTable do
          globalTable[i].id = i
        end
@@ -248,22 +248,6 @@ end
 end
 
 
--- Returns an array of random numbers between 1 - 15, each number represents a unique block
--- function getBlocksImageIDArray(numOfBlocks)
---     local imageIdArray, randomNumbersSet = {},{}
---     for i = 1, 15 do randomNumbersSet[i] = i end
---     for i = 1, (numOfBlocks/3) do
---       local randomID = math.random(1, #randomNumbersSet)
---       imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
---       imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
---       imageIdArray[#imageIdArray + 1] = randomNumbersSet[randomID]
---       print(imageIdArray[#imageIdArray])
---       table.remove(randomNumbersSet, randomID)
---     end
---     return imageIdArray
--- end
-
-
 function createGridGroup(grid)
    local gridGroup = display.newGroup()
    local slotContainer = {}
@@ -282,19 +266,11 @@ function createGridGroup(grid)
    local gridXPos = grid.xpos or randomX
    local gridYPos = grid.ypos or (height + 35)
    
-  -- randomIDIdx = 1
-  -- randomIDCounter = 1
-   -- array with random id that represents an image of a block
-   local randomIDNumbers = getBlocksImageIDArray(cols * rows)
    local mColors = colors.populateDimensions(cols, rows)
-   
    local colorIdx = 1
    for i=1, cols do
      for j=1, rows do
-        local randIdx = math.random(1, #randomIDNumbers)
-        --local path = "Images/Blocks/Block-"..randomIDNumbers[randIdx]..".png"
-      
-        local block = display.newRect(0, 0, 0, 0)
+        local block = display.newRoundedRect(0, 0, 0, 0, 2)
         local color = mColors[colorIdx]
         colorIdx = colorIdx + 1
 
@@ -303,7 +279,6 @@ function createGridGroup(grid)
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
         block.width, block.height = grid.blockSize, grid.blockSize
         block.colorId = color.id
-        table.remove(randomIDNumbers, randIdx)
 
         block.placeholder = display.newRect(block.x, block.y, block.width, block.height)
         block.placeholder.isVisible = false
@@ -314,9 +289,7 @@ function createGridGroup(grid)
         block.isFocus = false
         
         block:addEventListener("touch", blockSwipe)
-        slotContainer[#slotContainer + 1] = block
-
-        --randomIDCounter = randomIDCounter + 1           
+        slotContainer[#slotContainer + 1] = block         
      end
    end
    
@@ -553,7 +526,7 @@ function spawnGrid(x, y, rows, cols)
    for i = 1, #slotContainer do
        grid_group: insert(slotContainer[i])
    end
-
+   --reshuffleUponMatch(grid_group)
    local blocks = getMatchedBlocks(grid_group)
    removeMatchedBlocks(blocks, false)
 
@@ -568,6 +541,26 @@ function spawnGrid(x, y, rows, cols)
    end 
    return true
 end
+
+function reshuffleUponMatch(grid)
+  local matches = getMatchedBlocks(grid)
+  if (#matches > 0) then
+    print("precheck: matches found, commencing reshuffle of blocks")
+    shuffleGrid(grid)
+  else
+    print("precheck: no matches found")
+  end
+end
+
+-- function shuffleGrid(grid)
+--   local blocks = grid.slotContainer
+--   math.randomseed(os.time())
+
+--   for i = #blocks, 2, -1 do
+--     j = math.random(i)
+--     -- if (i ~= j) then swapBlocks(blocks[i], blocks[j]) end
+--   end 
+-- end
 
 function scroll(options, group)
   for i = 1, #options do
