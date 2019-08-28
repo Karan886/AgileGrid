@@ -274,7 +274,11 @@ function createGridGroup(grid)
         local color = mColors[colorIdx]
         colorIdx = colorIdx + 1
 
+        -- Style the block
         block: setFillColor(color.r, color.g, color.b)
+        block.strokeWidth = 1
+        block: setStrokeColor(0, 0, 0)
+
         block.x = gridXPos + i * (grid.blockSize + grid.offsetX) - grid.blockSize/2 - grid.offsetX
         block.y = gridYPos + j * (grid.blockSize + grid.offsetY) - grid.blockSize/2 - grid.offsetY
         block.width, block.height = grid.blockSize, grid.blockSize
@@ -384,12 +388,6 @@ function getAbsolutePosition(object)
  return {x = xpos, y = ypos}
 end
 
-function getGridlocation(gridGroup)
-    local blockSize = gridGroup.blockSize
-    local shapeWidth = gridGroup.shapeWidth
-    local shapeHeight = gridGroup.shapeHeight
-end
-
 function blockSwipe(event)
    if (gameState == "PAUSED" or gameState == "HALT") then
        return true
@@ -400,6 +398,7 @@ function blockSwipe(event)
    if (event.phase == "began") then
      event.target.isFocus = true
      display.getCurrentStage():setFocus(event.target)
+     
    elseif (event.target.isFocus) then
      if (event.phase == "ended" or event.phase == "cancelled") then
 
