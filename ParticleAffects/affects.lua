@@ -20,19 +20,19 @@ affects.smokeExplosion = {
 }
 
 affects.sprinkles = {
-    startColorAlpha = 0.8,
+    startColorAlpha = 1.0,
     startParticleSizeVariance = 0,
     blendFuncSource = 775,
-    particleLifespan = 0.5,
+    particleLifespan = 0.4,
     blendFuncDestination = 1,
     startParticleSize = 8,
     textureFileName = "Images/yellow_square.png",
-    endParticleSize = 10,
+    endParticleSize = 15,
     maxParticles = 2000,
     duration = 0.05,
     speed = 300,
     angleVariance = 180,
-    angle = 180,
+    angle = 270,
     finishColorRed = 0.93,
     finishColorGreen = 0.93,
     finishColorBlue = 0.0

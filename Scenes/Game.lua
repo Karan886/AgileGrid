@@ -460,7 +460,7 @@ function blockSwipe(event)
              local position = getAbsolutePosition(parentGroup.backdrop)
              smokeAffect.start(position.x, position.y, spawnLayer)
              removeOps.affect = false
-             
+
              removeMatchedBlocks(blocksToRemove, removeOps) 
              removeGridFromGlobalTable(parentGroup.id)
          else 
@@ -765,8 +765,8 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
-        bottomBar = display.newImage("Images/bottombar.png", 0, height + 8)
-        bottomBar.anchorX, bottomBar.anchorY = 0, 0
+        bottomBar = display.newImage("Images/bottombar.png", 0, actualHeight)
+        bottomBar.anchorX, bottomBar.anchorY = 0, 1
         ui[#ui + 1] = bottomBar
 
 
