@@ -70,7 +70,6 @@ local spawnLayer = display.newGroup()
 local physics = require "physics"
 physics.start()
 physics.setGravity(0, -0.1)
---physics.setDrawMode("hybrid")
 
 -- global timer variables
 local gridSpawnTimer
@@ -198,7 +197,8 @@ function removeMatchedBlocks(blocks, score)
   end
   if (score == true) then
       updateScore(#blocks / 3, {
-          startColor = {0.28, 0.52, 0.34}
+          startColor = {0.28, 0.52, 0.34},
+          endColor = {0, 0, 0}
       })
   end
   return true
@@ -517,7 +517,7 @@ function spawnGrid(x, y, rows, cols)
        5
    )
    backdrop: setFillColor(1, 1, 1, 0.5)
-   backdrop.strokeWidth = 2
+   backdrop.strokeWidth = 1
    backdrop: setStrokeColor(0, 0, 0, 0.5)
    grid_group: insert(backdrop)
    grid_group.backdrop = backdrop
@@ -621,6 +621,7 @@ function createPauseButton(x, y, sceneGroup)
                   end
             end
         })
+        pauseGameButton.anchorY = 0
         pauseGameButton.x, pauseGameButton.y = x, y
         ui[#ui + 1] = pauseGameButton
         sceneGroup: insert(pauseGameButton)
@@ -759,14 +760,13 @@ function scene:show( event )
 
         sceneGroup: insert(spawnLayer)
 
-        headerBar = display.newRoundedRect(0, -8, actualWidth + 7, 35, 10)
+        headerBar = display.newImage("Images/topbar.png", 0, 0)
         headerBar.anchorX, headerBar.anchorY = 0, 0
-        headerBar: setFillColor(0.85, 0.65, 0.13, 0.6)
         ui[#ui + 1] = headerBar
 
-        scoreText = display.newText("0", centerX, headerBar.y , "Fonts/BigBook-Heavy", 22)
-        scoreText.y = headerBar.y + scoreText.height/2
-        scoreText: setFillColor(0.5, 0.5, 0.5)
+        scoreText = display.newText("0", centerX, headerBar.y - 5 , "Fonts/BigBook-Heavy", 22)
+        scoreText.anchorY = 0
+        scoreText: setFillColor(0, 0, 0)
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
@@ -778,7 +778,7 @@ function scene:show( event )
         sceneGroup: insert(scoreText)
         sceneGroup: insert(gameStatsText)
 
-        createPauseButton(width - 28, scoreText.y + 2, sceneGroup)
+        createPauseButton(width - 15, scoreText.y + 10, sceneGroup)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
