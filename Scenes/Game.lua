@@ -541,26 +541,6 @@ function spawnGrid(x, y, rows, cols)
    return true
 end
 
-function reshuffleUponMatch(grid)
-  local matches = getMatchedBlocks(grid)
-  if (#matches > 0) then
-    print("precheck: matches found, commencing reshuffle of blocks")
-    shuffleGrid(grid)
-  else
-    print("precheck: no matches found")
-  end
-end
-
--- function shuffleGrid(grid)
---   local blocks = grid.slotContainer
---   math.randomseed(os.time())
-
---   for i = #blocks, 2, -1 do
---     j = math.random(i)
---     -- if (i ~= j) then swapBlocks(blocks[i], blocks[j]) end
---   end 
--- end
-
 function scroll(options, group)
   for i = 1, #options do
     local asset = display.newImage(options[i].path, options[i].xstart, options[i].ystart)
@@ -770,10 +750,15 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
+        bottomBar = display.newImage("Images/bottombar.png", 0, height + 8)
+        bottomBar.anchorX, bottomBar.anchorY = 0, 0
+        ui[#ui + 1] = bottomBar
+
 
         gameStatsText = createGameStatsText()
 
         sceneGroup: insert(headerBar)
+        sceneGroup: insert(bottomBar)
         sceneGroup: insert(gameOverLay)
         sceneGroup: insert(scoreText)
         sceneGroup: insert(gameStatsText)
