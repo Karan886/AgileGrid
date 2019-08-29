@@ -46,6 +46,7 @@ local playTexture = {
 
 
 local smokeAffect = particles.new(affects.smokeExplosion)
+local sprinkleAffect = particles.new(affects.sprinkles)
 local gameState = "PLAY"
 
 local gameData = {
@@ -183,11 +184,16 @@ function scene:gameOver(delay)
   })
 end
 
-function removeMatchedBlocks(blocks, score)
+function removeMatchedBlocks(blocks, ops)
   -- Assuming that all blocks belong to the same parent grid
   if (blocks == nil or #blocks == 0) then
     return false
   end
+
+  if (ops == nil) then
+    ops = {score = false, affect = false}
+  end
+
   local parentGrid = blocks[1].parent
   for i = 1, #blocks do
     blocks[i].isEnabled = false
@@ -195,11 +201,15 @@ function removeMatchedBlocks(blocks, score)
     transition.to(blocks[i], {xScale = 0.5, yScale = 0.5, time = 350, onComplete = function() blocks[i].isVisible = false end})
     parentGrid.numOfBlocks = parentGrid.numOfBlocks - 1
   end
-  if (score == true) then
+  if (ops.score == true) then
       updateScore(#blocks / 3, {
           startColor = {0.28, 0.52, 0.34},
           endColor = {0, 0, 0}
       })
+  end
+  if (ops.affect == true) then
+      local targetPos = getAbsolutePosition(blocks[2])
+      sprinkleAffect.start(targetPos.x, targetPos.y, spawnLayer)
   end
   return true
 end
@@ -444,13 +454,17 @@ function blockSwipe(event)
          display.getCurrentStage():setFocus(nil)
 
          local blocksToRemove = getMatchedBlocks(parentGroup)
-         removeMatchedBlocks(blocksToRemove, true)
+         local removeOps = {score = true, affect = true}
 
-         if (parentGroup.numOfBlocks == 0) then
+         if (parentGroup.numOfBlocks - #blocksToRemove <= 0) then
              local position = getAbsolutePosition(parentGroup.backdrop)
              smokeAffect.start(position.x, position.y, spawnLayer)
+             removeOps.affect = false
+             removeMatchedBlocks(blocksToRemove, removeOps) 
              removeGridFromGlobalTable(parentGroup.id)
-         end  
+         else 
+             removeMatchedBlocks(blocksToRemove, removeOps) 
+         end 
      end
    end
 
@@ -527,7 +541,7 @@ function spawnGrid(x, y, rows, cols)
    end
    --reshuffleUponMatch(grid_group)
    local blocks = getMatchedBlocks(grid_group)
-   removeMatchedBlocks(blocks, false)
+   removeMatchedBlocks(blocks)
 
    physics.addBody(grid_group, "dynamic", { shape = gridPhysicsShape, isSensor = true})
    gridsTable[#gridsTable + 1] = grid_group 
