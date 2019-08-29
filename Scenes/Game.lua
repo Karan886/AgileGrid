@@ -460,6 +460,7 @@ function blockSwipe(event)
              local position = getAbsolutePosition(parentGroup.backdrop)
              smokeAffect.start(position.x, position.y, spawnLayer)
              removeOps.affect = false
+             
              removeMatchedBlocks(blocksToRemove, removeOps) 
              removeGridFromGlobalTable(parentGroup.id)
          else 
