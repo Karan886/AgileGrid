@@ -170,17 +170,13 @@ function scene:gameOver(delay)
   if (gameState ~= "PAUSED") then
      stopGameActivity()
   end
-  changeScene({
+  delayOverlay({
     delay = delay or 0, 
     duration = 300,
     sceneName = "Scenes.GameOver",
     params = {
-      GameData = {
-        matches = gameData["matches"], 
-        doubleMatches = gameData["doubleMatches"], 
-        tripleMatches = gameData["tripleMatches"]
-        }
-     }
+      gameData = formatGameData()
+    }
   })
 end
 
@@ -603,16 +599,14 @@ function createPauseButton(x, y, sceneGroup)
             onPress = function()
                   if (gameState == "PLAY") then
                       stopGameActivity()
-                      composer.showOverlay(
-                        "Scenes.PauseMenuOverlay", 
-                        { 
-                          params = {
-                            gameData = formatGameData()
-                          }, 
-                          isModal = true, 
-                          effect = "fade"
+                      delayOverlay({
+                        delay = 0, 
+                        duration = 300,
+                        sceneName = "Scenes.PauseOverlay",
+                        params = {
+                          gameData = formatGameData()
                         }
-                      )
+                      })
                   end
             end
         })
@@ -637,7 +631,7 @@ function imageTransition(firstImage, secondImage, duration)
     firstFadeOutTransition()
 end
 -- delay refers to when to start changing scene, while duration defines the amount of time it takes for the scene to fade
-function changeScene(options)
+function delayOverlay(options)
     local ops = options or {}
     local duration = ops.duration or 1000
     local delay = ops.delay or 500
@@ -646,11 +640,16 @@ function changeScene(options)
     local effect = ops.effect or "fade"
 
     timer.performWithDelay(delay, function()
-        composer.gotoScene(sceneName, {
-        effect = effect,
-        time = duration,
-        params = parameters
-       })
+      composer.showOverlay(
+        sceneName, 
+        { 
+          params = {
+            gameData = formatGameData()
+          }, 
+          isModal = true, 
+          effect = "fade"
+        }
+    )
     end, 1)
 end
 

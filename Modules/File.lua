@@ -69,5 +69,4 @@ function file.loadJson(filename, location, property)
 	return returnVal
 end 
 
-
 return file

@@ -1,35 +1,54 @@
 local composer = require("composer")
 local scene = composer.newScene()
 
-local colors = require "Data.Colors"
- 
+local blur = require "Modules.Blur"
+
+--some dimensions
+local actualHeight = display.actualContentHeight
+local actualWidth = display.actualContentWidth
+local centerX = display.contentCenterX
+local centerY = display.contentCenterY
+
+-- ui layers
+local blurLayer = display.newGroup()
 
 function scene:create( event )
-    print("Switched to Game Over scene....")
+    print("switched to Game Over scene....")
+    local sceneGroup = self.view
     
-    -- local result = colors.populateDimensions(4, 3)
-    -- for i = 1, #result do
-    --     print(result[i].r..","..result[i].g..","..result[i].b)
-    -- end
-    
+    local blurOverlay = blur.getBlurredImage({
+        xmin = 0,
+        xmax = actualWidth,
+        ymin = -15,
+        ymax = actualHeight,
+    })
+    blurLayer: insert(blurOverlay)
+   
+    sceneGroup:insert(blurLayer)  
 end
  
 function scene:show( event )
- 
-   
+    local sceneGroup = self.view
+
+    if (event.phase == "will") then
+
+    elseif (event.phase == "did") then
+
+    end
 end
  
- 
--- hide()
 function scene:hide( event )
- 
+    local sceneGroup = self.view
+    
+    if (event.phase == "will") then
+
+    elseif (event.phase == "did") then
+
+    end
 end
  
 
 function scene:destroy( event )
- 
-    local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
  
 end
  
