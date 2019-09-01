@@ -33,18 +33,6 @@ local parallax_clouds_three
 local parallaxWrapPosition
 local gameStatsText
 
---initialized globals
-local pauseTexture = {
-    type = "image",
-    filename = "Images/pause_button.png"
-}
-
-local playTexture = {
-    type = "image",
-    filename = "Images/play_button.png"
-}
-
-
 local smokeAffect = particles.new(affects.smokeExplosion)
 local sprinkleAffect = particles.new(affects.sprinkles)
 local gameState = "PLAY"
@@ -593,7 +581,7 @@ function createPauseButton(x, y, sceneGroup)
     local ui = bin.UI
     timer.performWithDelay(1000, function()
         pauseGameButton = widget.newButton({
-            defaultFile = "Images/pause_button.png",
+            defaultFile = "Images/UI/pause_button.png",
             width = 15,
             height = 15,
             onPress = function()
@@ -705,13 +693,13 @@ function scene:create( event )
     print("Switched to game scene...")
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local firstGradientSky = display.newImage("Images/sky_gradient_one.png", centerX, centerY)
-    local secondGradientSky = display.newImage("Images/sky_gradient_two.png", centerX, centerY)
+    local firstGradientSky = display.newImage("Images/Background/sky_gradient_one.png", centerX, centerY)
+    local secondGradientSky = display.newImage("Images/Background/sky_gradient_two.png", centerX, centerY)
     imageTransition(firstGradientSky, secondGradientSky, 15000)
 
-    parallax_clouds_one = display.newImage("Images/parallax_clouds_one.png", centerX, centerY)
-    parallax_clouds_two = display.newImage("Images/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
-    parallax_clouds_three = display.newImage("Images/parallax_clouds_two.png", centerX, centerY - parallax_clouds_two.height)
+    parallax_clouds_one = display.newImage("Images/Background/parallax_clouds_one.png", centerX, centerY)
+    parallax_clouds_two = display.newImage("Images/Background/parallax_clouds_two.png", centerX, centerY - parallax_clouds_one.height)
+    parallax_clouds_three = display.newImage("Images/Background/parallax_clouds_two.png", centerX, centerY - parallax_clouds_two.height)
 
     parallaxWrapPosition = {x = parallax_clouds_two.x, y = parallax_clouds_two.y}
      
@@ -754,7 +742,7 @@ function scene:show( event )
 
         sceneGroup: insert(spawnLayer)
 
-        headerBar = display.newImage("Images/topbar.png", 0, 0)
+        headerBar = display.newImage("Images/UI/topbar.png", 0, 0)
         headerBar.anchorX, headerBar.anchorY = 0, 0
         ui[#ui + 1] = headerBar
 
@@ -764,7 +752,7 @@ function scene:show( event )
         scoreText = score.new("", scoreText, 0)
         ui[#ui + 1] = scoreText
 
-        bottomBar = display.newImage("Images/bottombar.png", 0, actualHeight)
+        bottomBar = display.newImage("Images/UI/bottombar.png", 0, actualHeight)
         bottomBar.anchorX, bottomBar.anchorY = 0, 1
         ui[#ui + 1] = bottomBar
 

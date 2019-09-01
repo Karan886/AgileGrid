@@ -15,7 +15,7 @@ function scene:create( event )
     print("Switched to menu scene...")
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local MainBackground = display.newImage("Images/sky_main.png", 0, 0)
+    local MainBackground = display.newImage("Images/Background/sky_main.png", 0, 0)
     MainBackground.anchorX, MainBackground.anchorY = 0, 0
 
 

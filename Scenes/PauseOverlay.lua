@@ -41,7 +41,7 @@ function scene:create(event)
     })
     blurLayer: insert(blurOverlay)
 
-    pauseContainer = display.newImage("Images/pauseContainer.png", centerX, centerY)
+    pauseContainer = display.newImage("Images/UI/pauseContainer.png", centerX, centerY)
     local menuTitleParams = {
         "Pause Menu", 
         centerX, 
@@ -90,7 +90,7 @@ function scene:show(event)
     local params = event.params
     local gameStats = params.gameData
 
-    local statsObjectY = centerY - pauseContainer.height / 4 + 15
+    local statsObjectY = centerY - pauseContainer.height / 4 + 25
     local statsObjectWidth = pauseContainer.width - 17
     local statsObjectHeight = pauseContainer.height / 2
 
