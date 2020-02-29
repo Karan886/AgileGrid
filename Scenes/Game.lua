@@ -72,12 +72,10 @@ function removeGridFromGlobalTable(id)
        table.remove(globalTable, id)
        spawnLayer: remove(gridToRemove)
        display.remove(gridToRemove)
-       print("Grid is successfully removed")
+
        for i=1,#globalTable do
          globalTable[i].id = i
        end
-   else
-       print("no grid to remove")
    end
 end
 
@@ -95,6 +93,7 @@ function createGameStatsText()
     local ui = bin.UI
     local group = display.newGroup()
     local count = 1
+
     for key, value in pairs(gameData) do
         local gameStat = display.newText(key..": "..value, pos.x, pos.y * count, actualWidth, 0,"Fonts/Carbon-Phyber", 10)
         gameStat.x = gameStat.width/2 + 5
@@ -213,9 +212,13 @@ function getMatchedBlocks(grid)
       local secondBlock = slotContainer[i + 1]
       local thirdBlock = slotContainer[i + 2]
 
-      if (isBlockOnBottomEdge(block) == false and isBlockOnBottomEdge(secondBlock) == false and block.isEnabled == true) then
+      if (isBlockOnBottomEdge(block) == false 
+          and isBlockOnBottomEdge(secondBlock) == false 
+          and block.isEnabled == true) then
+
           if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId) then
               disableBlocks({block, secondBlock, thirdBlock})
+
               matchedBlocks[#matchedBlocks + 1] = block
               matchedBlocks[#matchedBlocks + 1] = secondBlock
               matchedBlocks[#matchedBlocks + 1] = thirdBlock
@@ -229,15 +232,20 @@ function getMatchedBlocks(grid)
  while (block.id + (grid.size.rows * 2) <= #slotContainer) do
    local secondBlock = slotContainer[index + grid.size.rows]
    local thirdBlock = slotContainer[index + (grid.size.rows * 2)]
-   if (block.colorId == secondBlock.colorId and block.colorId == thirdBlock.colorId and block.isEnabled == true) then
+
+   if (block.colorId == secondBlock.colorId 
+      and block.colorId == thirdBlock.colorId 
+      and block.isEnabled == true) then
       disableBlocks({block, secondBlock, thirdBlock})
+
       matchedBlocks[#matchedBlocks + 1] = block
       matchedBlocks[#matchedBlocks + 1] = secondBlock
       matchedBlocks[#matchedBlocks + 1] = thirdBlock
    end
    index = index + 1
    block = slotContainer[index]
-end
+  end
+
   return matchedBlocks
 end
 
@@ -404,6 +412,7 @@ function blockSwipe(event)
              if (horizontalSwipeMagnitude < 0) then
                  local idA = event.target.id
                  local idB = idA - parentGroup.size.rows
+
                  if (isBlockOnLeftEdge(event.target) == false) then
                     local leftBlock = slotContainer[idB]
                     swapBlocks(event.target, leftBlock)
@@ -411,6 +420,7 @@ function blockSwipe(event)
              elseif (horizontalSwipeMagnitude > 0) then
                  local idA = event.target.id
                  local idB = idA + parentGroup.size.rows
+
                  if (isBlockOnRightEdge(event.target) == false) then
                     local rightBlock = slotContainer[idB]
                     swapBlocks(event.target, rightBlock)
@@ -420,6 +430,7 @@ function blockSwipe(event)
              if (verticalSwipeMagnitude < 0) then
                  local idA = event.target.id
                  local idB = idA - 1
+
                  if (isBlockOnUpperEdge(event.target) == false) then
                     local upperBlock = slotContainer[idB]
                     swapBlocks(event.target, upperBlock)               
@@ -427,6 +438,7 @@ function blockSwipe(event)
              elseif (verticalSwipeMagnitude > 0) then
                  local idA = event.target.id
                  local idB = idA + 1
+                 
                  if (isBlockOnBottomEdge(event.target) == false) then
                     local lowerBlock = slotContainer[idB]
                     swapBlocks(event.target, lowerBlock)

@@ -7,6 +7,8 @@ local width = display.actualContentWidth
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 
+local statBlock = require "Modules.StatBlock"
+
 function TransitionToGameScene()
     composer.gotoScene("Scenes.Game", { effect = "fade", time = 1000})
 end
@@ -25,6 +27,14 @@ function scene:create( event )
     GameTitle: setFillColor(0.14, 0.19, 0.17)
 
     hideStatusBar()
+
+    local b = statBlock.newStatBlock({
+        label = "Score",
+        value = 0,
+        x = centerX,
+        y = centerY,
+        font = "Fonts/BigBook-Heavy"
+    })
 
     --adding display elements to scene group
     SceneGroup: insert(MainBackground)
