@@ -10,17 +10,21 @@ local centerY = display.contentCenterY
 function TransitionToGameScene()
     composer.gotoScene("Scenes.Game", { effect = "fade", time = 1000})
 end
+
+function hideStatusBar()
+    display.setStatusBar(display.HiddenStatusBar);
+end
  
 function scene:create( event )
-    print("Switched to menu scene...")
     local SceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     local MainBackground = display.newImage("Images/Background/sky_main.png", 0, 0)
     MainBackground.anchorX, MainBackground.anchorY = 0, 0
 
-
     local GameTitle = display.newText("Agile Grid", centerX, centerY-150, "Fonts/BigBook-Heavy", 30)
     GameTitle: setFillColor(0.14, 0.19, 0.17)
+
+    hideStatusBar()
 
     --adding display elements to scene group
     SceneGroup: insert(MainBackground)
@@ -59,23 +63,13 @@ function scene:hide( event )
  
     end
 end
- 
 
-function scene:destroy( event )
- 
-    local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
- 
-end
- 
- 
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
 -- -----------------------------------------------------------------------------------
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
-scene:addEventListener( "destroy", scene )
 -- -----------------------------------------------------------------------------------
  
 return scene
